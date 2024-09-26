@@ -28,7 +28,7 @@ export class MovieService {
   }
 
   remove(id: number) {
-    return `This action removes a #${id} movie`;
+    return this.prisma.movie.delete({ where: { id } });
   }
 
   findDrafts() {
