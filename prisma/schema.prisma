@@ -24,4 +24,20 @@ model Movie {
   published   Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  
+ author User? @relation(fields: [authorId], references: [id])
+ authorId Int?
+}
+
+
+model User{
+  id Int @id @default(autoincrement())
+  createdAt DateTime  @default(now())
+  name      String?
+
+  email     String    @unique
+
+  password  String
+  updatedAt DateTime  @updatedAt
+  movies Movie[]
 }

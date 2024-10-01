@@ -6,54 +6,52 @@ import {
   Patch,
   Param,
   Delete,
-  Req,
-  HttpCode,
-  Header,
-  Redirect,
-  Query,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { Request } from 'express';
-
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { UserEntity } from './entities/user.entity';
 
 @Controller('users')
+@ApiTags('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
-  }
-
-  @Get('docs')
-  // @Redirect('https://docs.nestjs.com', 302)
-  getTest() {
-    return 'Hello World';
+  @ApiCreatedResponse({ type: UserEntity })
+  async create(@Body() createUserDto: CreateUserDto) {
+    return new UserEntity(await this.usersService.create(createUserDto));
   }
 
   @Get()
-  @HttpCode(204)
-  @Header('Cache-Control', 'none')
-  findAll(@Req() request: Request): string {
-    console.log('123');
-    return this.usersService.findAll();
+  @ApiOkResponse({ type: UserEntity, isArray: true })
+  async findAll() {
+    const users = await this.usersService.findAll();
+
+    return users.map((user) => new UserEntity(user));
   }
 
   @Get(':id')
-  findOne(@Param('id') params: any): string {
-    console.log(params.id);
-    return `This action returns a #${params.id} user`;
+  @ApiOkResponse({ type: UserEntity })
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    //  return this.usersService.findOne(id);
+    return new UserEntity(await this.usersService.findOne(id));
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  @ApiCreatedResponse({ type: UserEntity })
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    return new UserEntity(await this.usersService.update(id, updateUserDto));
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  @ApiOkResponse({ type: UserEntity })
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    return new UserEntity(await this.usersService.remove(id));
   }
 }

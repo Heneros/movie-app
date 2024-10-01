@@ -28,4 +28,7 @@ export class MovieEntity implements Movie {
 
   @ApiProperty()
   updatedAt: Date;
+
+  @ApiProperty({ required: false, nullable: true })
+  authorId: number | null;
 }
