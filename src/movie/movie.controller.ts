@@ -7,7 +7,6 @@ import {
   Param,
   Delete,
   ParseIntPipe,
-  NotFoundException,
 } from '@nestjs/common';
 import { MovieService } from './movie.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
@@ -22,20 +21,24 @@ export class MovieController {
 
   @Post()
   @ApiCreatedResponse({ type: MovieEntity })
-  create(@Body() createMovieDto: CreateMovieDto) {
-    return this.movieService.create(createMovieDto);
+  async create(@Body() createMovieDto: CreateMovieDto) {
+    return new MovieEntity(await this.movieService.create(createMovieDto));
   }
 
   @Get()
   @ApiOkResponse({ type: MovieEntity, isArray: true })
-  findAll() {
-    return this.movieService.findAll();
+  async findAll() {
+    const movies = await this.movieService.findAll();
+
+    return movies.map((article) => new MovieEntity(article));
   }
 
   @Get('drafts')
   @ApiOkResponse({ type: MovieEntity, isArray: true })
-  findDrafts() {
-    return this.movieService.findDrafts();
+  async findDrafts() {
+    const drafts = await this.movieService.findDrafts();
+
+    return drafts.map((draft) => new MovieEntity(draft));
   }
 
   @Get(':id')
@@ -43,27 +46,28 @@ export class MovieController {
   // findOne(@Param('id', ParseIntPipe) id: number) {
   //   return this.movieService.findOne(id);
   // }
-  async findOne(@Param('id') id: string) {
-    const movie = await this.movieService.findOne(+id);
-    if (!movie) {
-      throw new NotFoundException(`Movie with ${id} does not exist.`);
-    }
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    // const movie = await this.movieService.findOne(+id);
+    // if (!movie) {
+    //   throw new NotFoundException(`Movie with ${id} does not exist.`);
+    // }
 
-    return movie;
+    // return movie;
+    return new MovieEntity(await this.movieService.findOne(id));
   }
 
   @Patch(':id')
   @ApiOkResponse({ type: MovieEntity })
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateMovieDto: UpdateMovieDto,
   ) {
-    return this.movieService.update(id, updateMovieDto);
+    return new MovieEntity(await this.movieService.update(id, updateMovieDto));
   }
 
   @Delete(':id')
   @ApiOkResponse({ type: MovieEntity })
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.movieService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    return new MovieEntity(await this.movieService.remove(id));
   }
 }

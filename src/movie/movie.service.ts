@@ -17,7 +17,9 @@ export class MovieService {
   }
 
   findOne(id: number) {
-    return this.prisma.movie.findUnique({ where: { id } });
+    return this.prisma.movie.findUnique({ where: { id } , include:{
+      author: true
+    }});
   }
 
   update(id: number, updateMovieDto: UpdateMovieDto) {
