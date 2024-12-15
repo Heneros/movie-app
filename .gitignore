@@ -2,7 +2,7 @@
 /dist
 /node_modules
 /build
-
+1features.txt
 # Logs
 logs
 *.log

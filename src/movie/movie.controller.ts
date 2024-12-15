@@ -41,21 +41,17 @@ export class MovieController {
     return drafts.map((draft) => new MovieEntity(draft));
   }
 
+  // Patch /
   @Get(':id')
   @ApiOkResponse({ type: MovieEntity })
   // findOne(@Param('id', ParseIntPipe) id: number) {
   //   return this.movieService.findOne(id);
   // }
   async findOne(@Param('id', ParseIntPipe) id: number) {
-    // const movie = await this.movieService.findOne(+id);
-    // if (!movie) {
-    //   throw new NotFoundException(`Movie with ${id} does not exist.`);
-    // }
-
-    // return movie;
     return new MovieEntity(await this.movieService.findOne(id));
   }
 
+  // Patch /
   @Patch(':id')
   @ApiOkResponse({ type: MovieEntity })
   async update(
@@ -65,6 +61,7 @@ export class MovieController {
     return new MovieEntity(await this.movieService.update(id, updateMovieDto));
   }
 
+  // Delete /
   @Delete(':id')
   @ApiOkResponse({ type: MovieEntity })
   async remove(@Param('id', ParseIntPipe) id: number) {
