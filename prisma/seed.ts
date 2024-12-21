@@ -47,7 +47,7 @@ async function main() {
   });
 
   const movie2 = await prisma.movie.upsert({
-    where: { title: 'Anna ' },
+    where: { title: 'Anna' },
     update: {
       authorId: user2.id,
     },

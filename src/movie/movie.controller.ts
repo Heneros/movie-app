@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  NotFoundException,
 } from '@nestjs/common';
 import { MovieService } from './movie.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
@@ -41,14 +42,15 @@ export class MovieController {
     return drafts.map((draft) => new MovieEntity(draft));
   }
 
-  // Patch /
   @Get(':id')
   @ApiOkResponse({ type: MovieEntity })
-  // findOne(@Param('id', ParseIntPipe) id: number) {
-  //   return this.movieService.findOne(id);
-  // }
-  async findOne(@Param('id', ParseIntPipe) id: number) {
-    return new MovieEntity(await this.movieService.findOne(id));
+  async findOne(@Param('id') id: string) {
+    const article = await this.movieService.findOne(+id);
+
+    if (!article) {
+      throw new NotFoundException(`Article with ${id} does not exist.`);
+    }
+    return article;
   }
 
   // Patch /
