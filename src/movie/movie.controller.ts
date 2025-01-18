@@ -23,10 +23,9 @@ export class MovieController {
   constructor(private readonly movieService: MovieService) {}
 
   @Post()
-
   // @Roles(['admin'])
   @ApiCreatedResponse({ type: MovieEntity })
-  @SetMetadata('roles', ['admin'])
+  @Roles('Admin', 'Editor')
   async create(@Body() createMovieDto: CreateMovieDto) {
     return new MovieEntity(await this.movieService.create(createMovieDto));
   }
