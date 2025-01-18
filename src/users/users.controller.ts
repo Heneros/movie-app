@@ -22,12 +22,16 @@ import { UserEntity } from './entities/user.entity';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('users')
-@ApiTags('users')
+@ApiTags('Users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  @ApiCreatedResponse({ type: UserEntity })
+  @ApiCreatedResponse({
+    status: 201,
+    description: 'The record has been successfully created.',
+    type: UserEntity,
+  })
   async create(@Body() createUserDto: CreateUserDto) {
     return new UserEntity(await this.usersService.create(createUserDto));
   }
@@ -41,8 +45,7 @@ export class UsersController {
 
     return users.map((user) => new UserEntity(user));
   }
-  
-  
+
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()

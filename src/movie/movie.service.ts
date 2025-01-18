@@ -34,6 +34,8 @@ export class MovieService {
     });
   }
 
+  
+
   remove(id: number) {
     return this.prisma.movie.delete({ where: { id } });
   }

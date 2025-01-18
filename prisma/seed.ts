@@ -4,35 +4,38 @@ const prisma = new PrismaClient();
 const roundsOfHashing = 10;
 
 async function main() {
-  const passwordSabin = await bcrypt.hash('password-sabin', roundsOfHashing);
-  const passwordAlex = await bcrypt.hash('password-alex', roundsOfHashing);
+  const passwordAdmin = await bcrypt.hash('password-admin', roundsOfHashing);
+  const passwordUser = await bcrypt.hash('password-user', roundsOfHashing);
+
   const user1 = await prisma.user.upsert({
-    where: { email: 'sabin@adams.com' },
+    where: { email: 'admin@email.com' },
 
     update: {
-      password: passwordSabin,
+      password: passwordAdmin,
     },
     create: {
-      email: 'sabin@adams.com',
+      email: 'admin@email.com',
 
-      name: 'Sabin Adams',
+      name: 'Admin',
 
-      password: passwordSabin,
+      roles: ['Admin', 'Editor', 'User'],
+
+      password: passwordAdmin,
     },
   });
 
   const user2 = await prisma.user.upsert({
-    where: { email: 'alex@ruheni.com' },
+    where: { email: 'user@email.com' },
 
     update: {
-      password: passwordAlex,
+      password: passwordUser,
     },
     create: {
-      email: 'alex@ruheni.com',
+      email: 'user@email.com',
 
-      name: 'Alex Ruheni',
+      name: 'Default User',
 
-      password: passwordAlex,
+      password: passwordUser,
     },
   });
 

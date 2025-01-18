@@ -16,11 +16,14 @@ export class UserEntity implements User {
   @ApiProperty()
   updatedAt: Date;
 
-  @ApiProperty()
+  @ApiProperty({description: 'Name of user'})
   name: string;
 
   @ApiProperty()
   email: string;
+
+  @Exclude()
+  roles: string[];
 
   @Exclude()
   password: string;

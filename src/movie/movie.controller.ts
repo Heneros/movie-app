@@ -8,12 +8,14 @@ import {
   Delete,
   ParseIntPipe,
   NotFoundException,
+  SetMetadata,
 } from '@nestjs/common';
 import { MovieService } from './movie.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { MovieEntity } from './entities/movie.entity';
+import { Roles } from 'src/decorators/roles.decorator';
 
 @Controller('movie')
 @ApiTags('movie')
@@ -21,7 +23,10 @@ export class MovieController {
   constructor(private readonly movieService: MovieService) {}
 
   @Post()
+
+  // @Roles(['admin'])
   @ApiCreatedResponse({ type: MovieEntity })
+  @SetMetadata('roles', ['admin'])
   async create(@Body() createMovieDto: CreateMovieDto) {
     return new MovieEntity(await this.movieService.create(createMovieDto));
   }
