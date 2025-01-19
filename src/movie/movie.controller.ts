@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   NotFoundException,
   SetMetadata,
+  Query,
 } from '@nestjs/common';
 import { MovieService } from './movie.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
@@ -32,10 +33,12 @@ export class MovieController {
 
   @Get()
   @ApiOkResponse({ type: MovieEntity, isArray: true })
-  async findAll() {
-    const movies = await this.movieService.findAll();
+  async findAll(@Query('page') page = 1, @Query('limit') limit = 2) {
+    const skip = (page - 1) * limit;
 
-    return movies.map((article) => new MovieEntity(article));
+    const movies = await this.movieService.findAll(skip, limit);
+
+    return movies.map((movie) => new MovieEntity(movie));
   }
 
   @Get('drafts')
@@ -49,16 +52,16 @@ export class MovieController {
   @Get(':id')
   @ApiOkResponse({ type: MovieEntity })
   async findOne(@Param('id') id: string) {
-    const article = await this.movieService.findOne(+id);
+    const movie = await this.movieService.findOne(+id);
 
-    if (!article) {
-      throw new NotFoundException(`Article with ${id} does not exist.`);
+    if (!movie) {
+      throw new NotFoundException(`movie with ${id} does not exist.`);
     }
-    return article;
+    return movie;
   }
 
-  // Patch /
   @Patch(':id')
+  @Roles('Admin', 'Editor')
   @ApiOkResponse({ type: MovieEntity })
   async update(
     @Param('id', ParseIntPipe) id: number,
@@ -69,8 +72,14 @@ export class MovieController {
 
   // Delete /
   @Delete(':id')
+  @Roles('Admin', 'Editor')
   @ApiOkResponse({ type: MovieEntity })
   async remove(@Param('id', ParseIntPipe) id: number) {
+    const movie = await this.movieService.findOne(id);
+
+    if (!movie) {
+      throw new NotFoundException(`movie with ${id} does not exist.`);
+    }
     return new MovieEntity(await this.movieService.remove(id));
   }
 }

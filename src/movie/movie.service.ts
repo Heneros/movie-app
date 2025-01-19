@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { PrismaService } from '../prisma/prisma.service';
@@ -7,15 +7,26 @@ import { PrismaService } from '../prisma/prisma.service';
 export class MovieService {
   constructor(private prisma: PrismaService) {}
 
-  create(createMovieDto: CreateMovieDto) {
+  async create(createMovieDto: CreateMovieDto) {
+    const movieTitle = await this.prisma.movie.findUnique({
+      where: { title: createMovieDto.title },
+    });
+    if (movieTitle) {
+      // throw new Error('Already exist');
+      throw new BadRequestException('Movie already exists with this title', {
+        cause: new Error(),
+        description: 'Try another title',
+      });
+    }
+
     return this.prisma.movie.create({ data: createMovieDto });
   }
 
-  findAll() {
-    //return `This action returns all movie`;
-
-    return this.prisma.movie.findMany();
-    // return this.prisma.movie.findMany({ where: { published: true } });
+  findAll(skip: number, take: number) {
+    return this.prisma.movie.findMany({
+      skip,
+      take,
+    });
   }
 
   findOne(id: number) {
@@ -33,8 +44,6 @@ export class MovieService {
       data: updateMovieDto,
     });
   }
-
-  
 
   remove(id: number) {
     return this.prisma.movie.delete({ where: { id } });
