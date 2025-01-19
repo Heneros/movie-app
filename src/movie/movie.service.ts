@@ -8,9 +8,7 @@ import { PAGINATION_LIMIT } from 'src/data/defaultData';
 export class MovieService {
   private readonly paginationLimit: number;
 
-  constructor(private prisma: PrismaService) {
-    this.paginationLimit = Number(process.env.PAGINATION);
-  }
+  constructor(private prisma: PrismaService) {}
 
   async create(createMovieDto: CreateMovieDto) {
     const movieTitle = await this.prisma.movie.findUnique({
@@ -24,14 +22,15 @@ export class MovieService {
       });
     }
 
-    return this.prisma.movie.create({ data: createMovieDto });
+    return this.prisma.movie.create({
+      data: { ...createMovieDto, authorId: createMovieDto.authorId },
+    });
   }
 
-  async findAll(skip?: number, take?: number) {
-    console.log(process.env.PAGINATION!);
+  async findAll(skip: number = 0) {
     return this.prisma.movie.findMany({
-      skip: Math.max(0, skip),
-      take: this.paginationLimit,
+      skip,
+      take: PAGINATION_LIMIT,
       orderBy: {
         id: 'asc',
       },

@@ -7,6 +7,7 @@ import {
   IsOptional,
   IsString,
   MinLength,
+  IsNumber,
 } from 'class-validator';
 
 export class CreateMovieDto {
@@ -36,6 +37,11 @@ export class CreateMovieDto {
   @IsNotEmpty()
   @ApiProperty()
   category: string;
+
+  @IsNumber()
+  @IsOptional()
+  @ApiProperty({ required: false })
+  authorId: number;
 
   @IsBoolean()
   @IsOptional()

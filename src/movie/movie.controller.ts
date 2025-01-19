@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   NotFoundException,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { MovieService } from './movie.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
@@ -22,25 +23,15 @@ import {
 import { MovieEntity } from './entities/movie.entity';
 import { Roles } from 'src/decorators/roles.decorator';
 import { PAGINATION_LIMIT } from 'src/data/defaultData';
+import { User } from 'src/decorators/user.decorator';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('movie')
 @ApiTags('movie')
 export class MovieController {
   private readonly paginationLimit: number;
 
-  constructor(private readonly movieService: MovieService) {
-    this.paginationLimit = Number(process.env.PAGINATION);
-  }
-
-  @Post()
-  // @Roles(['admin'])
-  @ApiCreatedResponse({ type: MovieEntity })
-  @Roles('Admin', 'Editor')
-
-  // @ApiParam({name: 'id', description})
-  async create(@Body() createMovieDto: CreateMovieDto) {
-    return new MovieEntity(await this.movieService.create(createMovieDto));
-  }
+  constructor(private readonly movieService: MovieService) {}
 
   @Get()
   @ApiQuery({
@@ -51,8 +42,8 @@ export class MovieController {
   })
   @ApiOkResponse({ type: MovieEntity, isArray: true })
   async findAll(@Query('page') pageString?: string) {
-    const page = pageString ? Math.max(1, parseInt(pageString, 10)) : 1;
-    const skip = (page - 1) * this.paginationLimit;
+    const page = pageString ? parseInt(pageString, 10) : 1;
+    const skip = (page - 1) * PAGINATION_LIMIT;
 
     const movies = await this.movieService.findAll(skip);
     return movies.map((movie) => new MovieEntity(movie));
@@ -74,6 +65,21 @@ export class MovieController {
       throw new NotFoundException(`movie with ${id} does not exist.`);
     }
     return movie;
+  }
+
+  @Post()
+  // @Roles(['admin'])
+  @ApiCreatedResponse({ type: MovieEntity })
+  @Roles('Admin', 'Editor')
+  // @UseGuards(JwtAuthGuard)
+  // @ApiParam({name: 'id', description})
+  async create(@Body() createMovieDto: CreateMovieDto, @User() user: User) {
+    if (!user || !user.id) {
+      throw new Error('User not found or unauthorized');
+    }
+    createMovieDto.authorId = user.id;
+
+    return new MovieEntity(await this.movieService.create(createMovieDto));
   }
 
   @Patch(':id')
