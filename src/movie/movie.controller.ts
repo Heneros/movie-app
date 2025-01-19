@@ -8,39 +8,55 @@ import {
   Delete,
   ParseIntPipe,
   NotFoundException,
-  SetMetadata,
   Query,
 } from '@nestjs/common';
 import { MovieService } from './movie.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { MovieEntity } from './entities/movie.entity';
 import { Roles } from 'src/decorators/roles.decorator';
+import { PAGINATION_LIMIT } from 'src/data/defaultData';
 
 @Controller('movie')
 @ApiTags('movie')
 export class MovieController {
-  constructor(private readonly movieService: MovieService) {}
+  private readonly paginationLimit: number;
+
+  constructor(private readonly movieService: MovieService) {
+    this.paginationLimit = Number(process.env.PAGINATION);
+  }
 
   @Post()
   // @Roles(['admin'])
   @ApiCreatedResponse({ type: MovieEntity })
   @Roles('Admin', 'Editor')
+
+  // @ApiParam({name: 'id', description})
   async create(@Body() createMovieDto: CreateMovieDto) {
     return new MovieEntity(await this.movieService.create(createMovieDto));
   }
 
   @Get()
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    description: 'Page number for pagination',
+    type: Number,
+  })
   @ApiOkResponse({ type: MovieEntity, isArray: true })
-  async findAll(@Query('page') page = 1, @Query('limit') limit = 2) {
-    const skip = (page - 1) * limit;
+  async findAll(@Query('page') pageString?: string) {
+    const page = pageString ? Math.max(1, parseInt(pageString, 10)) : 1;
+    const skip = (page - 1) * this.paginationLimit;
 
-    const movies = await this.movieService.findAll(skip, limit);
-
+    const movies = await this.movieService.findAll(skip);
     return movies.map((movie) => new MovieEntity(movie));
   }
-
   @Get('drafts')
   @ApiOkResponse({ type: MovieEntity, isArray: true })
   async findDrafts() {

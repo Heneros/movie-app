@@ -4,7 +4,13 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { PrismaClientExceptionFilter } from './prisma-client-exception/prisma-client-exception.filter';
+import * as dotenv from 'dotenv';
 
+dotenv.config();
+
+ 
+
+ 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 

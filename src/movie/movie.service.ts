@@ -2,10 +2,15 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { PAGINATION_LIMIT } from 'src/data/defaultData';
 
 @Injectable()
 export class MovieService {
-  constructor(private prisma: PrismaService) {}
+  private readonly paginationLimit: number;
+
+  constructor(private prisma: PrismaService) {
+    this.paginationLimit = Number(process.env.PAGINATION);
+  }
 
   async create(createMovieDto: CreateMovieDto) {
     const movieTitle = await this.prisma.movie.findUnique({
@@ -22,10 +27,14 @@ export class MovieService {
     return this.prisma.movie.create({ data: createMovieDto });
   }
 
-  findAll(skip: number, take: number) {
+  async findAll(skip?: number, take?: number) {
+    console.log(process.env.PAGINATION!);
     return this.prisma.movie.findMany({
-      skip,
-      take,
+      skip: Math.max(0, skip),
+      take: this.paginationLimit,
+      orderBy: {
+        id: 'asc',
+      },
     });
   }
 

@@ -50,7 +50,6 @@ export class AuthGuard implements CanActivate {
         return false;
       }
     }
-    console.log('error');
     return true;
   }
 }
