@@ -5,7 +5,7 @@ import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
   controllers: [MovieController],
-  providers: [MovieService],
+  providers: [MovieService, PrismaModule],
   imports: [PrismaModule],
 })
 export class MovieModule {}

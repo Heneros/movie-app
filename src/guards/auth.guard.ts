@@ -1,7 +1,13 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as jwt from 'jsonwebtoken';
+import { IS_PUBLIC_KEY } from 'src/decorators/public.decorator';
 
 interface JwtPayload {
   name: string;
@@ -18,17 +24,35 @@ export class AuthGuard implements CanActivate {
     private readonly prismaService: PrismaService,
   ) {}
 
-  async canActivate(context: ExecutionContext) {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+    if (isPublic) {
+      //  console.log('isPublic');
+
+      return true;
+    }
+    const request = context.switchToHttp().getRequest();
+    const authHeader = request.headers?.authorization;
+
+    if (!authHeader) {
+      throw new UnauthorizedException('No authorization header');
+    }
+
+    const token = authHeader?.split('Bearer ')[1];
+    if (!token) {
+      throw new UnauthorizedException('No token provided');
+    }
+
     const roles = this.reflector.getAllAndOverride('roles', [
       context.getHandler(),
       context.getClass(),
     ]);
-    const request = context.switchToHttp().getRequest();
 
     if (roles?.length) {
-      const authHeader = request.headers?.authorization;
-
-      const token = authHeader?.split('Bearer ')[1];
+      // console.log('roles?.length');
 
       try {
         const payload = jwt.verify(token, process.env.JWT_KEY) as JwtPayload;

@@ -3,11 +3,10 @@ import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { PAGINATION_LIMIT } from 'src/data/defaultData';
+import { Movie } from '@prisma/client';
 
 @Injectable()
 export class MovieService {
-  private readonly paginationLimit: number;
-
   constructor(private prisma: PrismaService) {}
 
   async create(createMovieDto: CreateMovieDto) {
@@ -15,7 +14,6 @@ export class MovieService {
       where: { title: createMovieDto.title },
     });
     if (movieTitle) {
-      // throw new Error('Already exist');
       throw new BadRequestException('Movie already exists with this title', {
         cause: new Error(),
         description: 'Try another title',
@@ -37,13 +35,20 @@ export class MovieService {
     });
   }
 
-  findOne(id: number) {
-    return this.prisma.movie.findUnique({
-      where: { id },
-      include: {
-        author: true,
-      },
-    });
+  async findOne(id: number): Promise<Movie | null> {
+    try {
+      return await this.prisma.movie.findUnique({
+        where: {
+          id: id,
+        },
+        include: {
+          author: true,
+        },
+      });
+    } catch (error) {
+      console.error('Error finding movie:', error);
+      return null;
+    }
   }
 
   update(id: number, updateMovieDto: UpdateMovieDto) {
@@ -59,5 +64,24 @@ export class MovieService {
 
   findDrafts() {
     return this.prisma.movie.findMany({ where: { published: false } });
+  }
+
+  async searchByTitle(title: string): Promise<Movie[]> {
+    try {
+      return await this.prisma.movie.findMany({
+        where: {
+          title: {
+            contains: title,
+            mode: 'insensitive',
+          },
+        },
+        include: {
+          author: true,
+        },
+      });
+    } catch (error) {
+      console.error('Error searching movies:', error);
+      return [];
+    }
   }
 }

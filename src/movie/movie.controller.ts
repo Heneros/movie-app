@@ -9,14 +9,15 @@ import {
   ParseIntPipe,
   NotFoundException,
   Query,
-  UseGuards,
 } from '@nestjs/common';
 import { MovieService } from './movie.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import {
+  ApiBody,
   ApiCreatedResponse,
   ApiOkResponse,
+  ApiProperty,
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
@@ -24,15 +25,16 @@ import { MovieEntity } from './entities/movie.entity';
 import { Roles } from 'src/decorators/roles.decorator';
 import { PAGINATION_LIMIT } from 'src/data/defaultData';
 import { User } from 'src/decorators/user.decorator';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { Movie } from '@prisma/client';
+import { Public } from 'src/decorators/public.decorator';
+import { SearchMovieDto } from './dto/search-movie.dto';
 
 @Controller('movie')
 @ApiTags('movie')
 export class MovieController {
-  private readonly paginationLimit: number;
-
   constructor(private readonly movieService: MovieService) {}
 
+  @Public()
   @Get()
   @ApiQuery({
     name: 'page',
@@ -56,22 +58,22 @@ export class MovieController {
     return drafts.map((draft) => new MovieEntity(draft));
   }
 
+  @Public()
   @Get(':id')
   @ApiOkResponse({ type: MovieEntity })
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param('id', ParseIntPipe) id: number) {
     const movie = await this.movieService.findOne(+id);
-
     if (!movie) {
       throw new NotFoundException(`movie with ${id} does not exist.`);
     }
-    return movie;
+    return new MovieEntity(movie);
   }
 
   @Post()
   // @Roles(['admin'])
   @ApiCreatedResponse({ type: MovieEntity })
   @Roles('Admin', 'Editor')
-  // @UseGuards(JwtAuthGuard)
+
   // @ApiParam({name: 'id', description})
   async create(@Body() createMovieDto: CreateMovieDto, @User() user: User) {
     if (!user || !user.id) {
@@ -92,7 +94,6 @@ export class MovieController {
     return new MovieEntity(await this.movieService.update(id, updateMovieDto));
   }
 
-  // Delete /
   @Delete(':id')
   @Roles('Admin', 'Editor')
   @ApiOkResponse({ type: MovieEntity })
@@ -103,5 +104,28 @@ export class MovieController {
       throw new NotFoundException(`movie with ${id} does not exist.`);
     }
     return new MovieEntity(await this.movieService.remove(id));
+  }
+
+  @Public()
+  @Get('search')
+  @ApiProperty({ description: 'Search movie by title' })
+  @ApiQuery({
+    name: 'title',
+    required: true,
+    description: 'Search movie by title',
+    type: String,
+  })
+  @ApiOkResponse({
+    description: 'Returns found movies',
+    type: [MovieEntity],
+  })
+  async search(@Query('title') title: string): Promise<MovieEntity[]> {
+    console.log('Search query:', title);
+    if (!title || title.trim() === '') {
+      return [];
+    }
+    console.log('Search query:', title);
+    const movies = await this.movieService.searchByTitle(title);
+    return movies.map((movie) => new MovieEntity(movie));
   }
 }
