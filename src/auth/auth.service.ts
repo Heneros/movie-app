@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -17,6 +18,39 @@ export class AuthService {
     private mailService: MailService,
   ) {}
 
+  async create(createUserDto: CreateUserDto) {
+    const hashedPassword = await bcrypt.hash(
+      createUserDto.password,
+      roundsOfHashing,
+    );
+
+    const token = Math.floor(1000 + Math.random() * 9000).toString();
+    createUserDto.password = hashedPassword;
+
+    const userEmail = await this.prisma.user.findUnique({
+      where: { email: createUserDto.email },
+    });
+    if (userEmail) {
+      throw new BadRequestException('User already exists with this email', {
+        cause: new Error(),
+        description: 'Try another email',
+      });
+    }
+    const createdUser = await this.prisma.user.create({
+      data: createUserDto,
+    });
+
+    await this.mailService.sendUserConfirmation(
+      {
+        ...createdUser,
+        email: createUserDto.email,
+      },
+      token,
+    );
+
+    return createdUser;
+  }
+
   async login(
     email: string,
     password: string,
@@ -34,8 +68,6 @@ export class AuthService {
     }
     const payload = { id: user.id, name: user.name, roles: user.roles };
 
-    // console.log(payload);
-    // return this.generateJWT(user.id, user.name, user.roles);
     return {
       access_token: await this.jwtService.signAsync(payload),
     };

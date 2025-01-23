@@ -29,16 +29,6 @@ import { Public } from 'src/decorators/public.decorator';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Public()
-  @Post()
-  @ApiCreatedResponse({
-    status: 201,
-    description: 'The user has been successfully created.',
-    type: UserEntity,
-  })
-  async create(@Body() createUserDto: CreateUserDto) {
-    return new UserEntity(await this.usersService.create(createUserDto));
-  }
 
   @Get()
   @UseGuards(AuthGuard)

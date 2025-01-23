@@ -34,7 +34,7 @@ async function main() {
       email: 'user@email.com',
 
       name: 'Default User',
-
+      // isEmailVerified: false,
       password: passwordUser,
     },
   });
@@ -58,7 +58,7 @@ async function main() {
   const movie2 = await prisma.movie.upsert({
     where: { title: 'Anna' },
     update: {
-      authorId: user2.id,
+      authorId: user1.id,
     },
     create: {
       title: 'Anna',
@@ -67,7 +67,7 @@ async function main() {
       preview: 'URL_to_preview_image_or_video',
       description: 'Wonderful movie',
       published: false,
-      authorId: user2.id,
+      authorId: user1.id,
     },
   });
 
@@ -82,6 +82,7 @@ async function main() {
       description:
         'In the 1980s, an experiment by a weird scientist turns out to be faulty. ',
       published: true,
+      authorId: user1.id,
     },
   });
 
