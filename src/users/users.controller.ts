@@ -41,11 +41,12 @@ export class UsersController {
   }
 
   @Get()
-  @Roles('Admin', 'Editor')
   @UseGuards(AuthGuard)
+  @Roles('Admin', 'Editor')
   @ApiBearerAuth()
   @ApiOkResponse({ type: UserEntity, isArray: true })
   async findAll() {
+    // console.log('123');
     const users = await this.usersService.findAll();
     return users.map((user) => new UserEntity(user));
   }
@@ -56,7 +57,7 @@ export class UsersController {
   @ApiOkResponse({ type: UserEntity })
   async findOne(@Param('id', ParseIntPipe) id: number) {
     //  return this.usersService.findOne(id);
-    console.log(123);
+    // console.log(123);
     return new UserEntity(await this.usersService.findOne(+id));
   }
 

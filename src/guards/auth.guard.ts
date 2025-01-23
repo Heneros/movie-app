@@ -30,8 +30,6 @@ export class AuthGuard implements CanActivate {
       context.getClass(),
     ]);
     if (isPublic) {
-      //  console.log('isPublic');
-
       return true;
     }
     const request = context.switchToHttp().getRequest();
@@ -53,9 +51,8 @@ export class AuthGuard implements CanActivate {
 
     if (roles?.length) {
       // console.log('roles?.length');
-
       try {
-        const payload = jwt.verify(token, process.env.JWT_KEY) as JwtPayload;
+        const payload = jwt.verify(token, process.env.JWT_SECRET) as JwtPayload;
         // console.log('payload', payload);
         const user = await this.prismaService.user.findUnique({
           where: {

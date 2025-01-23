@@ -4,6 +4,7 @@ import { UpdateMovieDto } from './dto/update-movie.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { PAGINATION_LIMIT } from 'src/data/defaultData';
 import { Movie } from '@prisma/client';
+import { SearchMovieDto } from './dto/search-movie.dto';
 
 @Injectable()
 export class MovieService {
@@ -66,12 +67,12 @@ export class MovieService {
     return this.prisma.movie.findMany({ where: { published: false } });
   }
 
-  async searchByTitle(title: string): Promise<Movie[]> {
+  async searchByTitle(searchMovieDto: SearchMovieDto): Promise<Movie[]> {
     try {
       return await this.prisma.movie.findMany({
         where: {
           title: {
-            contains: title,
+            contains: searchMovieDto.title,
             mode: 'insensitive',
           },
         },

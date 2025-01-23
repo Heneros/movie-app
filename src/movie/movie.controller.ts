@@ -9,6 +9,8 @@ import {
   ParseIntPipe,
   NotFoundException,
   Query,
+  ValidationPipe,
+  UseInterceptors,
 } from '@nestjs/common';
 import { MovieService } from './movie.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
@@ -25,12 +27,13 @@ import { MovieEntity } from './entities/movie.entity';
 import { Roles } from 'src/decorators/roles.decorator';
 import { PAGINATION_LIMIT } from 'src/data/defaultData';
 import { User } from 'src/decorators/user.decorator';
-import { Movie } from '@prisma/client';
 import { Public } from 'src/decorators/public.decorator';
 import { SearchMovieDto } from './dto/search-movie.dto';
+import { TimeoutInterceptor } from 'src/interceptor/timeout.interceptor';
 
 @Controller('movie')
 @ApiTags('movie')
+@UseInterceptors(TimeoutInterceptor)
 export class MovieController {
   constructor(private readonly movieService: MovieService) {}
 
@@ -50,6 +53,35 @@ export class MovieController {
     const movies = await this.movieService.findAll(skip);
     return movies.map((movie) => new MovieEntity(movie));
   }
+
+  // @Public()
+  @Get('search')
+  @ApiProperty({ description: 'Search movie by title' })
+  @ApiQuery({
+    name: 'title',
+    required: true,
+    description: 'Search movie by title',
+    type: String,
+  })
+  @ApiOkResponse({
+    description: 'Returns found movies',
+    type: [MovieEntity],
+  })
+  async search(
+    @Query(new ValidationPipe())
+    searchMovieDto: SearchMovieDto,
+  ): Promise<MovieEntity[]> {
+    const movies = await this.movieService.searchByTitle(searchMovieDto);
+
+    if (!movies || movies.length === 0) {
+      throw new NotFoundException(
+        `Movies with title '${searchMovieDto.title}' do not exist.`,
+      );
+    }
+
+    return movies.map((movie) => new MovieEntity(movie));
+  }
+
   @Get('drafts')
   @ApiOkResponse({ type: MovieEntity, isArray: true })
   async findDrafts() {
@@ -104,28 +136,5 @@ export class MovieController {
       throw new NotFoundException(`movie with ${id} does not exist.`);
     }
     return new MovieEntity(await this.movieService.remove(id));
-  }
-
-  @Public()
-  @Get('search')
-  @ApiProperty({ description: 'Search movie by title' })
-  @ApiQuery({
-    name: 'title',
-    required: true,
-    description: 'Search movie by title',
-    type: String,
-  })
-  @ApiOkResponse({
-    description: 'Returns found movies',
-    type: [MovieEntity],
-  })
-  async search(@Query('title') title: string): Promise<MovieEntity[]> {
-    console.log('Search query:', title);
-    if (!title || title.trim() === '') {
-      return [];
-    }
-    console.log('Search query:', title);
-    const movies = await this.movieService.searchByTitle(title);
-    return movies.map((movie) => new MovieEntity(movie));
   }
 }

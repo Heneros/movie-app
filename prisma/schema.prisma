@@ -34,11 +34,8 @@ model User{
   id Int @id @default(autoincrement())
   createdAt DateTime  @default(now())
   name      String?
-
   email     String    @unique
-
   roles String[] @default(["User"])
-
 
   password  String
   updatedAt DateTime  @updatedAt

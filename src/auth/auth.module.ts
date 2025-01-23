@@ -6,8 +6,8 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { UsersModule } from 'src/users/users.module';
 import { JwtStrategy } from './jwt.strategy';
-
-export const jwtSecret = 'zjP9h6ZI5LoSKCRj';
+import { jwtConstants } from 'src/data/defaultData';
+import { MailService } from 'src/mail/mail.service';
 
 @Module({
   imports: [
@@ -15,13 +15,13 @@ export const jwtSecret = 'zjP9h6ZI5LoSKCRj';
     PassportModule,
     JwtModule.register({
       global: true,
-      secret: process.env.JWT_KEY!,
-      signOptions: { expiresIn: '1d' },
+      secret: jwtConstants.secret,
+      signOptions: { expiresIn: '30d' },
     }),
     UsersModule,
   ],
   controllers: [AuthController],
   exports: [AuthModule],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, MailService],
 })
 export class AuthModule {}

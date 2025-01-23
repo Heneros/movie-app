@@ -1,12 +1,14 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, UseInterceptors } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { AuthEntity } from './entity/auth.entity';
 import { LogInDto } from './dto/login.dto';
 import { Public } from 'src/decorators/public.decorator';
+import { TimeoutInterceptor } from 'src/interceptor/timeout.interceptor';
 
 @Controller('auth')
 @ApiTags('auth')
+@UseInterceptors(TimeoutInterceptor)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
