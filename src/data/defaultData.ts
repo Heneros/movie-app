@@ -5,3 +5,4 @@ export const jwtConstants = {
 };
 
 export const roundsOfHashing = 10;
+export const domain = process.env.DOMAIN_DEV;

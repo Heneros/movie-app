@@ -34,11 +34,8 @@ export class AuthService {
       roundsOfHashing,
     );
 
-    const token = randomBytes(32).toString('hex');
-
     const tokenVerification = randomBytes(20).toString('hex');
 
-    // const token = Math.floor(1000 + Math.random() * 9000).toString();
     createUserDto.password = hashedPassword;
 
     const userEmail = await this.prisma.user.findUnique({
@@ -62,7 +59,7 @@ export class AuthService {
       data: userData,
     });
 
-    await this.prisma.verifyResetToken.create({
+    const emailVerificationToken = await this.prisma.verifyResetToken.create({
       data: {
         userId: createdUser.id,
         token: tokenVerification,
@@ -71,12 +68,15 @@ export class AuthService {
 
     // console.log('emailVerficationToken', emailVerficationToken);
 
-    await this.mailService.sendUserConfirmation(
+    await this.mailService.sendEmail(
+      true,
       {
         ...createdUser,
         email: createUserDto.email,
       },
-      token,
+      'Welcome to Movie App! Confirm your Email ',
+      './confirmation',
+      emailVerificationToken,
     );
 
     return createdUser;
@@ -108,10 +108,54 @@ export class AuthService {
     };
   }
 
+  async verifyEmail(userId, emailToken) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (user.isEmailVerified) {
+      throw new BadRequestException('Email already verified');
+    }
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        isEmailVerified: true,
+        //token: emailToken,
+      },
+    });
+
+    const emailVerificationToken =
+      await this.prisma.verifyResetToken.findUnique({
+        where: {
+          userId: user.id,
+          token: emailToken,
+        },
+      });
+
+    if (!emailVerificationToken) {
+      throw new BadRequestException('Expired token');
+    }
+
+    const payload = {
+      emailVerificationToken: emailVerificationToken,
+    };
+
+    await this.mailService.sendEmail(
+      false,
+      user,
+      'Your email is verified!',
+      './welcome',
+      emailVerificationToken,
+    );
+    // return user;
+    // console.log('userToken', emailToken);
+    // console.log('prismauserId', prismauserId);
+  }
+
   async resendEmailValidation(email: string) {}
 
   async resetPassword(email: string) {}
-
   ///token sent to email
   async requestResetPassword(newPassword: string, confirmPassword) {}
 

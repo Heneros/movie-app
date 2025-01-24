@@ -34,7 +34,7 @@ model VerifyResetToken{
  
   userId Int @unique
   token String @unique
- createdAt DateTime @default(now())
+  createdAt DateTime @default(now())
 }
 
 
