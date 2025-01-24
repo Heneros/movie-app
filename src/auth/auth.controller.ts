@@ -6,6 +6,7 @@ import { LogInDto } from './dto/login.dto';
 import { Public } from 'src/decorators/public.decorator';
 import { TimeoutInterceptor } from 'src/interceptor/timeout.interceptor';
 import { UserEntity } from 'src/users/entities/user.entity';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -14,14 +15,15 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Public()
-  @Post()
+  @Post('register')
   @ApiCreatedResponse({
     status: 201,
     description: 'The user has been successfully created.',
     type: UserEntity,
   })
   async create(@Body() createUserDto: CreateUserDto) {
-    return new UserEntity(await this.usersService.create(createUserDto));
+    // console.log('create', createUserDto);
+    return new UserEntity(await this.authService.create(createUserDto));
   }
 
   @Public()

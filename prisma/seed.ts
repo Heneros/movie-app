@@ -32,9 +32,7 @@ async function main() {
     },
     create: {
       email: 'user@email.com',
-
       name: 'Default User',
-      // isEmailVerified: false,
       password: passwordUser,
     },
   });

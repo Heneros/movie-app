@@ -9,6 +9,9 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import { MailService } from 'src/mail/mail.service';
+import { CreateUserDto } from './dto/create-user.dto';
+import { roundsOfHashing } from 'src/data/defaultData';
+import { randomBytes } from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -19,26 +22,54 @@ export class AuthService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
+    if (createUserDto.password !== createUserDto.passwordConfirm) {
+      throw new BadRequestException('Confirm password.', {
+        cause: new Error(),
+        description: 'Check the passwords you provided.',
+      });
+    }
+
     const hashedPassword = await bcrypt.hash(
       createUserDto.password,
       roundsOfHashing,
     );
 
-    const token = Math.floor(1000 + Math.random() * 9000).toString();
+    const token = randomBytes(32).toString('hex');
+
+    const tokenVerification = randomBytes(20).toString('hex');
+
+    // const token = Math.floor(1000 + Math.random() * 9000).toString();
     createUserDto.password = hashedPassword;
 
     const userEmail = await this.prisma.user.findUnique({
       where: { email: createUserDto.email },
     });
+
     if (userEmail) {
       throw new BadRequestException('User already exists with this email', {
         cause: new Error(),
         description: 'Try another email',
       });
     }
+
+    const userData = {
+      name: createUserDto.name,
+      email: createUserDto.email,
+      password: hashedPassword,
+    };
+
     const createdUser = await this.prisma.user.create({
-      data: createUserDto,
+      data: userData,
     });
+
+    await this.prisma.verifyResetToken.create({
+      data: {
+        userId: createdUser.id,
+        token: tokenVerification,
+      },
+    });
+
+    // console.log('emailVerficationToken', emailVerficationToken);
 
     await this.mailService.sendUserConfirmation(
       {
@@ -66,6 +97,10 @@ export class AuthService {
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid password');
     }
+    if (!user.isEmailVerified) {
+      throw new BadRequestException('Not verified email');
+    }
+
     const payload = { id: user.id, name: user.name, roles: user.roles };
 
     return {
@@ -73,7 +108,11 @@ export class AuthService {
     };
   }
 
+  async resendEmailValidation(email: string) {}
+
   async resetPassword(email: string) {}
+
+  ///token sent to email
   async requestResetPassword(newPassword: string, confirmPassword) {}
 
   private generateJWT(id: number, name: string, roles: string[]) {
