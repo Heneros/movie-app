@@ -137,10 +137,6 @@ export class AuthService {
       throw new BadRequestException('Expired token');
     }
 
-    const payload = {
-      emailVerificationToken: emailVerificationToken,
-    };
-
     await this.mailService.sendEmail(
       false,
       user,
