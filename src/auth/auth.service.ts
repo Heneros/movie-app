@@ -10,8 +10,11 @@ import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import { MailService } from 'src/mail/mail.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { roundsOfHashing } from 'src/data/defaultData';
+import { domain, roundsOfHashing } from 'src/data/defaultData';
 import { randomBytes } from 'crypto';
+import { ResendEmailDto } from './dto/resend-email.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { Response } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -149,11 +152,150 @@ export class AuthService {
     // console.log('prismauserId', prismauserId);
   }
 
-  async resendEmailValidation(email: string) {}
+  async resendEmailValidation(resendEmailDto: ResendEmailDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { email: resendEmailDto.email },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    if (user.isEmailVerified) {
+      throw new BadRequestException('User already verified');
+    }
 
-  async resetPassword(email: string) {}
+    const verificationToken = await this.prisma.verifyResetToken.findUnique({
+      where: {
+        userId: user.id,
+      },
+    });
+
+    if (verificationToken) {
+      await this.prisma.verifyResetToken.delete({
+        where: {
+          userId: user.id,
+        },
+      });
+    }
+    const resentToken = randomBytes(32).toString('hex');
+
+    const emailToken = await this.prisma.verifyResetToken.create({
+      data: {
+        userId: user.id,
+        token: resentToken,
+      },
+    });
+
+    const emailLink = `${domain}/auth/verify/${emailToken.token}/${user.id}`;
+
+    const payload = {
+      name: user.name,
+      link: emailLink,
+    };
+
+    await this.mailService.resendEmail(
+      user,
+      'Welcome to Movie App! Confirm your Email ',
+      './confirmation',
+      payload,
+    );
+
+    // console.log(user);
+  }
+
+  async requestResetPassword(resendEmailDto: ResendEmailDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { email: resendEmailDto.email },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const verificationToken = await this.prisma.verifyResetToken.findUnique({
+      where: {
+        userId: user.id,
+      },
+    });
+
+    if (verificationToken) {
+      await this.prisma.verifyResetToken.delete({
+        where: {
+          userId: user.id,
+        },
+      });
+    }
+    const resentToken = randomBytes(32).toString('hex');
+
+    const emailToken = await this.prisma.verifyResetToken.create({
+      data: {
+        userId: user.id,
+        token: resentToken,
+        createdAt: new Date().toISOString(),
+      },
+    });
+
+    if (!user && user.isEmailVerified) {
+      throw new BadRequestException('User already verified');
+    }
+
+    const emailLink = `${domain}/auth/reset_password?emailToken=${emailToken.token}&userId=${user.id}`;
+
+    const payload = {
+      name: user.name,
+      link: emailLink,
+    };
+
+    await this.mailService.resendEmail(
+      user,
+      'Password Reset Request',
+      './requestResetPassword',
+      payload,
+    );
+  }
+
+  async resetPassword(resetPasswordDto: ResetPasswordDto) {
+    if (resetPasswordDto.password !== resetPasswordDto.passwordConfirm) {
+      throw new BadRequestException('Password do not match');
+    }
+
+    const verificationToken = await this.prisma.verifyResetToken.findUnique({
+      where: {
+        userId: resetPasswordDto.userId,
+      },
+    });
+    if (!verificationToken) {
+      throw new BadRequestException(
+        'Your token is either invalid or expired. Try resetting your password again',
+      );
+    }
+
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: verificationToken.userId,
+      },
+    });
+
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+    if (user && verificationToken) {
+      const user = await this.prisma.user.update({
+        where: {
+          id: verificationToken.userId,
+        },
+        data: {
+          password: resetPasswordDto.password,
+        },
+      });
+      console.log(user);
+      // await this.mailService.resendEmail(
+      //   user,
+      //   'Welcome to Movie App! Confirm your Email ',
+      //   './confirmation',
+      //   payload,
+      // );
+    }
+  }
   ///token sent to email
-  async requestResetPassword(newPassword: string, confirmPassword) {}
 
   private generateJWT(id: number, name: string, roles: string[]) {
     return jwt.sign({ id: id, name: name, roles: roles }, process.env.JWT_KEY, {

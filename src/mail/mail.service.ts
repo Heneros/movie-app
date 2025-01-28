@@ -8,6 +8,11 @@ interface EmailVerificationToken {
   url?: string;
 }
 
+interface ResendEmail {
+  name: string;
+  link: string;
+}
+
 @Injectable()
 export class MailService {
   constructor(private mailerService: MailerService) {}
@@ -23,7 +28,7 @@ export class MailService {
       ? `${domain}/auth/verify/${emailVerificationToken.token}/${user.id}`
       : `${domain}/auth/login`;
 
-    console.log(link);
+    // console.log(link);
     await this.mailerService.sendMail({
       to: user.email,
       subject: subject,
@@ -32,6 +37,20 @@ export class MailService {
         name: user.name,
         link,
       },
+    });
+  }
+
+  async resendEmail(
+    user: User,
+    subject: string,
+    template: string,
+    payload: ResendEmail,
+  ) {
+    await this.mailerService.sendMail({
+      to: user.email,
+      subject: subject,
+      template: template,
+      context: payload,
     });
   }
 }

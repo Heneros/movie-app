@@ -7,6 +7,7 @@ import {
   Res,
   UseInterceptors,
 } from '@nestjs/common';
+import express, { Response, Request } from 'express';
 
 import { AuthService } from './auth.service';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
@@ -17,6 +18,8 @@ import { TimeoutInterceptor } from 'src/interceptor/timeout.interceptor';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
+import { ResendEmailDto } from './dto/resend-email.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -54,11 +57,42 @@ export class AuthController {
     @Res() res: Response,
   ) {
     this.authService.verifyEmail(userId, emailToken);
-    // res.redirect('/auth/login');
     setTimeout(() => {
-      console.log('redirect');
-      // res.redirect('/auth/login');
+      res.redirect('/auth/login');
     }, 1500);
+  }
+
+  @Post('/resend_email_token')
+  @ApiCreatedResponse({
+    status: 200,
+    description: 'Email was successfully sent to user.',
+    type: UserEntity,
+  })
+  @ApiOkResponse({ type: AuthEntity })
+  resendEmailValidation(@Body() email: ResendEmailDto) {
+    return this.authService.resendEmailValidation(email);
+  }
+
+  @Post('/reset_password_request')
+  @ApiCreatedResponse({
+    status: 200,
+    description: 'On email was sent request to reset password',
+    type: UserEntity,
+  })
+  @ApiOkResponse({ type: AuthEntity })
+  requestResetPassword(@Body() email: ResendEmailDto) {
+    return this.authService.requestResetPassword(email);
+  }
+
+  @Post('/reset_password')
+  @ApiCreatedResponse({
+    status: 200,
+    description: 'Password was successfully reset!',
+    type: UserEntity,
+  })
+  @ApiOkResponse({ type: AuthEntity })
+  resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    return this.authService.resetPassword(resetPasswordDto);
   }
 
   // logout(@Body() {}) {
