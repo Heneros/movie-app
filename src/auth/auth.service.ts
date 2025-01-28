@@ -15,6 +15,8 @@ import { randomBytes } from 'crypto';
 import { ResendEmailDto } from './dto/resend-email.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { Response } from 'express';
+import { VerifyEmailDto } from './dto/verify-email.dto';
+import { LogInDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -82,20 +84,19 @@ export class AuthService {
       emailVerificationToken,
     );
 
-    return createdUser;
+    return { email: createUserDto.email, emailVerificationToken };
   }
 
-  async login(
-    email: string,
-    password: string,
-  ): Promise<{ access_token: string }> {
-    const user = await this.prisma.user.findUnique({ where: { email } });
+  async login(logInDto: LogInDto): Promise<{ access_token: string }> {
+    const user = await this.prisma.user.findUnique({
+      where: { email: logInDto.email },
+    });
 
     if (!user) {
-      throw new NotFoundException(`No user found for email: ${email}`);
+      throw new NotFoundException(`No user found for email: ${logInDto.email}`);
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await bcrypt.compare(logInDto.email, user.password);
 
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid password');
@@ -111,17 +112,21 @@ export class AuthService {
     };
   }
 
-  async verifyEmail(userId, emailToken) {
+  async verifyEmail(verifyEmailDto: VerifyEmailDto) {
     const user = await this.prisma.user.findUnique({
-      where: { id: userId },
+      where: { id: verifyEmailDto.userId },
     });
 
-    if (user.isEmailVerified) {
+    if (!user) {
+      throw new NotFoundException('User not found ');
+    }
+
+    if (user?.isEmailVerified) {
       throw new BadRequestException('Email already verified');
     }
 
     await this.prisma.user.update({
-      where: { id: userId },
+      where: { id: user.id },
       data: {
         isEmailVerified: true,
         //token: emailToken,
@@ -132,7 +137,7 @@ export class AuthService {
       await this.prisma.verifyResetToken.findUnique({
         where: {
           userId: user.id,
-          token: emailToken,
+          token: verifyEmailDto.emailToken,
         },
       });
 
@@ -198,6 +203,10 @@ export class AuthService {
       './confirmation',
       payload,
     );
+    return {
+      statusCode: 200,
+      message: 'Email was successfully sent',
+    };
 
     // console.log(user);
   }
@@ -278,21 +287,37 @@ export class AuthService {
       throw new BadRequestException('User not found');
     }
     if (user && verificationToken) {
+      const newPass = await bcrypt.hash(
+        resetPasswordDto.password,
+        roundsOfHashing,
+      );
+
       const user = await this.prisma.user.update({
         where: {
           id: verificationToken.userId,
         },
         data: {
-          password: resetPasswordDto.password,
+          password: newPass,
         },
       });
-      console.log(user);
-      // await this.mailService.resendEmail(
-      //   user,
-      //   'Welcome to Movie App! Confirm your Email ',
-      //   './confirmation',
-      //   payload,
-      // );
+
+      // console.log(user);
+      const payload = {
+        name: user.name,
+        link: null,
+      };
+
+      await this.mailService.resendEmail(
+        user,
+        'Your password was reset successfully!',
+        './resetPassword',
+        payload,
+      );
+
+      return {
+        statusCode: 200,
+        message: 'Your password was reset successfully!',
+      };
     }
   }
   ///token sent to email

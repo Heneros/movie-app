@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString, MinLength } from 'class-validator';
 
 export class ResetPasswordDto {
   @IsNotEmpty({ message: 'A password is required' })
@@ -11,6 +11,6 @@ export class ResetPasswordDto {
   passwordConfirm: string;
 
   @IsNotEmpty()
-  @IsString()
+  @IsNumber()
   userId: number;
 }

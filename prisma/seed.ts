@@ -21,10 +21,11 @@ async function main() {
       roles: ['Admin', 'Editor', 'User'],
 
       password: passwordAdmin,
+      isEmailVerified: true,
     },
   });
 
-  const user2 = await prisma.user.upsert({
+  await prisma.user.upsert({
     where: { email: 'user@email.com' },
 
     update: {

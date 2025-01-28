@@ -32,7 +32,7 @@ import { SearchMovieDto } from './dto/search-movie.dto';
 import { TimeoutInterceptor } from 'src/interceptor/timeout.interceptor';
 
 @Controller('movie')
-@ApiTags('movie')
+@ApiTags('Movie')
 @UseInterceptors(TimeoutInterceptor)
 export class MovieController {
   constructor(private readonly movieService: MovieService) {}

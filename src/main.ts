@@ -29,11 +29,35 @@ async function bootstrap() {
     .setTitle('Movie')
     .setDescription('The Movie REST API description')
     .setVersion('0.1')
-    .addBearerAuth()
+    .addTag(
+      'Auth',
+      'Registration for became a user. Login, Reset password, verify email',
+    )
+    .addTag(
+      'Users',
+      'Only available for authorized user or admin role. Actions: remove user, deactivate user, delete my account, change profile data, get all users',
+    )
+    .addTag(
+      'Movie',
+      'Only available for authorized user, editor and admin role. Actions for movie. Rate and review movie, CRUD operations with movie',
+    )
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        in: 'header',
+      },
+      'access-token',
+    )
     .build();
   const document = SwaggerModule.createDocument(app, config);
 
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+  });
 
   const { httpAdapter } = app.get(HttpAdapterHost);
 

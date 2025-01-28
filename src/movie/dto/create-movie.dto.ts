@@ -8,6 +8,7 @@ import {
   IsString,
   MinLength,
   IsNumber,
+  MaxLength,
 } from 'class-validator';
 
 export class CreateMovieDto {
@@ -25,6 +26,8 @@ export class CreateMovieDto {
 
   @IsInt()
   @IsNotEmpty()
+  @MaxLength(1)
+  @MaxLength(10)
   @ApiProperty()
   rating: number;
 

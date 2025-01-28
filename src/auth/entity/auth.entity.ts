@@ -9,4 +9,10 @@ export class AuthEntity {
 
   @ApiProperty()
   email: string;
+ 
+  
+
+  constructor(partial: Partial<AuthEntity>) {
+    Object.assign(this, partial);
+  }
 }

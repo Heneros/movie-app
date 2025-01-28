@@ -53,4 +53,18 @@ export class MailService {
       context: payload,
     });
   }
+
+  // async resendEmail(
+  //   user: User,
+  //   subject: string,
+  //   template: string,
+  //   payload: ResendEmail,
+  // ) {
+  //   await this.mailerService.sendMail({
+  //     to: user.email,
+  //     subject: subject,
+  //     template: template,
+  //     context: payload,
+  //   });
+  // }
 }

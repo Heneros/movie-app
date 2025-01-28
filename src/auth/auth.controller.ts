@@ -1,7 +1,10 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
+  HttpStatus,
+  NotFoundException,
   Param,
   Post,
   Res,
@@ -10,7 +13,15 @@ import {
 import express, { Response, Request } from 'express';
 
 import { AuthService } from './auth.service';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiCreatedResponse,
+  ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
 import { AuthEntity } from './entity/auth.entity';
 import { LogInDto } from './dto/login.dto';
 import { Public } from 'src/decorators/public.decorator';
@@ -20,46 +31,64 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 import { ResendEmailDto } from './dto/resend-email.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { AuthRegister } from './entity/register.entity';
 
 @Controller('auth')
-@ApiTags('auth')
+@ApiTags('Auth')
 @UseInterceptors(TimeoutInterceptor)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Public()
   @Post('register')
+  @ApiOperation({ summary: 'Create user' })
   @ApiCreatedResponse({
     status: 201,
-    description: 'The user has been successfully created.',
-    type: UserEntity,
+    description:
+      'The user has been successfully created. Check out your email to verify account',
+    // type: UserEntity,
+    type: AuthEntity,
   })
   async create(@Body() createUserDto: CreateUserDto) {
-    // console.log('create', createUserDto);
-    return new UserEntity(await this.authService.create(createUserDto));
-  }
-
-  @Public()
-  @Post('login')
-  @ApiOkResponse({ type: AuthEntity })
-  login(@Body() { email, password }: LogInDto) {
-    return this.authService.login(email, password);
+    return new AuthRegister(await this.authService.create(createUserDto));
   }
 
   @Get('verify/:emailToken/:userId')
+  @ApiOperation({ summary: 'Verify email. Enter id user and token' })
   @ApiCreatedResponse({
     status: 200,
     description: 'The user has been successfully verified email.',
     type: UserEntity,
   })
-  verifyEmail(
-    @Param() { userId, emailToken }: VerifyEmailDto,
+  @ApiNotFoundResponse({
+    status: 404,
+    description: 'Invalid or expired token.',
+  })
+  async verifyEmail(
+    @Param() verifyEmailDto: VerifyEmailDto,
     @Res() res: Response,
   ) {
-    this.authService.verifyEmail(userId, emailToken);
-    setTimeout(() => {
-      res.redirect('/auth/login');
-    }, 1500);
+    try {
+      await this.authService.verifyEmail(verifyEmailDto);
+      return res.status(200).send({ message: 'Email successfully verified!' });
+    } catch (error) {
+      if (error instanceof NotFoundException || BadRequestException) {
+        return res.status(404).send({ message: error.message });
+      }
+      return res.status(500).send({ message: 'An unexpected error occurred' });
+    }
+  }
+
+  @Public()
+  @Post('login')
+  @ApiOperation({ summary: 'Log in. Only for verified accounts' })
+  @ApiCreatedResponse({
+    status: 200,
+    description: 'User successfully authorize',
+    type: AuthEntity,
+  })
+  login(@Body() logInDto: LogInDto) {
+    return this.authService.login(logInDto);
   }
 
   @Post('/resend_email_token')

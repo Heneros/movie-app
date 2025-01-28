@@ -53,4 +53,7 @@
 - HttpModule NestJS for request to API 
 - Weekly newsletter with movie recommendations.
 - Nginx configure for load balancer app
-- Authorization through code. You should receive in mail box code and enter to proceed authorization/  
+- Authorization through code. You should receive in mail box code and enter to proceed authorization
+- AES encryption 
+- User can rate movie and change overall rating of the film display
+- Implement cors
