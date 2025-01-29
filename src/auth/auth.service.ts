@@ -87,7 +87,7 @@ export class AuthService {
     return { email: createUserDto.email, emailVerificationToken };
   }
 
-  async login(logInDto: LogInDto): Promise<{ access_token: string }> {
+  async login(logInDto: LogInDto) {
     const user = await this.prisma.user.findUnique({
       where: { email: logInDto.email },
     });
@@ -96,7 +96,10 @@ export class AuthService {
       throw new NotFoundException(`No user found for email: ${logInDto.email}`);
     }
 
-    const isPasswordValid = await bcrypt.compare(logInDto.email, user.password);
+    const isPasswordValid = await bcrypt.compare(
+      logInDto.password,
+      user.password,
+    );
 
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid password');

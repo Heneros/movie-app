@@ -50,7 +50,7 @@ export class AuthController {
     type: AuthEntity,
   })
   async create(@Body() createUserDto: CreateUserDto) {
-    return new AuthRegister(await this.authService.create(createUserDto));
+    return await this.authService.create(createUserDto);
   }
 
   @Get('verify/:emailToken/:userId')
@@ -79,13 +79,13 @@ export class AuthController {
     }
   }
 
-  @Public()
+  // @Public()
   @Post('login')
   @ApiOperation({ summary: 'Log in. Only for verified accounts' })
   @ApiCreatedResponse({
     status: 200,
     description: 'User successfully authorize',
-    type: AuthEntity,
+    type: AuthRegister,
   })
   login(@Body() logInDto: LogInDto) {
     return this.authService.login(logInDto);

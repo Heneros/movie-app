@@ -11,6 +11,7 @@ export class AuthEntity {
   email: string;
  
   
+  
 
   constructor(partial: Partial<AuthEntity>) {
     Object.assign(this, partial);
