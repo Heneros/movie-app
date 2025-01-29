@@ -6,6 +6,7 @@ import {
   HttpStatus,
   NotFoundException,
   Param,
+  Patch,
   Post,
   Res,
   UseInterceptors,
@@ -14,6 +15,7 @@ import express, { Response, Request } from 'express';
 
 import { AuthService } from './auth.service';
 import {
+  ApiBody,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
@@ -32,6 +34,7 @@ import { VerifyEmailDto } from './dto/verify-email.dto';
 import { ResendEmailDto } from './dto/resend-email.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { AuthRegister } from './entity/register.entity';
+import { EmailValidationPipe } from './pipe/EmailValidation.pipe';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -87,11 +90,12 @@ export class AuthController {
     description: 'User successfully authorize',
     type: AuthRegister,
   })
-  login(@Body() logInDto: LogInDto) {
+  login(@Body(EmailValidationPipe) logInDto: LogInDto) {
     return this.authService.login(logInDto);
   }
 
   @Post('/resend_email_token')
+  @ApiOperation({ summary: 'Action to resend email and receive token' })
   @ApiCreatedResponse({
     status: 200,
     description: 'Email was successfully sent to user.',
@@ -103,24 +107,36 @@ export class AuthController {
   }
 
   @Post('/reset_password_request')
+  @ApiOperation({
+    summary: 'Request for users who wants receive in email to change password',
+  })
   @ApiCreatedResponse({
     status: 200,
     description: 'On email was sent request to reset password',
     type: UserEntity,
   })
   @ApiOkResponse({ type: AuthEntity })
-  requestResetPassword(@Body() email: ResendEmailDto) {
+  requestResetPassword(@Body(EmailValidationPipe) email: ResendEmailDto) {
     return this.authService.requestResetPassword(email);
   }
 
   @Post('/reset_password')
+  @ApiOperation({
+    summary: 'For users, who receive link in email. And know user id.',
+  })
   @ApiCreatedResponse({
     status: 200,
     description: 'Password was successfully reset!',
-    type: UserEntity,
+    type: AuthEntity,
   })
   @ApiOkResponse({ type: AuthEntity })
-  resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+  @ApiBody({
+    type: ResetPasswordDto,
+    description: 'Actions specify new password and user id',
+  })
+  async resetPassword(
+    @Body(EmailValidationPipe) resetPasswordDto: ResetPasswordDto,
+  ) {
     return this.authService.resetPassword(resetPasswordDto);
   }
 

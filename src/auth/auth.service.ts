@@ -92,10 +92,6 @@ export class AuthService {
       where: { email: logInDto.email },
     });
 
-    if (!user) {
-      throw new NotFoundException(`No user found for email: ${logInDto.email}`);
-    }
-
     const isPasswordValid = await bcrypt.compare(
       logInDto.password,
       user.password,
@@ -103,9 +99,6 @@ export class AuthService {
 
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid password');
-    }
-    if (!user.isEmailVerified) {
-      throw new BadRequestException('Not verified email');
     }
 
     const payload = { id: user.id, name: user.name, roles: user.roles };
@@ -167,6 +160,7 @@ export class AuthService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
+
     if (user.isEmailVerified) {
       throw new BadRequestException('User already verified');
     }
@@ -218,9 +212,6 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({
       where: { email: resendEmailDto.email },
     });
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
 
     const verificationToken = await this.prisma.verifyResetToken.findUnique({
       where: {
@@ -245,7 +236,7 @@ export class AuthService {
       },
     });
 
-    if (!user && user.isEmailVerified) {
+    if (user.isEmailVerified) {
       throw new BadRequestException('User already verified');
     }
 
@@ -286,9 +277,6 @@ export class AuthService {
       },
     });
 
-    if (!user) {
-      throw new BadRequestException('User not found');
-    }
     if (user && verificationToken) {
       const newPass = await bcrypt.hash(
         resetPasswordDto.password,
