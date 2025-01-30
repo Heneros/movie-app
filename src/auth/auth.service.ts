@@ -10,7 +10,7 @@ import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import { MailService } from 'src/mail/mail.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { domain, roundsOfHashing } from 'src/data/defaultData';
+import { domain, isDevelopment, roundsOfHashing } from 'src/data/defaultData';
 import { randomBytes } from 'crypto';
 import { ResendEmailDto } from './dto/resend-email.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
@@ -87,7 +87,7 @@ export class AuthService {
     return { email: createUserDto.email, emailVerificationToken };
   }
 
-  async login(logInDto: LogInDto) {
+  async login(logInDto: LogInDto, res) {
     const user = await this.prisma.user.findUnique({
       where: { email: logInDto.email },
     });
@@ -103,9 +103,23 @@ export class AuthService {
 
     const payload = { id: user.id, name: user.name, roles: user.roles };
 
-    return {
-      access_token: await this.jwtService.signAsync(payload),
-    };
+    const accessToken = await this.jwtService.signAsync(payload);
+    //
+    // console.log(NODE_ENV);
+    res.cookie('jwtMovie', accessToken, {
+      httpOnly: isDevelopment ? false : true,
+      strict: isDevelopment ? 'none' : 'strict',
+      maxAge: 31 * 24 * 60 * 60 * 1000,
+      secure: isDevelopment ? false : true,
+    });
+
+    res.json({
+      message: 'Login successful',
+      accessToken,
+    });
+    // return {
+    //   access_token: await this.jwtService.signAsync(payload),
+    // };
   }
 
   async verifyEmail(verifyEmailDto: VerifyEmailDto) {

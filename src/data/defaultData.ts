@@ -6,3 +6,5 @@ export const jwtConstants = {
 
 export const roundsOfHashing = 10;
 export const domain = process.env.DOMAIN_DEV;
+
+export const isDevelopment = process.env.NODE_ENV === 'development';

@@ -7,6 +7,4 @@ export class ResendEmailDto {
   @IsNotEmpty()
   @ApiProperty()
   email: string;
-
-
 }

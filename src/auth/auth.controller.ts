@@ -90,8 +90,8 @@ export class AuthController {
     description: 'User successfully authorize',
     type: AuthRegister,
   })
-  login(@Body(EmailValidationPipe) logInDto: LogInDto) {
-    return this.authService.login(logInDto);
+  login(@Body(EmailValidationPipe) logInDto: LogInDto, @Res() res: Response) {
+    return this.authService.login(logInDto, res);
   }
 
   @Post('/resend_email_token')
