@@ -3,7 +3,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { MailService } from 'src/mail/mail.service';
-import { roundsOfHashing } from 'src/data/defaultData';
+import { PAGINATION_LIMIT, roundsOfHashing } from 'src/data/defaultData';
 
 @Injectable()
 export class UsersService {
@@ -12,8 +12,8 @@ export class UsersService {
     private mailService: MailService,
   ) {}
 
-  findAll() {
-    return this.prisma.user.findMany();
+  findAll(skip: number) {
+    return this.prisma.user.findMany({ skip, take: PAGINATION_LIMIT });
   }
 
   findOne(id: number) {

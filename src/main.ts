@@ -4,12 +4,30 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import 'reflect-metadata';
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { PrismaClientExceptionFilter } from './prisma-client-exception/prisma-client-exception.filter';
-// import * as dotenv from 'dotenv';
-// dotenv.config();
+import * as session from 'express-session';
 import * as cookieParser from 'cookie-parser';
+import * as passport from 'passport';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.use(
+    session({
+      secret: process.env.SECRET_SESSION,
+      resave: false,
+      saveUninitialized: false,
+      cookie: {
+        httpOnly: process.env.NODE_ENV === 'production',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 31 * 1000 * 60 * 60 * 24,
+      },
+    }),
+  );
+
+  app.use(cookieParser());
+
+  app.use(passport.initialize());
+  app.use(passport.session());
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -22,8 +40,6 @@ async function bootstrap() {
       },
     }),
   );
-
-  app.use(cookieParser());
 
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
@@ -48,16 +64,27 @@ async function bootstrap() {
         type: 'http',
         scheme: 'bearer',
         bearerFormat: 'JWT',
-        in: 'header',
+        in: 'cookie',
       },
       'access-token',
     )
+    .addSecurity('cookie-auth', {
+      type: 'apiKey',
+      in: 'header',
+      name: 'Cookie',
+    })
     .build();
   const document = SwaggerModule.createDocument(app, config);
 
   SwaggerModule.setup('api', app, document, {
     swaggerOptions: {
       persistAuthorization: true,
+      security: [
+        {
+          'access-token': [],
+          'cookie-auth': [],
+        },
+      ],
     },
   });
 

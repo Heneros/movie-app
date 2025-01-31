@@ -8,6 +8,7 @@ import {
   Param,
   Patch,
   Post,
+  Req,
   Res,
   UseInterceptors,
 } from '@nestjs/common';
@@ -90,8 +91,12 @@ export class AuthController {
     description: 'User successfully authorize',
     type: AuthRegister,
   })
-  login(@Body(EmailValidationPipe) logInDto: LogInDto, @Res() res: Response) {
-    return this.authService.login(logInDto, res);
+  login(
+    @Body(EmailValidationPipe) logInDto: LogInDto,
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
+    return this.authService.login(logInDto, req, res);
   }
 
   @Post('/resend_email_token')
@@ -140,7 +145,11 @@ export class AuthController {
     return this.authService.resetPassword(resetPasswordDto);
   }
 
-  // logout(@Body() {}) {
-  //   return this.authService.logout();
-  // }
+  @Post('logout')
+  @ApiOperation({
+    summary: 'Log out for application ',
+  })
+  logout(@Req() req: Request, @Res() res: Response) {
+    return this.authService.logout(req, res);
+  }
 }

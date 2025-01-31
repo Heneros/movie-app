@@ -32,8 +32,13 @@ export class AuthGuard implements CanActivate {
     if (isPublic) {
       return true;
     }
+
     const request = context.switchToHttp().getRequest();
     const authHeader = request.headers?.authorization;
+
+    // console.log('Cookies:', request.cookies);
+    // const cookie = request.cookies;
+    // console.log(cookie);
 
     if (!authHeader) {
       throw new UnauthorizedException('No authorization header');

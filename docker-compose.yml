@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+ 
  postgres:
    image: postgres:13.5
    restart: always
@@ -14,7 +15,6 @@ services:
    ports:
     - '5432:5432'
 
-
  pgadmin:
    container_name: pgadmi_nest
    image: dpage/pgadmin4:latest
@@ -27,6 +27,17 @@ services:
    depends_on:  
     - postgres
    restart: always
+   
+ maildev:
+  image: maildev/maildev:2.2.1
+  restart: always
+  ports:
+    - "1080:1080"
+    - "1025:1025"
+  environment:
+      - MAILDEV_WEB_PORT=1080
+      - MAILDEV_SMTP_PORT=1025
+  
 
 
 volumes:

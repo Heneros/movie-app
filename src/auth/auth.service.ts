@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  HttpStatus,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -14,7 +15,7 @@ import { domain, isDevelopment, roundsOfHashing } from 'src/data/defaultData';
 import { randomBytes } from 'crypto';
 import { ResendEmailDto } from './dto/resend-email.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 import { LogInDto } from './dto/login.dto';
 
@@ -87,7 +88,7 @@ export class AuthService {
     return { email: createUserDto.email, emailVerificationToken };
   }
 
-  async login(logInDto: LogInDto, res) {
+  async login(logInDto: LogInDto, req, res) {
     const user = await this.prisma.user.findUnique({
       where: { email: logInDto.email },
     });
@@ -106,6 +107,13 @@ export class AuthService {
     const accessToken = await this.jwtService.signAsync(payload);
     //
     // console.log(NODE_ENV);
+    if (!req.session) {
+      throw new UnauthorizedException('Session is not initialized');
+    }
+    // req.session.user = user;
+
+    req.session.user = payload;
+    // await new Promise((resolve) => req.session.save(resolve));
     res.cookie('jwtMovie', accessToken, {
       httpOnly: isDevelopment ? false : true,
       strict: isDevelopment ? 'none' : 'strict',
@@ -113,7 +121,8 @@ export class AuthService {
       secure: isDevelopment ? false : true,
     });
 
-    res.json({
+    console.log(user);
+    res.status(200).json({
       message: 'Login successful',
       accessToken,
     });
@@ -325,7 +334,20 @@ export class AuthService {
       };
     }
   }
-  ///token sent to email
+
+  async logout(req: Request, res: Response) {
+    res.clearCookie('jwtMovie', {});
+    req.session.destroy((err) => {
+      if (err) {
+        console.log(err);
+        res.send('Error destroying session');
+      } else {
+        res.clearCookie('connect.sid');
+        res.status(200).json({ message: 'Logged out successfully' });
+      }
+    });
+    //
+  }
 
   private generateJWT(id: number, name: string, roles: string[]) {
     return jwt.sign({ id: id, name: name, roles: roles }, process.env.JWT_KEY, {

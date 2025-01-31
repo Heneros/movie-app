@@ -8,8 +8,6 @@ import { MovieModule } from './movie/movie.module';
 import { AuthModule } from './auth/auth.module';
 import { APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { MailModule } from './mail/mail.module';
-import { ServiceModule } from './service/service.module';
-import { EmailValidationPipe } from './auth/pipe/EmailValidation.pipe';
 
 @Module({
   imports: [
@@ -28,7 +26,6 @@ import { EmailValidationPipe } from './auth/pipe/EmailValidation.pipe';
         limit: 100,
       },
     ]),
-    ServiceModule,
   ],
 
   controllers: [AppController],
