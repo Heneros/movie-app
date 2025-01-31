@@ -18,6 +18,7 @@ import {
   ApiCookieAuth,
   ApiCreatedResponse,
   ApiOkResponse,
+  ApiOperation,
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
@@ -36,10 +37,10 @@ export class UsersController {
   @Get()
   @UseGuards(AuthGuard)
   @Roles('Admin', 'Editor')
-  // @ApiBearerAuth()
   @ApiBearerAuth('access-token')
   @ApiCookieAuth('cookie-auth')
   @ApiOkResponse({ type: UserEntity, isArray: true })
+  @ApiOperation({ summary: 'For admin. Get All User' })
   @ApiQuery({
     name: 'page',
     required: false,
@@ -83,6 +84,4 @@ export class UsersController {
   async remove(@Param('id', ParseIntPipe) id: number) {
     return new UserEntity(await this.usersService.remove(id));
   }
-
-  
 }

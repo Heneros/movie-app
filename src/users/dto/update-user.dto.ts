@@ -21,7 +21,6 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @ApiProperty()
   refreshToken: string[]
 
-
   @Exclude()
   password: string;
 

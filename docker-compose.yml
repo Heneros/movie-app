@@ -14,6 +14,13 @@ services:
    - postgres:/var/lib/postgresql/data
    ports:
     - '5432:5432'
+   healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+   networks:
+    app_movie:
 
  pgadmin:
    container_name: pgadmi_nest
@@ -37,8 +44,41 @@ services:
   environment:
       - MAILDEV_WEB_PORT=1080
       - MAILDEV_SMTP_PORT=1025
-  
+
+    
+ redis:
+  image: redis:7.4
+  container_name: 'redis-nestjs'
+  restart: always
+  ports:
+   - '6379:6379'
+  volumes:
+  - redis_data:/data
+  networks:
+    app_movie:
+
+ nestapp:
+  container_name: 'nestapp'
+  restart: always
+  depends_on:
+    postgres:
+     condition: service_healthy
+  ports:
+  - '3000:3000'
+  build:
+    context: .
+    dockerfile: ./docker/dev/nestjs/Dockerfile
+  env_file: ./.env
+  volumes:
+   - .:/app
+   - /app/node_modules
+  networks:
+    app_movie:
 
 
 volumes:
   postgres:
+  redis_data:
+
+networks:
+  app_movie:

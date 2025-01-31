@@ -105,12 +105,13 @@ export class AuthService {
     const payload = { id: user.id, name: user.name, roles: user.roles };
 
     const accessToken = await this.jwtService.signAsync(payload);
-    //
-    // console.log(NODE_ENV);
+
+
+    
     if (!req.session) {
       throw new UnauthorizedException('Session is not initialized');
     }
-    // req.session.user = user;
+
 
     req.session.user = payload;
     // await new Promise((resolve) => req.session.save(resolve));
