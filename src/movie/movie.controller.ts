@@ -30,6 +30,7 @@ import { User } from 'src/decorators/user.decorator';
 import { Public } from 'src/decorators/public.decorator';
 import { SearchMovieDto } from './dto/search-movie.dto';
 import { TimeoutInterceptor } from 'src/interceptor/timeout.interceptor';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 
 @Controller('movie')
 @ApiTags('Movie')
@@ -39,6 +40,7 @@ export class MovieController {
 
   @Public()
   @Get()
+  @CacheTTL(30)
   @ApiQuery({
     name: 'page',
     required: false,

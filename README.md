@@ -21,8 +21,10 @@
 - Github Actions
 
 
+
 ## Features should be:
-- roles admin/user/editor 
+- Redis(refreshToken table) should be
+- roles admin/user/editor  
 - Adding movies is only available for admins and editor
 - search movie
 - Each movie has a category, preview, title, synopsis, and rating
