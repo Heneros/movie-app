@@ -24,7 +24,7 @@ services:
 
  pgadmin:
    container_name: pgadmi_nest
-   image: dpage/pgadmin4:latest
+   image: dpage/pgadmin4:8
    environment: 
       - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
       - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}
@@ -61,8 +61,25 @@ services:
   networks:
     app_movie:
 
+
+ nginx:
+  container_name: nginx_nest
+  restart: always
+  build:
+    context: .
+    dockerfile: ./docker/prod/nginx/Dockerfile
+  volumes:
+    - ./logs/nginx:/var/log/nginx
+  ports:
+      - "80:80"
+      - "443:443"
+  depends_on:
+    - nestapp
+  networks:
+    app_movie:
+
  nestapp:
-  container_name: 'nestapp'
+  container_name: nestapp
   restart: always
   depends_on:
     postgres:
@@ -73,12 +90,13 @@ services:
    - '3000:3000'
   build:
     context: .
-    dockerfile: ./docker/dev/nestjs/Dockerfile
+    dockerfile: ./docker/prod/nestjs/Dockerfile
   volumes:
    - .:/app
    - /app/node_modules
   networks:
     app_movie:
+
 
 
 volumes:

@@ -24,7 +24,7 @@ services:
 
  pgadmin:
    container_name: pgadmi_nest
-   image: dpage/pgadmin4:latest
+   image: dpage/pgadmin4:8
    environment: 
       - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
       - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}
@@ -35,6 +35,7 @@ services:
    restart: always
    networks:
     app_movie:
+
 
    
  maildev:

@@ -16,22 +16,24 @@
 - RabbitMQ
 - Prometheus
 - Nodemailer
-- TensorFlow
-- TMDb API, Quotable API 
+- TensorFlow.js
 - Github Actions
 
 
 
 ## Features should be:
+- Bash write script
 - Redis(refreshToken table) should be
-- roles admin/user/editor  
+- Load Balancer to db and redis
+- roles admin/user/editor  - done
 - Adding movies is only available for admins and editor
 - search movie
 - Each movie has a category, preview, title, synopsis, and rating
 - user can register/login validation have
 - filter movies. By year/category/key actors/rationg
 - 2FA authentication
-- Session management
+- TMDb API, Quotable API 
+- Session management   - done
 - Moderation reviews with moderation
 - Automatic moderation   
 - Integration with calender

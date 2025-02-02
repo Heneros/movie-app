@@ -8,7 +8,7 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  @CacheTTL(20)
+  // @CacheTTL(20)
   // @UseInterceptors(CacheInterceptor)
   async getUsers(): Promise<any> {
     return this.appService.getCachedData();
