@@ -8,6 +8,8 @@ import { UsersModule } from 'src/users/users.module';
 import { JwtStrategy } from './jwt.strategy';
 import { jwtConstants } from 'src/data/defaultData';
 import { MailService } from 'src/mail/mail.service';
+import { AppService } from 'src/app.service';
+import { AppModule } from 'src/app.module';
 
 @Module({
   imports: [

@@ -18,6 +18,7 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { Request, Response } from 'express';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 import { LogInDto } from './dto/login.dto';
+import { Cache } from '@nestjs/cache-manager';
 
 @Injectable()
 export class AuthService {
@@ -106,14 +107,12 @@ export class AuthService {
 
     const accessToken = await this.jwtService.signAsync(payload);
 
-
-    
     if (!req.session) {
       throw new UnauthorizedException('Session is not initialized');
     }
 
-
     req.session.user = payload;
+
     // await new Promise((resolve) => req.session.save(resolve));
     res.cookie('jwtMovie', accessToken, {
       httpOnly: isDevelopment ? false : true,
@@ -122,7 +121,6 @@ export class AuthService {
       secure: isDevelopment ? false : true,
     });
 
-    console.log(user);
     res.status(200).json({
       message: 'Login successful',
       accessToken,

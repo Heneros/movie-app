@@ -1,14 +1,19 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { PAGINATION_LIMIT } from 'src/data/defaultData';
 import { Movie } from '@prisma/client';
 import { SearchMovieDto } from './dto/search-movie.dto';
+import { Cache } from 'cache-manager';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @Injectable()
 export class MovieService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {}
 
   async create(createMovieDto: CreateMovieDto) {
     const movieTitle = await this.prisma.movie.findUnique({
@@ -27,13 +32,28 @@ export class MovieService {
   }
 
   async findAll(skip: number = 0) {
-    return this.prisma.movie.findMany({
+    const cacheKey = `movies:${skip}`;
+
+    const cachedData = await this.cacheManager.get(cacheKey);
+
+    if (cachedData) {
+      const ttl = await this.cacheManager.ttl(cacheKey);
+
+      const remainingTime = ttl > 0 ? (ttl - Date.now()) / 1000 : ttl;
+      console.log(`Cache hit: ${cacheKey}, TTL: ${remainingTime} seconds`);
+      return cachedData;
+    }
+
+    const allMovies = await this.prisma.movie.findMany({
       skip,
       take: PAGINATION_LIMIT,
       orderBy: {
         id: 'asc',
       },
     });
+
+    await this.cacheManager.set(cacheKey, allMovies, 3500);
+    return allMovies;
   }
 
   async findOne(id: number): Promise<Movie | null> {

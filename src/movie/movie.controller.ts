@@ -31,6 +31,7 @@ import { Public } from 'src/decorators/public.decorator';
 import { SearchMovieDto } from './dto/search-movie.dto';
 import { TimeoutInterceptor } from 'src/interceptor/timeout.interceptor';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
+import { Movie } from '@prisma/client';
 
 @Controller('movie')
 @ApiTags('Movie')
@@ -52,7 +53,8 @@ export class MovieController {
     const page = pageString ? parseInt(pageString, 10) : 1;
     const skip = (page - 1) * PAGINATION_LIMIT;
 
-    const movies = await this.movieService.findAll(skip);
+    const movies = (await this.movieService.findAll(skip)) as Movie[];
+
     return movies.map((movie) => new MovieEntity(movie));
   }
 
