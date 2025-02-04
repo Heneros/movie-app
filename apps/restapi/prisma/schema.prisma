@@ -35,6 +35,7 @@ model VerifyResetToken{
   userId Int @unique
   token String @unique
   createdAt DateTime @default(now())
+  expiresAt DateTime?
 }
 
 

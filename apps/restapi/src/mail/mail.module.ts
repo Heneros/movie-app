@@ -24,7 +24,7 @@ import { isDevelopment } from '../data/defaultData';
         from: `"No Replay" <noreply@example.com>`,
       },
       template: {
-        dir: path.join(__dirname, 'templates'),
+        dir: path.join(__dirname, 'src/mail/templates'),
         adapter: new HandlebarsAdapter(),
         options: {
           strict: true,

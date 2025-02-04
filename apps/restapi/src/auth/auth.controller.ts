@@ -121,8 +121,11 @@ export class AuthController {
     type: UserEntity,
   })
   @ApiOkResponse({ type: AuthEntity })
-  requestResetPassword(@Body(EmailValidationPipe) email: ResendEmailDto) {
-    return this.authService.requestResetPassword(email);
+  requestResetPassword(
+    @Body(EmailValidationPipe) email: ResendEmailDto,
+    @Res() res: Response,
+  ) {
+    return this.authService.requestResetPassword(res, email);
   }
 
   @Post('/reset_password')

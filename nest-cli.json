@@ -7,7 +7,7 @@
       {
         "include": "mail/templates/**/*.hbs",
         "watchAssets": true,
-        "outDir": "dist/src"
+        "outDir": "dist/apps/restapi/src"
       }
     ],
     "watchAssets": true,

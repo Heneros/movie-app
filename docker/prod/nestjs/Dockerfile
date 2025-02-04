@@ -16,4 +16,4 @@ ENV POSTGRES_PASSWORD=postgres
 ENV POSTGRES_DB=moviedb
 ENV DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
 
-ENTRYPOINT ["/bin/sh", "-c", "npx prisma migrate deploy && npx prisma db seed && npm run start:dev"]
+ENTRYPOINT ["/bin/sh", "-c", "npx prisma migrate dev --schema=apps/restapi/prisma/schema.prisma && npx prisma db seed && npm run start:dev"]

@@ -105,28 +105,41 @@ export class AuthService {
 
     const payload = { id: user.id, name: user.name, roles: user.roles };
 
-    const accessToken = await this.jwtService.signAsync(payload);
+    const newRefreshToken = await this.jwtService.signAsync(payload);
 
     const cookies = req.cookies;
 
-    console.log(cookies);
+    // console.log(cookies);
 
-    let newRefreshToken = !cookies?.jwtMovie
+    let newRefreshTokenArray = !cookies?.jwtMovie
       ? user.refreshToken
-      : user.refreshToken.filter((refT) => refT !== cookies.jwtMovie);
+      : user.refreshToken.filter((refT) => refT !== cookies?.jwtMovie);
 
-    console.log('newRefreshToken', newRefreshToken);
+    console.log('newRefreshToken', newRefreshTokenArray);
 
     if (cookies?.jwtMovie) {
       const refreshToken = cookies.jwtMovie;
 
       const existingRefreshToken = await this.prisma.user.findFirst({
         where: {
+          id: user.id,
           // refreshToken: user.refreshToken,
-          refreshToken: { hasEvery: newRefreshToken },
+          refreshToken: { hasSome: [refreshToken] },
         },
       });
+      if (!existingRefreshToken) {
+        newRefreshTokenArray = [];
+      }
+      res.clearCookie('jwtMovie', {});
     }
+
+    user.refreshToken = [...newRefreshTokenArray, newRefreshToken];
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { refreshToken: [...newRefreshTokenArray, newRefreshToken] },
+    });
+
     if (!req.session) {
       throw new UnauthorizedException('Session is not initialized');
     }
@@ -134,7 +147,7 @@ export class AuthService {
     req.session.user = payload;
 
     // await new Promise((resolve) => req.session.save(resolve));
-    res.cookie('jwtMovie', accessToken, {
+    res.cookie('jwtMovie', newRefreshToken, {
       httpOnly: isDevelopment ? false : true,
       strict: isDevelopment ? 'none' : 'strict',
       maxAge: 31 * 24 * 60 * 60 * 1000,
@@ -143,7 +156,7 @@ export class AuthService {
 
     res.status(200).json({
       message: 'Login successful',
-      accessToken,
+      newRefreshToken,
     });
   }
 
@@ -186,6 +199,7 @@ export class AuthService {
       './welcome',
       emailVerificationToken,
     );
+
     // return user;
     // console.log('userToken', emailToken);
     // console.log('prismauserId', prismauserId);
@@ -246,7 +260,7 @@ export class AuthService {
     // console.log(user);
   }
 
-  async requestResetPassword(resendEmailDto: ResendEmailDto) {
+  async requestResetPassword(res: Response, resendEmailDto: ResendEmailDto) {
     const user = await this.prisma.user.findUnique({
       where: { email: resendEmailDto.email },
     });
@@ -274,9 +288,9 @@ export class AuthService {
       },
     });
 
-    if (user.isEmailVerified) {
-      throw new BadRequestException('User already verified');
-    }
+    // if (user.isEmailVerified) {
+    //   throw new BadRequestException('User already verified');
+    // }
 
     const emailLink = `${domain}/auth/reset_password?emailToken=${emailToken.token}&userId=${user.id}`;
 
@@ -291,6 +305,10 @@ export class AuthService {
       './requestResetPassword',
       payload,
     );
+
+    res.status(200).json({
+      message: 'Password Reset Request',
+    });
   }
 
   async resetPassword(resetPasswordDto: ResetPasswordDto) {

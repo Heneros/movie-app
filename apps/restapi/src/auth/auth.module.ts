@@ -8,8 +8,7 @@ import { UsersModule } from '../users/users.module';
 import { JwtStrategy } from './jwt.strategy';
 import { jwtConstants } from '../data/defaultData';
 import { MailService } from '../mail/mail.service';
-import { AppService } from '../app.service';
-import { AppModule } from '../app.module';
+
 
 @Module({
   imports: [
