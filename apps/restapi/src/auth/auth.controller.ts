@@ -36,12 +36,31 @@ import { ResendEmailDto } from './dto/resend-email.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { AuthRegister } from './entity/register.entity';
 import { EmailValidationPipe } from './pipe/EmailValidation.pipe';
+import { CreateUserService } from './services/createUser.service';
+import { LoginAuthService } from './services/login.service';
+import { VerifyEmailService } from './services/verifyEmail.service';
+import { ResendEmailService } from './services/resendEmailValidation.service';
+import { ResetPasswordService } from './services/resetPassword.service';
+import { LogoutAuthService } from './services/logout.service';
+import { RefreshTokenService } from './services/refreshTokens.service';
+import { RequestResetPasswordService } from './services/requestResetPassword.service';
 
 @Controller('auth')
 @ApiTags('Auth')
 @UseInterceptors(TimeoutInterceptor)
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly createUserService: CreateUserService,
+    private readonly loginAuthService: LoginAuthService,
+    private readonly verifyEmailService: VerifyEmailService,
+    private readonly resendEmailService: ResendEmailService,
+    private readonly resetPasswordService: ResetPasswordService,
+    private readonly logoutAuthService: LogoutAuthService,
+
+    private readonly requestResetPasswordService: RequestResetPasswordService,
+    private readonly refreshTokenService: RefreshTokenService,
+  ) {}
 
   @Public()
   @Post('register')
@@ -50,11 +69,10 @@ export class AuthController {
     status: 201,
     description:
       'The user has been successfully created. Check out your email to verify account',
-    // type: UserEntity,
     type: AuthEntity,
   })
   async create(@Body() createUserDto: CreateUserDto) {
-    return await this.authService.create(createUserDto);
+    return await this.createUserService.create(createUserDto);
   }
 
   @Get('verify/:emailToken/:userId')
@@ -73,7 +91,7 @@ export class AuthController {
     @Res() res: Response,
   ) {
     try {
-      await this.authService.verifyEmail(verifyEmailDto);
+      await this.verifyEmailService.verifyEmail(verifyEmailDto);
       return res.status(200).send({ message: 'Email successfully verified!' });
     } catch (error) {
       if (error instanceof NotFoundException || BadRequestException) {
@@ -96,7 +114,7 @@ export class AuthController {
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    return this.authService.login(logInDto, req, res);
+    return this.loginAuthService.login(logInDto, req, res);
   }
 
   @Post('/resend_email_token')
@@ -108,7 +126,7 @@ export class AuthController {
   })
   @ApiOkResponse({ type: AuthEntity })
   resendEmailValidation(@Body() email: ResendEmailDto) {
-    return this.authService.resendEmailValidation(email);
+    return this.resendEmailService.resendEmailValidation(email);
   }
 
   @Post('/reset_password_request')
@@ -125,7 +143,7 @@ export class AuthController {
     @Body(EmailValidationPipe) email: ResendEmailDto,
     @Res() res: Response,
   ) {
-    return this.authService.requestResetPassword(res, email);
+    return this.requestResetPasswordService.requestResetPassword(res, email);
   }
 
   @Post('/reset_password')
@@ -145,7 +163,12 @@ export class AuthController {
   async resetPassword(
     @Body(EmailValidationPipe) resetPasswordDto: ResetPasswordDto,
   ) {
-    return this.authService.resetPassword(resetPasswordDto);
+    return this.resetPasswordService.resetPassword(resetPasswordDto);
+  }
+
+  @Post('refresh')
+  async refresh(@Body('refreshToken') refreshToken: string) {
+    return this.refreshTokenService.refreshTokens(refreshToken);
   }
 
   @Post('logout')
@@ -153,6 +176,6 @@ export class AuthController {
     summary: 'Log out for application ',
   })
   logout(@Req() req: Request, @Res() res: Response) {
-    return this.authService.logout(req, res);
+    return this.logoutAuthService.logout(req, res);
   }
 }
