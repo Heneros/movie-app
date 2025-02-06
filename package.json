@@ -19,6 +19,7 @@
     "docker:prod:build": "docker compose -f docker-compose.prod.yml up -d --build ",
     "docker:prod:down": "docker compose -f  docker-compose.prod.yml down",
     "prisma:dev": "cross-env DATABASE_URL=postgres://postgres:postgres@localhost:5432/moviedb?schema=public npx prisma migrate dev --schema=apps/restapi/prisma/schema.prisma",
+    
     "prisma:docker": "cross-env DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public npx prisma migrate dev --schema=apps/restapi/prisma/schema.prisma",
     "start:docker": "npm run prisma:docker && npm run start",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
@@ -69,7 +70,7 @@
     "@nestjs/cli": "^10.0.0",
     "@nestjs/schematics": "^10.0.0",
     "@nestjs/swagger": "^7.4.2",
-    "@nestjs/testing": "^10.0.0",
+    "@nestjs/testing": "^10.4.15",
     "@prisma/client": "^5.22.0",
     "@types/bcrypt": "^5.0.2",
     "@types/cache-manager-redis-store": "^2.0.4",

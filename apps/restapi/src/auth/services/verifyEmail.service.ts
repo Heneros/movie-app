@@ -36,10 +36,11 @@ export class VerifyEmailService {
         },
       });
 
-    if (
-      !emailVerificationToken ||
-      new Date() > emailVerificationToken.expiresAt
-    ) {
+    if (!emailVerificationToken) {
+      throw new BadRequestException('Not found token');
+    }
+
+    if (new Date() > emailVerificationToken.expiresAt) {
       throw new BadRequestException('Expired token or invalid token');
     }
 
