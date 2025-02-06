@@ -6,8 +6,9 @@ import {
 import { PrismaService } from '../../prisma/prisma.service';
 import { ResendEmailDto } from '../dto/resend-email.dto';
 import { MailService } from '../../mail/mail.service';
-import { domain } from '../../data/defaultData';
+import { domain, tempRegisterDate } from '../../data/defaultData';
 import { randomBytes } from 'crypto';
+import { Response } from 'express';
 
 @Injectable()
 export class ResendEmailService {
@@ -16,7 +17,7 @@ export class ResendEmailService {
     private mailService: MailService,
   ) {}
 
-  async resendEmailValidation(resendEmailDto: ResendEmailDto) {
+  async resendEmailValidation(res: Response, resendEmailDto: ResendEmailDto) {
     const user = await this.prisma.user.findUnique({
       where: { email: resendEmailDto.email },
     });
@@ -47,6 +48,7 @@ export class ResendEmailService {
       data: {
         userId: user.id,
         token: resentToken,
+        expiresAt: tempRegisterDate
       },
     });
 
@@ -63,11 +65,12 @@ export class ResendEmailService {
       './confirmation',
       payload,
     );
-    return {
-      statusCode: 200,
-      message: 'Email was successfully sent',
-    };
+    // return {
+    //   statusCode: 200,
+    //   message: 'Email was successfully sent',
+    // };
 
+    res.status(200).json({ message: 'Email was successfully sent' });
     // console.log(user);
   }
 }

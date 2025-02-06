@@ -4,6 +4,7 @@ import { ResetPasswordDto } from '../dto/reset-password.dto';
 import { MailService } from '../../mail/mail.service';
 import * as bcrypt from 'bcrypt';
 import { roundsOfHashing } from '../../data/defaultData';
+import { Response } from 'express';
 
 @Injectable()
 export class ResetPasswordService {
@@ -12,7 +13,7 @@ export class ResetPasswordService {
     private mailService: MailService,
   ) {}
 
-  async resetPassword(resetPasswordDto: ResetPasswordDto) {
+  async resetPassword(res: Response, resetPasswordDto: ResetPasswordDto) {
     if (resetPasswordDto.password !== resetPasswordDto.passwordConfirm) {
       throw new BadRequestException('Password do not match');
     }
@@ -22,7 +23,7 @@ export class ResetPasswordService {
         userId: resetPasswordDto.userId,
       },
     });
-    if (!verificationToken) {
+    if (!verificationToken || new Date() > verificationToken.expiresAt) {
       throw new BadRequestException(
         'Your token is either invalid or expired. Try resetting your password again',
       );
@@ -62,10 +63,9 @@ export class ResetPasswordService {
         payload,
       );
 
-      return {
-        statusCode: 200,
-        message: 'Your password was reset successfully!',
-      };
+      res
+        .status(200)
+        .json({ message: 'Your password was reset successfully!' });
     }
   }
 }

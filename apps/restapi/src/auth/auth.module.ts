@@ -15,7 +15,6 @@ import { VerifyEmailService } from './services/verifyEmail.service';
 import { ResendEmailService } from './services/resendEmailValidation.service';
 import { ResetPasswordService } from './services/resetPassword.service';
 import { LogoutAuthService } from './services/logout.service';
-import { RefreshTokenService } from './services/refreshTokens.service';
 import { RequestResetPasswordService } from './services/requestResetPassword.service';
 
 @Module({
@@ -41,7 +40,6 @@ import { RequestResetPasswordService } from './services/requestResetPassword.ser
     VerifyEmailService,
     ResendEmailService,
     ResetPasswordService,
-    RefreshTokenService,
     RequestResetPasswordService,
     LogoutAuthService,
   ],

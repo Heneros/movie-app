@@ -42,7 +42,6 @@ import { VerifyEmailService } from './services/verifyEmail.service';
 import { ResendEmailService } from './services/resendEmailValidation.service';
 import { ResetPasswordService } from './services/resetPassword.service';
 import { LogoutAuthService } from './services/logout.service';
-import { RefreshTokenService } from './services/refreshTokens.service';
 import { RequestResetPasswordService } from './services/requestResetPassword.service';
 
 @Controller('auth')
@@ -59,7 +58,6 @@ export class AuthController {
     private readonly logoutAuthService: LogoutAuthService,
 
     private readonly requestResetPasswordService: RequestResetPasswordService,
-    private readonly refreshTokenService: RefreshTokenService,
   ) {}
 
   @Public()
@@ -71,8 +69,8 @@ export class AuthController {
       'The user has been successfully created. Check out your email to verify account',
     type: AuthEntity,
   })
-  async create(@Body() createUserDto: CreateUserDto) {
-    return await this.createUserService.create(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto, @Res() res: Response) {
+    return await this.createUserService.create(res, createUserDto);
   }
 
   @Get('verify/:emailToken/:userId')
@@ -90,15 +88,16 @@ export class AuthController {
     @Param() verifyEmailDto: VerifyEmailDto,
     @Res() res: Response,
   ) {
-    try {
-      await this.verifyEmailService.verifyEmail(verifyEmailDto);
-      return res.status(200).send({ message: 'Email successfully verified!' });
-    } catch (error) {
-      if (error instanceof NotFoundException || BadRequestException) {
-        return res.status(404).send({ message: error.message });
-      }
-      return res.status(500).send({ message: 'An unexpected error occurred' });
-    }
+    await this.verifyEmailService.verifyEmail(res, verifyEmailDto);
+    // try {
+    //
+    //   return res.status(200).send({ message: 'Email successfully verified!' });
+    // } catch (error) {
+    //   if (error instanceof NotFoundException || BadRequestException) {
+    //     return res.status(404).send({ message: error.message });
+    //   }
+    //   return res.status(500).send({ message: 'An unexpected error occurred' });
+    // }
   }
 
   // @Public()
@@ -125,8 +124,8 @@ export class AuthController {
     type: UserEntity,
   })
   @ApiOkResponse({ type: AuthEntity })
-  resendEmailValidation(@Body() email: ResendEmailDto) {
-    return this.resendEmailService.resendEmailValidation(email);
+  resendEmailValidation(@Body() email: ResendEmailDto, @Res() res: Response) {
+    return this.resendEmailService.resendEmailValidation(res, email);
   }
 
   @Post('/reset_password_request')
@@ -162,13 +161,9 @@ export class AuthController {
   })
   async resetPassword(
     @Body(EmailValidationPipe) resetPasswordDto: ResetPasswordDto,
+    @Res() res: Response,
   ) {
-    return this.resetPasswordService.resetPassword(resetPasswordDto);
-  }
-
-  @Post('refresh')
-  async refresh(@Body('refreshToken') refreshToken: string) {
-    return this.refreshTokenService.refreshTokens(refreshToken);
+    return this.resetPasswordService.resetPassword(res, resetPasswordDto);
   }
 
   @Post('logout')

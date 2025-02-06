@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../../prisma/prisma.service';
 import { LogInDto } from '../dto/login.dto';
 import * as bcrypt from 'bcrypt';
-import { isDevelopment } from '../../data/defaultData';
+import { isDevelopment, tempLoginDate } from '../../data/defaultData';
 
 @Injectable()
 export class LoginAuthService {
@@ -32,8 +32,6 @@ export class LoginAuthService {
     const newRefreshToken = await this.jwtService.signAsync(payload);
     const cookies = req.cookies;
 
-    // console.log(cookies);
-
     let newRefreshTokenArray = !cookies?.jwtMovie
       ? user.refreshToken
       : user.refreshToken.filter((refT) => refT !== cookies?.jwtMovie);
@@ -61,7 +59,7 @@ export class LoginAuthService {
     // await this.saveRefreshToken(user.id, tokens.refreshToken);
 
     const refreshToken = this.jwtService.sign(payload, {
-      expiresIn: '1h',
+      expiresIn: '7d',
     });
 
     await this.prisma.verifyResetToken.deleteMany({
@@ -72,7 +70,7 @@ export class LoginAuthService {
       data: {
         token: refreshToken,
         userId: user.id,
-        expiresAt: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
+        expiresAt: tempLoginDate,
       },
     });
 

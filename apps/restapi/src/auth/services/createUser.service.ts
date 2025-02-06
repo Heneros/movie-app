@@ -3,8 +3,9 @@ import { CreateUserDto } from '../dto/create-user.dto';
 import { randomBytes } from 'crypto';
 import { PrismaService } from '../../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
-import { roundsOfHashing } from '../../data/defaultData';
+import { roundsOfHashing, tempRegisterDate } from '../../data/defaultData';
 import { MailService } from '../../mail/mail.service';
+import { Response } from 'express';
 
 @Injectable()
 export class CreateUserService {
@@ -13,7 +14,7 @@ export class CreateUserService {
     private mailService: MailService,
   ) {}
 
-  async create(createUserDto: CreateUserDto) {
+  async create(res: Response, createUserDto: CreateUserDto) {
     if (createUserDto.password !== createUserDto.passwordConfirm) {
       throw new BadRequestException('Confirm password.', {
         cause: new Error(),
@@ -26,7 +27,7 @@ export class CreateUserService {
       roundsOfHashing,
     );
 
-    const tokenVerification = randomBytes(20).toString('hex');
+    const tokenVerification = randomBytes(32).toString('hex');
 
     createUserDto.password = hashedPassword;
 
@@ -55,10 +56,9 @@ export class CreateUserService {
       data: {
         userId: createdUser.id,
         token: tokenVerification,
+        expiresAt: tempRegisterDate,
       },
     });
-
-    // console.log('emailVerficationToken', emailVerficationToken);
 
     await this.mailService.sendEmail(
       true,
@@ -70,6 +70,10 @@ export class CreateUserService {
       './confirmation',
       emailVerificationToken,
     );
+
+    res
+      .status(201)
+      .json({ message: 'Welcome to Movie App! Confirm your Email ' });
 
     return { email: createUserDto.email, emailVerificationToken };
   }
