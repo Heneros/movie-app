@@ -1,14 +1,18 @@
 import * as request from 'supertest';
+import * as fs from 'fs';
+import * as path from 'path';
+
 import { app } from '../setup';
+
 import { PrismaService } from '../../src/prisma/prisma.service';
+
+const testUserFile = path.join(__dirname, './data/testUser.json');
 
 describe('Auth - Register (e2e)', () => {
   let prisma: PrismaService;
 
   beforeEach(async () => {
     prisma = app.get(PrismaService);
-    // await prisma.verifyResetToken.deleteMany({});
-    // await prisma.user.deleteMany({});
   });
 
   it('should create a user successfully', async () => {
@@ -34,6 +38,16 @@ describe('Auth - Register (e2e)', () => {
       where: { userId: user.id },
     });
     expect(verificationToken).toBeDefined();
+
+    await fs.writeFileSync(
+      testUserFile,
+      JSON.stringify({
+        id: user.id,
+        email: user.email,
+        token: verificationToken.token,
+      }),
+      'utf8',
+    );
   });
 
   it('Should throw an error if user already existing', async () => {
