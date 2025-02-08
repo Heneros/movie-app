@@ -1,9 +1,9 @@
 const TestSequencer = require('@jest/test-sequencer').default;
 
 const priorityOrder = [
-  'auth/create-user.e2e-spec.ts',
-  'auth/verifyEmail.e2e-spec.ts',
-  'auth/resetPassword.e2e-spec.ts',
+  'auth/A_create-user.e2e-spec.ts',
+  'auth/B_verifyEmail.e2e-spec.ts',
+  'auth/C_resetPassword.e2e-spec.ts',
 ];
 
 class CustomSequencer extends TestSequencer {

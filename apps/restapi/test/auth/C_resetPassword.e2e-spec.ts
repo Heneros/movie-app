@@ -15,5 +15,7 @@ describe('Auth - Reset password (e2e)', () => {
     prisma = app.get(PrismaService);
   });
 
-  it(' Reset password (e2e) successfully', async () => {});
+  it(' Reset password (e2e) successfully', async () => {
+    
+  });
 });

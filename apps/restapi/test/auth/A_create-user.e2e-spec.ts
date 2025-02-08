@@ -23,26 +23,29 @@ describe('Auth - Register (e2e)', () => {
       passwordConfirm: 'password123',
     };
 
-    await request(app.getHttpServer())
+    const response = await request(app.getHttpServer())
       .post('/auth/register')
       .send(userData)
       .expect(201);
+    expect(response.status).toBe(201);
 
     const user = await prisma.user.findUnique({
       where: { email: userData.email },
     });
+
     expect(user).toBeDefined();
     expect(user.name).toBe(userData.name);
 
     const verificationToken = await prisma.verifyResetToken.findFirst({
       where: { userId: user.id },
     });
+
     expect(verificationToken).toBeDefined();
 
-    await fs.writeFileSync(
+    fs.writeFileSync(
       testUserFile,
       JSON.stringify({
-        id: user.id,
+        id: Number(user.id),
         email: user.email,
         token: verificationToken.token,
       }),
