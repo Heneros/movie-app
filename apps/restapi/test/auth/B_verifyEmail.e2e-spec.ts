@@ -17,9 +17,7 @@ describe('Auth - Verify Email (e2e)', () => {
 
   beforeEach(async () => {
     prisma = app.get(PrismaService);
-
     // user = await JSON.parse(fs.readFileSync(testUserFile, 'utf8'));
-
     // testUser = await prisma.user.findFirst({
     //   where: { id: Number(user.id) },
     // });
@@ -46,10 +44,10 @@ describe('Auth - Verify Email (e2e)', () => {
     });
     expect(user).toBeDefined();
 
-    //   const verifyData: VerifyEmailDto = {
-    //     userId: testUser.id,
-    //     emailToken: user.token,
-    //   };
+    // const verifyData: VerifyEmailDto = {
+    //   userId: testUser.id,
+    //   emailToken: user.token,
+    // };
 
     const response = await request(app.getHttpServer())
       .get(
@@ -58,10 +56,5 @@ describe('Auth - Verify Email (e2e)', () => {
       .expect(200);
     console.log(response.body);
     expect(response.body).toEqual({ message: 'Your email is verified!' });
-
-    //   const updatedUser = await prisma.user.findUnique({
-    //     where: { id: testUser.id },
-    //   });
-    // //   expect(updatedUser.isEmailVerified).toBe(true);
   });
 });

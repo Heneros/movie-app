@@ -20,11 +20,10 @@ import { AuthModule } from '../src/auth/auth.module';
 
 export let app: INestApplication;
 
-const mockMailService = {
+export const mockMailService = {
   sendEmail: jest.fn().mockImplementation(() => Promise.resolve(true)),
+  resendEmail: jest.fn().mockImplementation(() => Promise.resolve(true)),
 };
-let userData;
-const testUserFile = path.join(__dirname, './data/testUser.json');
 
 beforeAll(async () => {
   const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -53,32 +52,6 @@ beforeAll(async () => {
   await app.init();
   const prisma = app.get(PrismaService);
   await clearDatabase(prisma);
-
-  // userData = {
-  //   id: 1,
-  //   name: 'John Doe',
-  //   email: 'test@example.com',
-  //   password: 'password123',
-  //   passwordConfirm: 'password123',
-  //   isEmailVerified: false,
-  // };
-
-  // const createUserResponse = await request(app.getHttpServer())
-  //   .post('/auth/register')
-  //   .send(userData)
-  //   .expect(201);
-
-  // userData.id = createUserResponse.body.id;
-
-  // fs.writeFileSync(
-  //   testUserFile,
-  //   JSON.stringify({
-  //     id: Number(userData.id),
-  //     email: userData.email,
-  //     token: createUserResponse.body.token,
-  //   }),
-  //   'utf8',
-  // );
 });
 
 afterAll(async () => {

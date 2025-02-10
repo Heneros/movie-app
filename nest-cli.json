@@ -35,6 +35,24 @@
       "compilerOptions": {
         "tsConfigPath": "apps/books/tsconfig.app.json"
       }
+    },
+    "bookstore-api-gateway": {
+      "type": "application",
+      "root": "apps/bookstore-api-gateway",
+      "entryFile": "main",
+      "sourceRoot": "apps/bookstore-api-gateway/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/bookstore-api-gateway/tsconfig.app.json"
+      }
+    },
+    "users": {
+      "type": "application",
+      "root": "apps/users",
+      "entryFile": "main",
+      "sourceRoot": "apps/users/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/users/tsconfig.app.json"
+      }
     }
   }
 }
