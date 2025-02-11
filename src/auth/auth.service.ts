@@ -6,12 +6,12 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '@/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
-import { MailService } from '../mail/mail.service';
+import { MailService } from '@/mail/mail.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { domain, isDevelopment, roundsOfHashing } from '../data/defaultData';
+import { domain, isDevelopment, roundsOfHashing } from '@/data/defaultData';
 import { randomBytes } from 'crypto';
 import { ResendEmailDto } from './dto/resend-email.dto';
 import { Request, Response } from 'express';

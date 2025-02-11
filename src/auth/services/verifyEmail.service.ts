@@ -3,11 +3,11 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
-import { MailService } from '../../mail/mail.service';
+import { PrismaService } from '@/prisma/prisma.service';
+import { MailService } from '@/mail/mail.service';
 import { VerifyEmailDto } from '../dto/verify-email.dto';
 import { Response } from 'express';
-import { tempLoginDate } from '../../data/defaultData';
+import { tempLoginDate } from '@/data/defaultData';
 
 @Injectable()
 export class VerifyEmailService {

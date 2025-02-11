@@ -24,12 +24,12 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { MovieEntity } from './entities/movie.entity';
-import { Roles } from '../decorators/roles.decorator';
-import { PAGINATION_LIMIT } from '../data/defaultData';
-import { User } from '../decorators/user.decorator';
-import { Public } from '../decorators/public.decorator';
+import { Roles } from '@/decorators/roles.decorator';
+import { PAGINATION_LIMIT } from '@/data/defaultData';
+import { User } from '@/decorators/user.decorator';
+import { Public } from '@/decorators/public.decorator';
 import { SearchMovieDto } from './dto/search-movie.dto';
-import { TimeoutInterceptor } from '../interceptor/timeout.interceptor';
+import { TimeoutInterceptor } from '@/interceptor/timeout.interceptor';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { Movie } from '@prisma/client';
 

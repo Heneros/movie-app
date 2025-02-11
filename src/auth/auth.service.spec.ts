@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Response } from 'express';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '@/prisma/prisma.service';
 import { CreateUserService } from './services/createUser.service';
-import { resetDatabase } from '../../../prisma/prisma.test';
-import { MailService } from '../mail/mail.service';
+import { resetDatabase } from '@/@/prisma/prisma.test';
+import { MailService } from '@/mail/mail.service';
 import { BadRequestException } from '@nestjs/common';
-import { tempRegisterDate } from '../data/defaultData';
+import { tempRegisterDate } from '@/data/defaultData';
 
 describe('AuthService create use (integration)', () => {
   let createUserService: CreateUserService;

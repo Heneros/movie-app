@@ -3,7 +3,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { MailService } from './mail.service';
 import { MailerModule } from '@nestjs-modules/mailer';
 import * as path from 'path';
-import { isDevelopment } from '../data/defaultData';
+import { isDevelopment } from '@/data/defaultData';
 
 // console.log(isDevelopment);
 @Module({

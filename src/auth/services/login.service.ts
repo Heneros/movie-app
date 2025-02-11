@@ -1,13 +1,10 @@
-import {
-  BadRequestException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from '@/prisma/prisma.service';
 import { LogInDto } from '../dto/login.dto';
 import * as bcrypt from 'bcrypt';
-import { isDevelopment, tempLoginDate } from '../../data/defaultData';
+import { isDevelopment, tempLoginDate } from '@/data/defaultData';
+// import { isDevelopment, tempLoginDate } from '@/data/defaultData';
 
 @Injectable()
 export class LoginAuthService {

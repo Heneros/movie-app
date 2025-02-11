@@ -3,10 +3,10 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from '@/prisma/prisma.service';
 import { ResendEmailDto } from '../dto/resend-email.dto';
-import { MailService } from '../../mail/mail.service';
-import { domain, tempRegisterDate } from '../../data/defaultData';
+import { MailService } from '@/mail/mail.service';
+import { domain, tempRegisterDate } from '@/data/defaultData';
 import { randomBytes } from 'crypto';
 import { Response } from 'express';
 

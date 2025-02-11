@@ -5,9 +5,9 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '@/prisma/prisma.service';
 import * as jwt from 'jsonwebtoken';
-import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
+import { IS_PUBLIC_KEY } from '@/decorators/public.decorator';
 
 interface JwtPayload {
   name: string;
@@ -36,10 +36,6 @@ export class AuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const authHeader = request.headers?.authorization;
 
-    // console.log('Cookies:', request.cookies);
-    // const cookie = request.cookies;
-    // console.log(cookie);
-
     if (!authHeader) {
       throw new UnauthorizedException('No authorization header');
     }
@@ -55,7 +51,7 @@ export class AuthGuard implements CanActivate {
     ]);
 
     if (roles?.length) {
-      // console.log('roles?.length');
+      // console.log(roles);
       try {
         const payload = jwt.verify(token, process.env.JWT_SECRET) as JwtPayload;
         const user = await this.prismaService.user.findUnique({

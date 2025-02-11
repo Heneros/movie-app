@@ -9,6 +9,9 @@ import {
   ParseIntPipe,
   UseGuards,
   Query,
+  Res,
+  UsePipes,
+  Put,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 
@@ -19,19 +22,35 @@ import {
   ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiParam,
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { UserEntity } from './entities/user.entity';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { AuthGuard } from '../guards/auth.guard';
-import { Roles } from '../decorators/roles.decorator';
-import { PAGINATION_LIMIT } from '../data/defaultData';
+import { JwtAuthGuard } from '@/auth/jwt-auth.guard';
+import { AuthGuard } from '@/guards/auth.guard';
+import { Roles } from '@/decorators/roles.decorator';
+import { PAGINATION_LIMIT } from '@/data/defaultData';
+import { GetAllUsersService } from './services/getAllUsers.service';
+import { Response } from 'express';
+import { CheckUserExistPipe } from './pipe/CheckUserExist.pipe';
+import { UpdateUserService } from './services/updateMyProfile.service';
+import { ProfileOwnerGuard } from './guard/ProfileOwner.guard';
+import { GetIdUsersService } from './services/getIdUser.service';
+import { RemoveUserAccountService } from './services/removeUser.service';
+import { RemoveMyAccountService } from './services/removeMyAccount.services';
 
 @Controller('users')
 @ApiTags('Users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly getAllUsersService: GetAllUsersService,
+    private readonly updateUserService: UpdateUserService,
+    private readonly getIdUsersService: GetIdUsersService,
+    private readonly removeUserAccountService: RemoveUserAccountService,
+    private readonly removeMyAccountService: RemoveMyAccountService,
+  ) {}
 
   @Get()
   @UseGuards(AuthGuard)
@@ -51,36 +70,58 @@ export class UsersController {
     const page = pageString ? Number(pageString) : 1;
     const skip = (page - 1) * PAGINATION_LIMIT;
 
-    const users = await this.usersService.findAll(skip);
+    const users = await this.getAllUsersService.findAll(skip);
     return users.map((user) => new UserEntity(user));
   }
 
   @Get(':id')
   @UseGuards(AuthGuard)
-  @ApiBearerAuth()
+  @ApiOperation({ summary: 'For all register. Get id user' })
+  @ApiBearerAuth('access-token')
+  @ApiCookieAuth('cookie-auth')
+  @ApiParam({
+    name: 'id',
+    required: true,
+    description: 'Id for user',
+    type: Number,
+  })
+  @UsePipes(CheckUserExistPipe)
   @ApiOkResponse({ type: UserEntity })
   async findOne(@Param('id', ParseIntPipe) id: number) {
-    //  return this.usersService.findOne(id);
-    // console.log(123);
-    return new UserEntity(await this.usersService.findOne(+id));
+    return new UserEntity(await this.getIdUsersService.findOne(id));
   }
 
-  @Patch(':id')
-  @UseGuards(AuthGuard)
-  @ApiBearerAuth()
+  @Put(':id')
+  @UseGuards(AuthGuard, ProfileOwnerGuard)
+  @ApiOperation({ summary: 'Update my profile. Only for authorized user' })
+  @ApiBearerAuth('access-token')
+  // @UsePipes(CheckUserExistPipe)
   @ApiCreatedResponse({ type: UserEntity })
   async update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', CheckUserExistPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    return new UserEntity(await this.usersService.update(id, updateUserDto));
+    return new UserEntity(
+      await this.updateUserService.update(id, updateUserDto),
+    );
   }
 
   @Delete(':id')
+  @Roles('Admin')
   @UseGuards(AuthGuard)
-  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Delete user profile. Only for admin' })
+  @ApiBearerAuth('access-token')
   @ApiOkResponse({ type: UserEntity })
   async remove(@Param('id', ParseIntPipe) id: number) {
-    return new UserEntity(await this.usersService.remove(id));
+    return new UserEntity(await this.removeUserAccountService.remove(id));
+  }
+
+  @Delete(':id/user')
+  @UseGuards(AuthGuard, ProfileOwnerGuard)
+  @ApiOperation({ summary: 'Delete my account. Only for User' })
+  @ApiBearerAuth('access-token')
+  @ApiOkResponse({ type: UserEntity })
+  async removeMyAccount(@Param('id', ParseIntPipe) id: number) {
+    return await this.removeMyAccountService.remove(id);
   }
 }

@@ -1,4 +1,4 @@
-//../prisma-client-exception.filter.ts
+//@/prisma-client-exception.filter.ts
 
 import { ArgumentsHost, Catch, HttpStatus } from '@nestjs/common';
 import { BaseExceptionFilter } from '@nestjs/core';

@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { PrismaModule } from '../prisma/prisma.module';
+import { PrismaModule } from '@/prisma/prisma.module';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
-import { UsersModule } from '../users/users.module';
+import { UsersModule } from '@/users/users.module';
 
-import { jwtConstants } from '../data/defaultData';
-import { MailService } from '../mail/mail.service';
+import { jwtConstants } from '@/data/defaultData';
+import { MailService } from '@/mail/mail.service';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { CreateUserService } from './services/createUser.service';
 import { LoginAuthService } from './services/login.service';
@@ -24,7 +24,7 @@ import { RequestResetPasswordService } from './services/requestResetPassword.ser
     JwtModule.register({
       global: true,
       secret: jwtConstants.secret,
-      signOptions: { expiresIn: '1m' },
+      signOptions: { expiresIn: '31d' },
     }),
     UsersModule,
   ],

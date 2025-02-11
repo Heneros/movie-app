@@ -1,10 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { randomBytes } from 'crypto';
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from '@/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
-import { roundsOfHashing, tempRegisterDate } from '../../data/defaultData';
-import { MailService } from '../../mail/mail.service';
+import { roundsOfHashing, tempRegisterDate } from '@/data/defaultData';
+import { MailService } from '@/mail/mail.service';
 import { Response } from 'express';
 
 @Injectable()

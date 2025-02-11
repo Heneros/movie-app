@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from '@/prisma/prisma.service';
 import { ResendEmailDto } from '../dto/resend-email.dto';
-import { SchedulerRegistry } from '@nestjs/schedule';
-import { MailService } from '../../mail/mail.service';
+import { MailService } from '@/mail/mail.service';
 import { randomBytes } from 'crypto';
-import { domain, tempRequestPassDate } from '../../data/defaultData';
+import { domain, tempRequestPassDate } from '@/data/defaultData';
 import { Response } from 'express';
 
 @Injectable()

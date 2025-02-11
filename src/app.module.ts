@@ -10,7 +10,7 @@ import { UsersModule } from './users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { MovieModule } from './movie/movie.module';
 import { AuthModule } from './auth/auth.module';
-import { APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { MailModule } from './mail/mail.module';
 import { ConfigModule } from '@nestjs/config';
 
@@ -43,6 +43,7 @@ import { ConfigModule } from '@nestjs/config';
   controllers: [AppController],
   providers: [
     AppService,
+    
     // MailService,
     {
       provide: APP_INTERCEPTOR,

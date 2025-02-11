@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { User } from '@prisma/client';
-import { domain } from '../data/defaultData';
+import { domain } from '@/data/defaultData';
 
 interface EmailVerificationToken {
   token: string;

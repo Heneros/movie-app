@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Movie } from '@prisma/client';
-import { UserEntity } from '../../users/entities/user.entity';
-
+import { UserEntity } from '@/users/entities/user.entity';
 
 export class MovieEntity implements Movie {
   @ApiProperty()
