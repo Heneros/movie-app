@@ -11,22 +11,22 @@
     "start": "nest start",
     "start:dev": "nest start --watch ",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/apps/restapi/main",
+    "start:prod": "node dist/main",
     "docker:dev": "docker compose -f docker-compose.dev.yml up -d ",
     "docker:dev:build": "docker compose -f docker-compose.dev.yml up -d --build",
     "docker:dev:down": "docker compose -f docker-compose.dev.yml down",
     "docker:prod": "docker compose -f docker-compose.prod.yml up -d ",
     "docker:prod:build": "docker compose -f docker-compose.prod.yml up -d --build ",
     "docker:prod:down": "docker compose -f  docker-compose.prod.yml down",
-    "prisma:dev": "cross-env DATABASE_URL=postgres://postgres:postgres@localhost:5432/moviedb?schema=public npx prisma migrate dev --schema=apps/restapi/prisma/schema.prisma",
-    "prisma:docker": "cross-env DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public npx prisma migrate dev --schema=apps/restapi/prisma/schema.prisma",
+    "prisma:dev": "cross-env DATABASE_URL=postgres://postgres:postgres@localhost:5432/moviedb?schema=public npx prisma migrate dev ",
+    "prisma:docker": "cross-env DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public npx prisma migrate dev ",
     "start:docker": "npm run prisma:docker && npm run start",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./apps/restapi/test/jest-e2e.json --runInBand"
+    "test:e2e": "jest --config ./test/jest-e2e.json --runInBand"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^2.0.2",
@@ -117,10 +117,14 @@
     "coverageDirectory": "./coverage",
     "testEnvironment": "node",
     "roots": [
-      "<rootDir>/apps/"
-    ]
+      "<rootDir>/apps/",
+      "<rootDir>/libs/"
+    ],
+    "moduleNameMapper": {
+      "^@app/contracts(|/.*)$": "<rootDir>/libs/contracts/src/$1"
+    }
   },
   "prisma": {
-    "seed": "ts-node apps/restapi/prisma/seed.ts"
+    "seed": "ts-node prisma/seed.ts"
   }
 }

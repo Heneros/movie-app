@@ -1,0 +1,86 @@
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseIntPipe,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
+import { UsersService } from './users.service';
+
+import { UpdateUserDto } from './dto/update-user.dto';
+import {
+  ApiBearerAuth,
+  ApiCookieAuth,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
+import { UserEntity } from './entities/user.entity';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { AuthGuard } from '../guards/auth.guard';
+import { Roles } from '../decorators/roles.decorator';
+import { PAGINATION_LIMIT } from '../data/defaultData';
+
+@Controller('users')
+@ApiTags('Users')
+export class UsersController {
+  constructor(private readonly usersService: UsersService) {}
+
+  @Get()
+  @UseGuards(AuthGuard)
+  @Roles('Admin', 'Editor')
+  @ApiBearerAuth('access-token')
+  @ApiCookieAuth('cookie-auth')
+  @ApiOkResponse({ type: UserEntity, isArray: true })
+  @ApiOperation({ summary: 'For admin. Get All User' })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    description: 'Page number for pagination',
+    type: Number,
+  })
+  async findAll(@Query('page') pageString: number) {
+    // console.log('123');
+    const page = pageString ? Number(pageString) : 1;
+    const skip = (page - 1) * PAGINATION_LIMIT;
+
+    const users = await this.usersService.findAll(skip);
+    return users.map((user) => new UserEntity(user));
+  }
+
+  @Get(':id')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @ApiOkResponse({ type: UserEntity })
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    //  return this.usersService.findOne(id);
+    // console.log(123);
+    return new UserEntity(await this.usersService.findOne(+id));
+  }
+
+  @Patch(':id')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @ApiCreatedResponse({ type: UserEntity })
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    return new UserEntity(await this.usersService.update(id, updateUserDto));
+  }
+
+  @Delete(':id')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @ApiOkResponse({ type: UserEntity })
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    return new UserEntity(await this.usersService.remove(id));
+  }
+}

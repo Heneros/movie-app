@@ -23,10 +23,10 @@
 
 ## Features should be:
 - Bash write script
-- Redis(refreshToken table) should be
+- Redis(search movie result) should be
 - Load Balancer to db and redis
 - roles admin/user/editor  - done
-- Adding movies is only available for admins and editor
+- CRUD operations with movies is only available for admins and editor
 - search movie
 - Each movie has a category, preview, title, synopsis, and rating
 - user can register/login validation have
