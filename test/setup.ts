@@ -6,18 +6,16 @@ import {
 import * as request from 'supertest';
 import * as fs from 'fs';
 import * as path from 'path';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 
 import { Test, TestingModule } from '@nestjs/testing';
-import { AppModule } from '../src/src/app.module';
-import { ThrottlerGuard } from '@nestjs/throttler';
-import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
-import { PrismaService } from '../src/src/prisma/prisma.service';
-import { PrismaModule } from '../src/src/prisma/prisma.module';
-import { MailModule } from '../src/src/mail/mail.module';
-import { MailService } from '../src/src/mail/mail.service';
+import { AppModule } from '@/app.module';
+import { PrismaService } from '../src/prisma/prisma.service';
+import { PrismaModule } from '../src/prisma/prisma.module';
+import { MailModule } from '../src/mail/mail.module';
+import { MailService } from '../src/mail/mail.service';
 import { clearDatabase } from './helpers/db-helper';
-import { AuthModule } from '../src/src/auth/auth.module';
-import session from 'express-session';
+import { AuthModule } from '../src/auth/auth.module';
 
 export let app: INestApplication;
 

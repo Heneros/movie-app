@@ -1,9 +1,9 @@
 import express, { Request, Response } from 'express';
 import session from 'express-session';
-import { PrismaService } from '../../src/src/prisma/prisma.service';
+import { PrismaService } from '../../src/prisma/prisma.service';
 
-import { LogoutAuthService } from '../../src/src/auth/services/logout.service';
 import { app } from '../setup';
+import { LogoutAuthService } from '../../src/auth/services/logout.service';
 import * as bcrypt from 'bcrypt';
 import * as request from 'supertest';
 

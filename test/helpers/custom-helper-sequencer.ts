@@ -1,10 +1,10 @@
 const TestSequencer = require('@jest/test-sequencer').default;
 
 const priorityOrder = [
-  // 'auth/A_create-user.e2e-spec.ts',
-  // 'auth/B_resendEmailValidation.e2e-spec.ts',
-  // 'auth/C_verifyEmail.e2e-spec.ts',
-  // 'auth/D_resetPassword.e2e-spec.ts',
+  'auth/A_create-user.e2e-spec.ts',
+  'auth/B_resendEmailValidation.e2e-spec.ts',
+  'auth/C_verifyEmail.e2e-spec.ts',
+  'auth/D_resetPassword.e2e-spec.ts',
   'auth/E_login.e2e-spec.ts',
 ];
 

@@ -5,9 +5,8 @@ import * as path from 'path';
 // dir: path.join(__dirname, 'templates'),
 
 import { app } from '../setup';
-import { VerifyEmailDto } from '../../src/src/auth/dto/verify-email.dto';
-import { PrismaService } from '../../src/src/prisma/prisma.service';
-import { tempRegisterDate } from '../../src/src/data/defaultData';
+import { PrismaService } from '../../src/prisma/prisma.service';
+import { tempRegisterDate } from '@/data/defaultData';
 
 const testUserFile = path.join(__dirname, './data/testUser.json');
 describe('Auth - Verify Email (e2e)', () => {

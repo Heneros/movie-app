@@ -4,7 +4,7 @@
     "json",
     "ts"
   ],
-  "rootDir": ".",
+  "rootDir": "../",
   "testEnvironment": "node",
   "testRegex": ".e2e-spec.ts$",
   "transform": {
@@ -13,5 +13,8 @@
   "extensionsToTreatAsEsm": [
     ".ts"
   ],
-  "testSequencer": "<rootDir>/helpers/custom-helper-sequencer.ts"
+  "testSequencer": "<rootDir>/test/helpers/custom-helper-sequencer.ts",
+  "moduleNameMapper": {
+    "^@/(.*)$": "<rootDir>/src/$1"
+  }
 }

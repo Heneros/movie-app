@@ -39,6 +39,10 @@ import { ProfileOwnerGuard } from './guard/ProfileOwner.guard';
 import { GetIdUsersService } from './services/getIdUser.service';
 import { RemoveUserAccountService } from './services/removeUser.service';
 import { RemoveMyAccountService } from './services/removeMyAccount.services';
+import { ChangeRoleService } from './services/changeRoleUser.service';
+import { UpdateUserRole } from './dto/update-user-role.dto';
+import { UserUpdatedProfileEntity } from './entities/updated-profile.entity';
+import { DeactivateUserService } from './services/deactivateUser.service';
 
 @Controller('users')
 @ApiTags('Users')
@@ -50,6 +54,8 @@ export class UsersController {
     private readonly getIdUsersService: GetIdUsersService,
     private readonly removeUserAccountService: RemoveUserAccountService,
     private readonly removeMyAccountService: RemoveMyAccountService,
+    private readonly changeRoleService: ChangeRoleService,
+    private readonly deactivateUserService: DeactivateUserService,
   ) {}
 
   @Get()
@@ -116,12 +122,40 @@ export class UsersController {
     return new UserEntity(await this.removeUserAccountService.remove(id));
   }
 
-  @Delete(':id/user')
+  @Put(':id/role')
+  @Roles('Admin')
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Change role for users. Only for admin user' })
+  @ApiBearerAuth('access-token')
+  // @UsePipes(CheckUserExistPipe)
+  @ApiCreatedResponse({ type: UserUpdatedProfileEntity })
+  async changeRole(
+    @Param('id', CheckUserExistPipe) id: number,
+    @Body() updateUserRole: UpdateUserRole,
+  ) {
+    // console.log(updateUserRole);
+    return new UserUpdatedProfileEntity(
+      await this.changeRoleService.changeRole(id, updateUserRole),
+    );
+  }
+
+  @Delete(':id/myaccount')
   @UseGuards(AuthGuard, ProfileOwnerGuard)
   @ApiOperation({ summary: 'Delete my account. Only for User' })
   @ApiBearerAuth('access-token')
   @ApiOkResponse({ type: UserEntity })
   async removeMyAccount(@Param('id', ParseIntPipe) id: number) {
     return await this.removeMyAccountService.remove(id);
+  }
+
+  @Put(':id/deactivate')
+  @Roles('Admin')
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Change role for users. Only for admin user' })
+  @ApiBearerAuth('access-token')
+  // @UsePipes(CheckUserExistPipe)
+  @ApiCreatedResponse({ type: UserEntity })
+  async deactivate(@Param('id', CheckUserExistPipe) id: number) {
+    return new UserEntity(await this.deactivateUserService.deactivate(id));
   }
 }

@@ -43,7 +43,7 @@ import { ConfigModule } from '@nestjs/config';
   controllers: [AppController],
   providers: [
     AppService,
-    
+
     // MailService,
     {
       provide: APP_INTERCEPTOR,

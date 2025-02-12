@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as bcrypt from 'bcrypt';
 import { app, mockMailService } from '../setup';
 
-import { PrismaService } from '../../src/src/prisma/prisma.service';
+import { PrismaService } from '../../src/prisma/prisma.service';
 
 const testUserFile = path.join(__dirname, './data/testUser.json');
 

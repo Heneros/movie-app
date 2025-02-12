@@ -1,5 +1,4 @@
-import session from 'express-session';
-import { PrismaService } from '../../src/src/prisma/prisma.service';
+import { PrismaService } from '../../src/prisma/prisma.service';
 import { app } from '../setup';
 import * as bcrypt from 'bcrypt';
 import * as request from 'supertest';

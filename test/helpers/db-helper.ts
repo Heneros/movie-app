@@ -1,4 +1,4 @@
-import { PrismaService } from '../../src/src/prisma/prisma.service';
+import { PrismaService } from '@/prisma/prisma.service';
 
 export async function clearDatabase(prisma: PrismaService) {
   await prisma.verifyResetToken.deleteMany({});
