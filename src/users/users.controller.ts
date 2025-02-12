@@ -12,6 +12,7 @@ import {
   Res,
   UsePipes,
   Put,
+  Req,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 
@@ -32,7 +33,7 @@ import { AuthGuard } from '@/guards/auth.guard';
 import { Roles } from '@/decorators/roles.decorator';
 import { PAGINATION_LIMIT } from '@/data/defaultData';
 import { GetAllUsersService } from './services/getAllUsers.service';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { CheckUserExistPipe } from './pipe/CheckUserExist.pipe';
 import { UpdateUserService } from './services/updateMyProfile.service';
 import { ProfileOwnerGuard } from './guard/ProfileOwner.guard';
@@ -132,10 +133,11 @@ export class UsersController {
   async changeRole(
     @Param('id', CheckUserExistPipe) id: number,
     @Body() updateUserRole: UpdateUserRole,
+    @Req() req: Request,
   ) {
     // console.log(updateUserRole);
     return new UserUpdatedProfileEntity(
-      await this.changeRoleService.changeRole(id, updateUserRole),
+      await this.changeRoleService.changeRole(req, id, updateUserRole),
     );
   }
 

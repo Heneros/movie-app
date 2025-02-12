@@ -61,3 +61,4 @@
 - AES encryption 
 - User can rate movie and change overall rating of the film display
 - Implement cors
+- Add field to table Users ban true or false. By default false

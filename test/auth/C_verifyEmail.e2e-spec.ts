@@ -5,7 +5,7 @@ import * as path from 'path';
 // dir: path.join(__dirname, 'templates'),
 
 import { app } from '../setup';
-import { PrismaService } from '../../src/prisma/prisma.service';
+import { PrismaService } from '@/prisma/prisma.service';
 import { tempRegisterDate } from '@/data/defaultData';
 
 const testUserFile = path.join(__dirname, './data/testUser.json');
@@ -16,13 +16,6 @@ describe('Auth - Verify Email (e2e)', () => {
 
   beforeEach(async () => {
     prisma = app.get(PrismaService);
-    // user = await JSON.parse(fs.readFileSync(testUserFile, 'utf8'));
-    // testUser = await prisma.user.findFirst({
-    //   where: { id: Number(user.id) },
-    // });
-    // console.log(testUser);
-    // expect(testUser).toBeDefined();
-    // expect(testUser.email).toBe(user.email);
   });
 
   it('should verify email successfully', async () => {

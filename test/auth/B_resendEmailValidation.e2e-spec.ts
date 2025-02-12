@@ -1,10 +1,8 @@
 import * as request from 'supertest';
-import * as fs from 'fs';
-import * as path from 'path';
 import * as bcrypt from 'bcrypt';
 
 import { app, mockMailService } from '../setup';
-import { PrismaService } from '../../src/prisma/prisma.service';
+import { PrismaService } from '@/prisma/prisma.service';
 
 describe('Auth - Resend Email (e2e)', () => {
   let prisma: PrismaService;
