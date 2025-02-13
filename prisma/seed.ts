@@ -15,11 +15,9 @@ async function main() {
     },
     create: {
       email: 'admin@email.com',
-
+      // movies: movie1.id,
       name: 'Admin',
-
       roles: ['Admin', 'Editor', 'User'],
-
       password: passwordAdmin,
       isEmailVerified: true,
     },
@@ -34,6 +32,7 @@ async function main() {
     create: {
       email: 'user@email.com',
       name: 'Default User',
+      roles: ['User'],
       password: passwordUser,
     },
   });
@@ -51,6 +50,7 @@ async function main() {
       description: 'Good Movie',
       published: false,
       authorId: user1.id,
+      actorsList: [],
     },
   });
 
@@ -70,10 +70,30 @@ async function main() {
     },
   });
 
-  const movie3 = await prisma.movie.upsert({
-    where: { title: 'Back to the Future' },
+  const review1 = await prisma.reviews.upsert({
+    where: { id: 1 },
     update: {},
     create: {
+      auId: user1.id,
+      movieId: movie1.id,
+      positive: false,
+      review: 'test test',
+    },
+  });
+
+  const movie3 = await prisma.movie.upsert({
+    where: { title: 'Back to the Future', authorId: user1.id },
+    update: {
+      authorId: user1.id,
+      reviews: {
+        connect: { id: review1.id },
+      },
+    },
+    create: {
+      reviews: {
+        connect: { id: review1.id },
+      },
+
       title: 'Back to the Future',
       category: 'Science Fiction',
       rating: 7,
@@ -84,8 +104,7 @@ async function main() {
       authorId: user1.id,
     },
   });
-
-  console.log({ movie1, movie2, movie3 });
+  console.log({ movie3, review1 });
 }
 
 main()
