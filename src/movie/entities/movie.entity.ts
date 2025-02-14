@@ -31,10 +31,19 @@ export class MovieEntity implements Movie {
   updatedAt: Date;
 
   @ApiProperty({ required: false, nullable: true })
-  authorId: number | null;
+  authorId: number;
 
   @ApiProperty({ required: false, type: UserEntity })
   author?: UserEntity;
+
+  @ApiProperty()
+  actorsList: string[];
+
+  @ApiProperty()
+  movieId: number;
+
+  @ApiProperty()
+  userId: number;
 
   constructor({ author, ...data }: Partial<MovieEntity>) {
     Object.assign(this, data);

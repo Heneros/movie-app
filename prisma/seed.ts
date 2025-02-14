@@ -8,14 +8,14 @@ async function main() {
   const passwordUser = await bcrypt.hash('password-user', roundsOfHashing);
 
   const user1 = await prisma.user.upsert({
-    where: { email: 'admin@email.com' },
-
+    where: {
+      email: 'admin@email.com',
+    },
     update: {
       password: passwordAdmin,
     },
     create: {
       email: 'admin@email.com',
-      // movies: movie1.id,
       name: 'Admin',
       roles: ['Admin', 'Editor', 'User'],
       password: passwordAdmin,
@@ -84,10 +84,10 @@ async function main() {
   const movie3 = await prisma.movie.upsert({
     where: { title: 'Back to the Future', authorId: user1.id },
     update: {
-      authorId: user1.id,
-      reviews: {
-        connect: { id: review1.id },
-      },
+      // authorId: user1.id,
+      // reviews: {
+      //   connect: { id: review1.id },
+      // },
     },
     create: {
       reviews: {
@@ -104,7 +104,32 @@ async function main() {
       authorId: user1.id,
     },
   });
-  console.log({ movie3, review1 });
+
+  const actor1 = await prisma.actors.upsert({
+    where: { name: 'Johnny Depp' },
+    update: {},
+    create: {
+      name: 'Johnny Depp',
+      preview: '',
+      age: '12-03-1996',
+    },
+  });
+
+  const userFav = await prisma.userFavoriteMovies.create({
+    data: {
+      userId: user1.id,
+      movieId: movie1.id,
+    },
+  });
+
+  const actors = await prisma.actorsOnMovies.create({
+    data: {
+      actorId: actor1.id,
+      movieId: movie1.id,
+    },
+  });
+
+  console.log({ userFav, actors });
 }
 
 main()

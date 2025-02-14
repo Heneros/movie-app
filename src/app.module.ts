@@ -3,6 +3,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 // import { RedisService } from '@nestjs/redis';
 import { CacheModule } from '@nestjs/cache-manager';
 import * as redisStore from 'cache-manager-redis-store';
+import * as path from 'path';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -13,6 +14,8 @@ import { AuthModule } from './auth/auth.module';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { MailModule } from './mail/mail.module';
 import { ConfigModule } from '@nestjs/config';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 
 @Module({
   imports: [
@@ -24,6 +27,14 @@ import { ConfigModule } from '@nestjs/config';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    // GraphQLModule.forRoot<ApolloDriverConfig>({
+    // driver: ApolloDriver,
+    // autoSchemaFile: path.join(process.cwd(), 'src/schema.gql'),
+    // autoSchemaFile: true,
+    // playground: true,
+    // sortSchema: true,
+    // }),
+
     CacheModule.register({
       store: redisStore,
       socket: {

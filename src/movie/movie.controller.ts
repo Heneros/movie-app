@@ -11,6 +11,7 @@ import {
   Query,
   ValidationPipe,
   UseInterceptors,
+  UseGuards,
 } from '@nestjs/common';
 import { MovieService } from './movie.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
@@ -19,6 +20,7 @@ import {
   ApiBody,
   ApiCreatedResponse,
   ApiOkResponse,
+  ApiOperation,
   ApiProperty,
   ApiQuery,
   ApiTags,
@@ -32,12 +34,17 @@ import { SearchMovieDto } from './dto/search-movie.dto';
 import { TimeoutInterceptor } from '@/interceptor/timeout.interceptor';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { Movie } from '@prisma/client';
+import { MovieFavorite } from './services/addMovieFavoriteList.service';
+import { AuthGuard } from '@/guards/auth.guard';
 
 @Controller('movie')
 @ApiTags('Movie')
 @UseInterceptors(TimeoutInterceptor)
 export class MovieController {
-  constructor(private readonly movieService: MovieService) {}
+  constructor(
+    private readonly movieService: MovieService,
+    private readonly movieFavorite: MovieFavorite,
+  ) {}
 
   @Get()
   @ApiQuery({
@@ -138,5 +145,50 @@ export class MovieController {
       throw new NotFoundException(`movie with ${id} does not exist.`);
     }
     return new MovieEntity(await this.movieService.remove(id));
+  }
+
+  @Post(':id/addFav')
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Add to favorite list user.' })
+  @ApiOkResponse({ type: MovieEntity })
+  async addMovieFav(
+    @Param('id', ParseIntPipe) movieId: number,
+    @Body('userId') userObjectId: number,
+  ) {
+    const movie = await this.movieService.findOne(movieId);
+
+    if (!movie) {
+      throw new NotFoundException(`movie with ${movieId} does not exist.`);
+    }
+    // let userID;
+    // const { userId } = userId;
+    // return new MovieEntity(
+    const userId = userObjectId;
+    // console.log(userId);
+    // return new MovieEntity(
+    await this.movieFavorite.addMovieFav(movieId, userId);
+    // );
+    // (await this.movieService.remove(id))
+    // );
+  }
+
+  @Delete(':id/removeFav')
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Add to favorite list user.' })
+  @ApiOkResponse({ type: MovieEntity })
+  async removeMovieFavorite(
+    @Param('id', ParseIntPipe) movieId: number,
+    @Body('userId') userObjectId: number,
+  ) {
+    const movie = await this.movieService.findOne(movieId);
+
+    if (!movie) {
+      throw new NotFoundException(`movie with ${movieId} does not exist.`);
+    }
+
+    const userId = userObjectId;
+    // return new MovieEntity(
+    await this.movieFavorite.removeMovieFav(movieId, userId);
+    // );
   }
 }
