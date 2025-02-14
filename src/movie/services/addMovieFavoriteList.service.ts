@@ -48,4 +48,12 @@ export class MovieFavorite {
     return movieUni;
     // console.log(movieUni);
   }
+
+  async getAllFavorites(userId: number) {
+    return await this.prisma.userFavoriteMovies.findMany({
+      where: {
+        userId,
+      },
+    });
+  }
 }

@@ -40,7 +40,7 @@ export class MovieEntity implements Movie {
   actorsList: string[];
 
   @ApiProperty()
-  movieId: number;
+  movieId?: number;
 
   @ApiProperty()
   userId: number;

@@ -36,6 +36,7 @@ import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { Movie } from '@prisma/client';
 import { MovieFavorite } from './services/addMovieFavoriteList.service';
 import { AuthGuard } from '@/guards/auth.guard';
+import { PrismaService } from '@/prisma/prisma.service';
 
 @Controller('movie')
 @ApiTags('Movie')
@@ -44,6 +45,7 @@ export class MovieController {
   constructor(
     private readonly movieService: MovieService,
     private readonly movieFavorite: MovieFavorite,
+    private readonly prisma: PrismaService,
   ) {}
 
   @Get()
@@ -160,16 +162,12 @@ export class MovieController {
     if (!movie) {
       throw new NotFoundException(`movie with ${movieId} does not exist.`);
     }
-    // let userID;
-    // const { userId } = userId;
-    // return new MovieEntity(
+
     const userId = userObjectId;
-    // console.log(userId);
-    // return new MovieEntity(
-    await this.movieFavorite.addMovieFav(movieId, userId);
-    // );
-    // (await this.movieService.remove(id))
-    // );
+
+    return new MovieEntity(
+      await this.movieFavorite.addMovieFav(movieId, userId),
+    );
   }
 
   @Delete(':id/removeFav')
@@ -187,8 +185,27 @@ export class MovieController {
     }
 
     const userId = userObjectId;
-    // return new MovieEntity(
-    await this.movieFavorite.removeMovieFav(movieId, userId);
-    // );
+    return new MovieEntity(
+      await this.movieFavorite.removeMovieFav(movieId, userId),
+    );
+  }
+
+  @Get(':id/allFavorites')
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'All favorite list user.' })
+  @ApiOkResponse({ type: [MovieEntity] })
+  async allFavorites(@Param('id', ParseIntPipe) userId: number) {
+    // const userIdSt = userId;
+    const favoriteMovies = await this.movieFavorite.getAllFavorites(userId);
+    const movieIds = favoriteMovies.map((fav) => fav.movieId);
+
+    const movies = await this.prisma.movie.findMany({
+      where: {
+        id: { in: movieIds },
+      },
+    });
+
+    return movies.map((movie) => new MovieEntity(movie));
+    // return new MovieEntity(await this.movieFavorite.getAllFavorites(userId));
   }
 }
