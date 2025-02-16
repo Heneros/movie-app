@@ -27,13 +27,13 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    // GraphQLModule.forRoot<ApolloDriverConfig>({
-    // driver: ApolloDriver,
-    // autoSchemaFile: path.join(process.cwd(), 'src/schema.gql'),
-    // autoSchemaFile: true,
-    // playground: true,
-    // sortSchema: true,
-    // }),
+
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: path.join(process.cwd(), 'src/schema.gql'),
+      playground: true,
+      sortSchema: true,
+    }),
 
     CacheModule.register({
       store: redisStore,
