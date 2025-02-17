@@ -1,12 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Movie } from '@prisma/client';
 import { UserEntity } from '@/users/entities/user.entity';
+import { Field, Int, ObjectType } from '@nestjs/graphql';
 
+@ObjectType()
 export class MovieEntity implements Movie {
   @ApiProperty()
+  @Field((type) => Int)
   id: number;
 
   @ApiProperty()
+  
   title: string;
 
   @ApiProperty()
