@@ -5,14 +5,10 @@ import { Movie } from '@prisma/client';
 import { UpdateMovieDto } from '../dto/update-movie.dto';
 
 @Injectable()
-export class MovieUpdateService {
+export class MovieRemoveService {
   constructor(private prisma: PrismaService) {}
 
-
-  update(id: number, updateMovieDto: UpdateMovieDto) {
-    return this.prisma.movie.update({
-      where: { id },
-      data: updateMovieDto,
-    });
+  remove(id: number) {
+    return this.prisma.movie.delete({ where: { id } });
   }
 }

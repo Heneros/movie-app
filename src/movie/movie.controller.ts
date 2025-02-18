@@ -37,6 +37,15 @@ import { Movie } from '@prisma/client';
 import { MovieFavorite } from './services/addMovieFavoriteList.service';
 import { AuthGuard } from '@/guards/auth.guard';
 import { PrismaService } from '@/prisma/prisma.service';
+import { MovieSearchService } from './services/searchMovie.service';
+import { MovieCreateService } from './services/createMovie.service';
+import { MovieFindAllService } from './services/findAllMovie.service';
+import { MovieFindOneService } from './services/findOneMovie.service';
+import { MovieUpdateService } from './services/updateMovie.service';
+import { MovieRemoveService } from './services/removeMovie.service';
+import { MovieFindDraftsService } from './services/findDraftsMovie.service';
+import { MovieRateService } from './services/rateMovie.service';
+import { CheckMovieExistPipe } from './guard/checkIfMovieExist.guard';
 
 @Controller('movie')
 @ApiTags('Movie')
@@ -45,6 +54,15 @@ export class MovieController {
   constructor(
     private readonly movieService: MovieService,
     private readonly movieFavorite: MovieFavorite,
+    private readonly movieSearchService: MovieSearchService,
+    private readonly movieCreateService: MovieCreateService,
+    private readonly movieFindAllService: MovieFindAllService,
+    private readonly movieFindOneService: MovieFindOneService,
+    private readonly movieUpdateService: MovieUpdateService,
+    private readonly movieRemoveService: MovieRemoveService,
+    private readonly movieFindDraftsService: MovieFindDraftsService,
+    private readonly movieRateService: MovieRateService,
+
     private readonly prisma: PrismaService,
   ) {}
 
@@ -60,7 +78,7 @@ export class MovieController {
     const page = pageString ? parseInt(pageString, 10) : 1;
     const skip = (page - 1) * PAGINATION_LIMIT;
 
-    const movies = (await this.movieService.findAll(skip)) as Movie[];
+    const movies = (await this.movieFindAllService.findAll(skip)) as Movie[];
 
     return movies.map((movie) => new MovieEntity(movie));
   }
@@ -82,7 +100,7 @@ export class MovieController {
     @Query(new ValidationPipe())
     searchMovieDto: SearchMovieDto,
   ): Promise<MovieEntity[]> {
-    const movies = await this.movieService.searchByTitle(searchMovieDto);
+    const movies = await this.movieSearchService.searchByTitle(searchMovieDto);
 
     if (!movies || movies.length === 0) {
       throw new NotFoundException(
@@ -96,7 +114,7 @@ export class MovieController {
   @Get('drafts')
   @ApiOkResponse({ type: MovieEntity, isArray: true })
   async findDrafts() {
-    const drafts = await this.movieService.findDrafts();
+    const drafts = await this.movieFindDraftsService.findDrafts();
 
     return drafts.map((draft) => new MovieEntity(draft));
   }
@@ -105,7 +123,7 @@ export class MovieController {
   @Get(':id')
   @ApiOkResponse({ type: MovieEntity })
   async findOne(@Param('id', ParseIntPipe) id: number) {
-    const movie = await this.movieService.findOne(+id);
+    const movie = await this.movieFindOneService.findOne(+id);
     if (!movie) {
       throw new NotFoundException(`movie with ${id} does not exist.`);
     }
@@ -113,18 +131,18 @@ export class MovieController {
   }
 
   @Post()
-  // @Roles(['admin'])
+  @UseGuards(AuthGuard)
   @ApiCreatedResponse({ type: MovieEntity })
   @Roles('Admin', 'Editor')
-
-  // @ApiParam({name: 'id', description})
   async create(@Body() createMovieDto: CreateMovieDto, @User() user: User) {
     if (!user || !user.id) {
       throw new Error('User not found or unauthorized');
     }
     createMovieDto.authorId = user.id;
 
-    return new MovieEntity(await this.movieService.create(createMovieDto));
+    return new MovieEntity(
+      await this.movieCreateService.create(createMovieDto),
+    );
   }
 
   @Patch(':id')
@@ -134,19 +152,21 @@ export class MovieController {
     @Param('id', ParseIntPipe) id: number,
     @Body() updateMovieDto: UpdateMovieDto,
   ) {
-    return new MovieEntity(await this.movieService.update(id, updateMovieDto));
+    return new MovieEntity(
+      await this.movieUpdateService.update(id, updateMovieDto),
+    );
   }
 
   @Delete(':id')
   @Roles('Admin', 'Editor')
   @ApiOkResponse({ type: MovieEntity })
   async remove(@Param('id', ParseIntPipe) id: number) {
-    const movie = await this.movieService.findOne(id);
+    const movie = await this.movieFindOneService.findOne(id);
 
     if (!movie) {
       throw new NotFoundException(`movie with ${id} does not exist.`);
     }
-    return new MovieEntity(await this.movieService.remove(id));
+    return new MovieEntity(await this.movieRemoveService.remove(id));
   }
 
   @Post(':id/addFav')
@@ -154,17 +174,9 @@ export class MovieController {
   @ApiOperation({ summary: 'Add to favorite list user.' })
   @ApiOkResponse({ type: MovieEntity })
   async addMovieFav(
-    @Param('id', ParseIntPipe) movieId: number,
-    @Body('userId') userObjectId: number,
+    @Param('id', CheckMovieExistPipe, ParseIntPipe) movieId: number,
+    @Body('userId') userId: number,
   ) {
-    const movie = await this.movieService.findOne(movieId);
-
-    if (!movie) {
-      throw new NotFoundException(`movie with ${movieId} does not exist.`);
-    }
-
-    const userId = userObjectId;
-
     return new MovieEntity(
       await this.movieFavorite.addMovieFav(movieId, userId),
     );
@@ -178,7 +190,7 @@ export class MovieController {
     @Param('id', ParseIntPipe) movieId: number,
     @Body('userId') userObjectId: number,
   ) {
-    const movie = await this.movieService.findOne(movieId);
+    const movie = await this.movieFindOneService.findOne(movieId);
 
     if (!movie) {
       throw new NotFoundException(`movie with ${movieId} does not exist.`);
@@ -194,9 +206,12 @@ export class MovieController {
   @UseGuards(AuthGuard)
   @ApiOperation({ summary: 'All favorite list user.' })
   @ApiOkResponse({ type: [MovieEntity] })
-  async allFavorites(@Param('id', ParseIntPipe) userId: number) {
+  async allFavorites(@Param('id', ParseIntPipe) @User() user: User) {
     // const userIdSt = userId;
-    const favoriteMovies = await this.movieFavorite.getAllFavorites(userId);
+
+    const favoriteMovies = await this.movieFavorite.getAllFavorites(user.id);
+
+    console.log('allFavorites', user);
     const movieIds = favoriteMovies.map((fav) => fav.movieId);
 
     const movies = await this.prisma.movie.findMany({
@@ -206,5 +221,15 @@ export class MovieController {
     });
 
     return movies.map((movie) => new MovieEntity(movie));
+  }
+
+  @Patch(':id/rateMovie')
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Rate Movie' })
+  @ApiOkResponse({ type: [MovieEntity] })
+  async rateMovie(
+    @Param('id', ParseIntPipe, CheckMovieExistPipe) userId: number,
+  ) {
+    // const userIdSt = userId;
   }
 }

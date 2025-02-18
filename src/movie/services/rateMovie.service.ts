@@ -1,0 +1,58 @@
+import { PrismaService } from '@/prisma/prisma.service';
+import { BadRequestException, Injectable } from '@nestjs/common';
+
+@Injectable()
+export class MovieRateService {
+  constructor(private prisma: PrismaService) {}
+
+  async rateMovie(movieId: number, userId: number, value: number) {
+    if (value < 1 || value > 10) {
+      throw new BadRequestException('Rating value must be between 1 and 10');
+    }
+
+    const existingRating = await this.prisma.rating.findUnique({
+      where: {
+        userId_movieId: {
+          movieId,
+          userId,
+        },
+      },
+    });
+
+    let rating;
+
+    if (existingRating) {
+      rating = await this.prisma.rating.update({
+        where: {
+          id: existingRating.id,
+        },
+        data: {
+          value,
+        },
+      });
+    } else {
+      rating = await this.prisma.rating.create({
+        data: {
+          value,
+          user: { connect: { id: userId } },
+          movie: { connect: { id: userId } },
+        },
+      });
+    }
+
+    const ratings = await this.prisma.rating.findMany({
+      where: { movieId },
+      select: { value: true },
+    });
+
+    const total = ratings.reduce((sum, r) => sum + r.value, 0);
+    const avg = total / rating.length;
+
+    await this.prisma.movie.update({
+      where: { id: movieId },
+      data: { avgRating: avg },
+    });
+
+    return rating;
+  }
+}

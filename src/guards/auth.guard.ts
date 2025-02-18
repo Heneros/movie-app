@@ -36,8 +36,6 @@ export class AuthGuard implements CanActivate {
 
     let request: any;
 
-    // const request = context.switchToHttp().getRequest();
-
     if (context.getType().toString() === 'http') {
       request = context.switchToHttp().getRequest();
     } else {

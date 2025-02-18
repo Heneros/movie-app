@@ -12,6 +12,7 @@ type MovieEntity {
   actorsList: [String!]!
   author: [UserEntity!]!
   authorId: Float
+  avgRating: Float
   category: String!
   createdAt: DateTime
   description: String!
@@ -26,6 +27,9 @@ type MovieEntity {
 }
 
 type Mutation {
+  """Add to favorite list"""
+  addToFavorite(movieId: Float!, userId: Float!): MovieEntity!
+
   """Remove from favorites"""
   removeFromFavorite(movieId: Int!, userId: Int!): MovieEntity!
 }

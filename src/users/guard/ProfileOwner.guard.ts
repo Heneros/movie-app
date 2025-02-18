@@ -7,15 +7,27 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { GqlExecutionContext } from '@nestjs/graphql';
 import { JwtService } from '@nestjs/jwt';
 import { ExecException } from 'child_process';
-
 @Injectable()
 export class ProfileOwnerGuard implements CanActivate {
   constructor(private readonly jwtService: JwtService) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const request = context.switchToHttp().getRequest();
+    let request: any;
+    let idFromParams: number | null = null;
+
+    if (context.getType().toString() === 'http') {
+      context = context.switchToHttp().getRequest();
+      idFromParams = +request.params.id;
+    } else {
+      const gqlContext = GqlExecutionContext.create(context);
+      request = gqlContext.getContext().req;
+      const args = gqlContext.getArgs();
+      idFromParams = +args.userId || +args.id;
+    }
+
     const authHeader = request.headers?.authorization;
 
     if (!authHeader) {
@@ -23,6 +35,7 @@ export class ProfileOwnerGuard implements CanActivate {
     }
 
     const token = authHeader?.split('Bearer ')[1];
+    // console.log(token);
     if (!token) {
       throw new UnauthorizedException('No token provided');
     }
@@ -30,16 +43,14 @@ export class ProfileOwnerGuard implements CanActivate {
 
     try {
       const decodedToken = this.jwtService.verify(token);
-      userIdFromToken = decodedToken.id;
+      userIdFromToken = decodedToken.id || decodedToken.userId;
     } catch (error) {
       throw new UnauthorizedException('Invalid token');
     }
 
-    const idFromParams = +request.params.id;
-    console.log(userIdFromToken, idFromParams);
-    if (userIdFromToken !== idFromParams) {
+    if (!idFromParams || userIdFromToken !== idFromParams) {
       throw new ForbiddenException(
-        'You are not authorized to update this profile',
+        'You are not authorized to update this profile 33',
       );
     }
 

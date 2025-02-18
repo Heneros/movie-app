@@ -5,10 +5,30 @@ import { PrismaModule } from '@/prisma/prisma.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { MovieFavorite } from './services/addMovieFavoriteList.service';
 import { MovieResolver } from './movie.resolver';
+import { MovieSearchService } from './services/searchMovie.service';
+import { MovieCreateService } from './services/createMovie.service';
+import { MovieFindAllService } from './services/findAllMovie.service';
+import { MovieFindOneService } from './services/findOneMovie.service';
+import { MovieUpdateService } from './services/updateMovie.service';
+import { MovieRemoveService } from './services/removeMovie.service';
+import { MovieFindDraftsService } from './services/findDraftsMovie.service';
+import { MovieRateService } from './services/rateMovie.service';
 
 @Module({
   controllers: [MovieController],
-  providers: [MovieService, MovieFavorite, MovieResolver],
+  providers: [
+    MovieService,
+    MovieFavorite,
+    MovieSearchService,
+    MovieCreateService,
+    MovieFindAllService,
+    MovieFindOneService,
+    MovieUpdateService,
+    MovieRemoveService,
+    MovieFindDraftsService,
+    MovieRateService,
+    MovieResolver,
+  ],
   imports: [PrismaModule, CacheModule.register()],
 })
 export class MovieModule {}

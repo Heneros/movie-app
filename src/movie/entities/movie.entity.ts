@@ -62,6 +62,10 @@ export class MovieEntity implements Movie {
   @Field({ nullable: true })
   userId: number;
 
+  @ApiProperty()
+  @Field({ nullable: true })
+  avgRating: number;
+
   constructor({ author, ...data }: Partial<MovieEntity>) {
     Object.assign(this, data);
 
