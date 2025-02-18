@@ -29,7 +29,6 @@ model Movie {
 
   author User   @relation(fields: [authorId], references: [id])
 
-
   favoriteMovies UserFavoriteMovies[] 
   actors ActorsOnMovies[]
   actorsList String[]

@@ -33,6 +33,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
       autoSchemaFile: path.join(process.cwd(), 'src/schema.gql'),
       playground: true,
       sortSchema: true,
+      context: ({ req }) => ({ headers: req.headers }),
     }),
 
     CacheModule.register({
@@ -42,13 +43,13 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
         port: 6379,
       },
     }),
-    ThrottlerModule.forRoot([
-      {
-        name: 'long',
-        ttl: 6000,
-        limit: 100,
-      },
-    ]),
+    // ThrottlerModule.forRoot([
+    //   {
+    //     name: 'long',
+    //     ttl: 6000,
+    //     limit: 100,
+    //   },
+    // ]),
   ],
 
   controllers: [AppController],
@@ -60,10 +61,10 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
       provide: APP_INTERCEPTOR,
       useClass: ClassSerializerInterceptor,
     },
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerGuard,
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: ThrottlerGuard,
+    // },
     // {
     //   provide: APP_PIPE,
     //   useClass: EmailValidationPipe,

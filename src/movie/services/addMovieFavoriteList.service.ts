@@ -6,12 +6,15 @@ export class MovieFavorite {
   constructor(private prisma: PrismaService) {}
 
   async addMovieFav(movieId: number, userId: number) {
-    const movieFound = await this.prisma.userFavoriteMovies.findMany({
+    const movieFound = await this.prisma.userFavoriteMovies.findUnique({
       where: {
-        movieId,
-        userId: userId,
+        userId_movieId: {
+          movieId: movieId,
+          userId: userId,
+        },
       },
     });
+
     if (movieFound) {
       throw new BadRequestException('Movie Exist in Favorites list');
     }
@@ -26,17 +29,19 @@ export class MovieFavorite {
   }
 
   async removeMovieFav(movieId: number, userId: number) {
-    const movieFound = await this.prisma.userFavoriteMovies.findMany({
+    const movieFound = await this.prisma.userFavoriteMovies.findUnique({
       where: {
-        movieId,
-        userId: userId,
+        userId_movieId: {
+          movieId: movieId,
+          userId: userId,
+        },
       },
     });
-    if (movieFound) {
+    if (!movieFound) {
       throw new BadRequestException('Movie Not Found list');
     }
 
-    const movieUni = await this.prisma.userFavoriteMovies.delete({
+    await this.prisma.userFavoriteMovies.delete({
       where: {
         userId_movieId: {
           movieId,
@@ -44,9 +49,7 @@ export class MovieFavorite {
         },
       },
     });
-    // console.log('success');
-    return movieUni;
-    // console.log(movieUni);
+    return movieFound;
   }
 
   async getAllFavorites(userId: number) {

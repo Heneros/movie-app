@@ -206,6 +206,5 @@ export class MovieController {
     });
 
     return movies.map((movie) => new MovieEntity(movie));
-    // return new MovieEntity(await this.movieFavorite.getAllFavorites(userId));
   }
 }
