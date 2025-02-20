@@ -35,8 +35,20 @@ type Mutation {
 }
 
 type Query {
+  """Find By id movie"""
+  findById(id: Float!): MovieEntity!
+
+  """Get Drafts movies"""
+  findDrafts: [MovieEntity!]!
+
   """Get All favorites """
   getAllFavorites(id: Int!): [MovieEntity!]!
+
+  """Get All movies"""
+  getAllMovies(page: Float! = 1): [MovieEntity!]!
+
+  """Search movies"""
+  searchMovies(title: String!): [MovieEntity!]!
 }
 
 type UserEntity {

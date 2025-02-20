@@ -16,13 +16,12 @@ export class MovieFindAllService {
 
     const cachedData = await this.cacheManager.get(cacheKey);
 
-    if (cachedData) {
-      const ttl = await this.cacheManager.ttl(cacheKey);
-
-      const remainingTime = ttl > 0 ? (ttl - Date.now()) / 1000 : ttl;
-      console.log(`Cache hit: ${cacheKey}, TTL: ${remainingTime} seconds`);
-      return cachedData;
-    }
+    // if (cachedData) {
+    //   const ttl = await this.cacheManager.ttl(cacheKey);
+    // const remainingTime = ttl > 0 ? (ttl - Date.now()) / 1000 : ttl;
+    // console.log(`Cache hit: ${cacheKey}, TTL: ${remainingTime} seconds`);
+    //   return cachedData;
+    // }
 
     const allMovies = await this.prisma.movie.findMany({
       skip,
