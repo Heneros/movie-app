@@ -123,11 +123,14 @@ export class MovieResolver {
     @Args('id', { type: () => Number, nullable: false }, CheckMovieExistPipe)
     id: number,
   ) {
-    // const movie = await this.movieFindOneService.findOne(+id);
-    // if (!movie) {
-    //   throw new NotFoundException(`movie with ${id} does not exist.`);
-    // }
-    // return new MovieEntity(movie);
+    return await this.movieFindOneService.findOne(+id);
+  }
+
+  @Mutation(() => MovieEntity, { description: 'Rate movie' })
+  async rateMovie(
+    @Args('id', { type: () => Number, nullable: false }, CheckMovieExistPipe)
+    id: number,
+  ) {
     return await this.movieFindOneService.findOne(+id);
   }
 }

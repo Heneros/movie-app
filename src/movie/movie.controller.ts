@@ -32,7 +32,6 @@ import { User } from '@/decorators/user.decorator';
 import { Public } from '@/decorators/public.decorator';
 import { SearchMovieDto } from './dto/search-movie.dto';
 import { TimeoutInterceptor } from '@/interceptor/timeout.interceptor';
-import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { Movie } from '@prisma/client';
 import { MovieFavorite } from './services/addMovieFavoriteList.service';
 import { AuthGuard } from '@/guards/auth.guard';
@@ -211,7 +210,7 @@ export class MovieController {
 
     const favoriteMovies = await this.movieFavorite.getAllFavorites(user.id);
 
-    console.log('allFavorites', user);
+    // console.log('allFavorites', user);
     const movieIds = favoriteMovies.map((fav) => fav.movieId);
 
     const movies = await this.prisma.movie.findMany({
@@ -223,13 +222,18 @@ export class MovieController {
     return movies.map((movie) => new MovieEntity(movie));
   }
 
-  @Patch(':id/rateMovie')
+  @Patch(':id')
   @UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Rate Movie' })
   @ApiOkResponse({ type: [MovieEntity] })
   async rateMovie(
-    @Param('id', ParseIntPipe, CheckMovieExistPipe) userId: number,
+    @Param('id', ParseIntPipe) movieId: number,
+    @User('id') user: User,
+    @Body('rating') value: number,
   ) {
+    // console.log(id, user.id, value);
+    // console.log('id, user.id, value', movieId, user);
+    return await this.movieRateService.rateMovie(movieId, user.id, value);
     // const userIdSt = userId;
   }
 }

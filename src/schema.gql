@@ -30,6 +30,9 @@ type Mutation {
   """Add to favorite list"""
   addToFavorite(movieId: Float!, userId: Float!): MovieEntity!
 
+  """Rate movie"""
+  rateMovie(id: Float!): MovieEntity!
+
   """Remove from favorites"""
   removeFromFavorite(movieId: Int!, userId: Int!): MovieEntity!
 }
