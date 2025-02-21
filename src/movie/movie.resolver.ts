@@ -20,6 +20,8 @@ import { SearchMovieDto } from './dto/search-movie.dto';
 import { MovieSearchService } from './services/searchMovie.service';
 import { CheckMovieExistPipe } from './guard/checkIfMovieExist.guard';
 import { MovieFindDraftsService } from './services/findDraftsMovie.service';
+import { User } from '@/decorators/user.decorator';
+import { MovieRateService } from './services/rateMovie.service';
 
 @Resolver((of) => MovieEntity)
 export class MovieResolver {
@@ -30,6 +32,7 @@ export class MovieResolver {
     private readonly movieSearchService: MovieSearchService,
     private readonly movieFindDraftsService: MovieFindDraftsService,
 
+    private movieRateService: MovieRateService,
     private movieFavorite: MovieFavorite,
     private prisma: PrismaService,
   ) {}
@@ -126,11 +129,17 @@ export class MovieResolver {
     return await this.movieFindOneService.findOne(+id);
   }
 
-  @Mutation(() => MovieEntity, { description: 'Rate movie' })
+  @UseGuards(AuthGuard)
+  @Mutation((returns) => MovieEntity, { description: 'Rate movie' })
   async rateMovie(
-    @Args('id', { type: () => Number, nullable: false }, CheckMovieExistPipe)
-    id: number,
+    @Args('id', { type: () => Int, nullable: false }, CheckMovieExistPipe)
+    movieId: number,
+    // @Args('userId', { type: () => Number, nullable: false })
+    @User('id') user: User,
+    @Args('rating', { type: () => Int, nullable: false })
+    value: number,
+    // user: number,
   ) {
-    return await this.movieFindOneService.findOne(+id);
+    return await this.movieRateService.rateMovie(movieId, user.id, value);
   }
 }

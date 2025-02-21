@@ -10,7 +10,7 @@ export class MovieEntity implements Movie {
   id: number;
 
   @ApiProperty()
-  @Field({ nullable: false })
+  @Field(() => String, { nullable: false })
   title: string;
 
   @ApiProperty()
@@ -65,6 +65,9 @@ export class MovieEntity implements Movie {
   @ApiProperty()
   @Field({ nullable: true })
   avgRating: number;
+
+  @Field((type) => Int, { nullable: true })
+  value: number;
 
   constructor({ author, ...data }: Partial<MovieEntity>) {
     Object.assign(this, data);

@@ -222,17 +222,17 @@ export class MovieController {
     return movies.map((movie) => new MovieEntity(movie));
   }
 
-  @Patch(':id')
+  @Patch(':id/rateMovie')
   @UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Rate Movie' })
   @ApiOkResponse({ type: [MovieEntity] })
   async rateMovie(
-    @Param('id', ParseIntPipe) movieId: number,
+    @Param('id', ParseIntPipe, CheckMovieExistPipe) movieId: number,
     @User('id') user: User,
-    @Body('rating') value: number,
+    @Body('rating', ParseIntPipe) value: number,
   ) {
-    // console.log(id, user.id, value);
-    // console.log('id, user.id, value', movieId, user);
+    // console.log(value);
+
     return await this.movieRateService.rateMovie(movieId, user.id, value);
     // const userIdSt = userId;
   }

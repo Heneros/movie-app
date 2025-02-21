@@ -1,11 +1,16 @@
 import { PrismaService } from '@/prisma/prisma.service';
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { Movie } from '@prisma/client';
 
 @Injectable()
 export class MovieRateService {
   constructor(private prisma: PrismaService) {}
 
-  async rateMovie(movieId: number, userId: number, value: number) {
+  async rateMovie(
+    movieId: number,
+    userId: number,
+    value: number,
+  ): Promise<Movie> {
     if (value < 1 || value > 10) {
       throw new BadRequestException('Rating value must be between 1 and 10');
     }
@@ -35,7 +40,7 @@ export class MovieRateService {
         data: {
           value,
           user: { connect: { id: userId } },
-          movie: { connect: { id: userId } },
+          movie: { connect: { id: movieId } },
         },
       });
     }
@@ -46,13 +51,15 @@ export class MovieRateService {
     });
 
     const total = ratings.reduce((sum, r) => sum + r.value, 0);
-    const avg = total / rating.length;
+    const avg = rating.length > 0 ? total / ratings.length : 0;
+    // console.log(avg);
 
-    await this.prisma.movie.update({
+    return await this.prisma.movie.update({
       where: { id: movieId },
-      data: { avgRating: avg },
+      // data: { avgRating: avg },
+      data: { avgRating: isNaN(avg) ? 0 : avg },
     });
 
-    return rating;
+    // return rating;
   }
 }

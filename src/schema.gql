@@ -24,6 +24,7 @@ type MovieEntity {
   title: String!
   updatedAt: DateTime
   userId: Float
+  value: Int
 }
 
 type Mutation {
@@ -31,7 +32,7 @@ type Mutation {
   addToFavorite(movieId: Float!, userId: Float!): MovieEntity!
 
   """Rate movie"""
-  rateMovie(id: Float!): MovieEntity!
+  rateMovie(id: Int!, rating: Int!): MovieEntity!
 
   """Remove from favorites"""
   removeFromFavorite(movieId: Int!, userId: Int!): MovieEntity!

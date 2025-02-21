@@ -33,7 +33,9 @@ model Movie {
   actors ActorsOnMovies[]
 
   ratings Rating[]
-  avgRating Float?
+  // avgRating Float?
+  avgRating Float @default(0)
+
 
   actorsList String[]
   authorId Int
