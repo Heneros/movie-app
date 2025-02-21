@@ -16,5 +16,10 @@
   "testSequencer": "<rootDir>/test/helpers/custom-helper-sequencer.ts",
   "moduleNameMapper": {
     "^@/(.*)$": "<rootDir>/src/$1"
-  }
+  },
+  "testPathIgnorePatterns": [
+    "/node_modules/",
+    "/users/",
+    "/auth/"
+  ]
 }

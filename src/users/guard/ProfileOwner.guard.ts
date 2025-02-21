@@ -25,7 +25,15 @@ export class ProfileOwnerGuard implements CanActivate {
       const gqlContext = GqlExecutionContext.create(context);
       request = gqlContext.getContext().req;
       const args = gqlContext.getArgs();
-      idFromParams = +args.userId || +args.id;
+
+ 
+      idFromParams = +args.userId || +args.id || args.input.userId;
+
+      // const {
+      //   input: { movieId, userId },
+      // } = args.input;
+
+      // console.log(args, args.id, args.movieId, args.userId);
     }
 
     const authHeader = request.headers?.authorization;
@@ -44,13 +52,15 @@ export class ProfileOwnerGuard implements CanActivate {
     try {
       const decodedToken = this.jwtService.verify(token);
       userIdFromToken = decodedToken.id || decodedToken.userId;
+
+      // console.log(userIdFromToken, idFromParams);
     } catch (error) {
       throw new UnauthorizedException('Invalid token');
     }
 
     if (!idFromParams || userIdFromToken !== idFromParams) {
       throw new ForbiddenException(
-        'You are not authorized to update this profile 33',
+        'You are not authorized to update this profile',
       );
     }
 

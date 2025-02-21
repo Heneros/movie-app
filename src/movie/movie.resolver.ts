@@ -22,6 +22,7 @@ import { CheckMovieExistPipe } from './guard/checkIfMovieExist.guard';
 import { MovieFindDraftsService } from './services/findDraftsMovie.service';
 import { User } from '@/decorators/user.decorator';
 import { MovieRateService } from './services/rateMovie.service';
+import { MovieBasicInput } from './input/movie.input';
 
 @Resolver((of) => MovieEntity)
 export class MovieResolver {
@@ -45,15 +46,16 @@ export class MovieResolver {
     @Args('movieId', CheckMovieExistPipe) movieId: number,
     @Args('userId') userId: number,
   ) {
-    const movie = await this.movieFindOneService.findOne(movieId);
+    const movie = await this.movieFindOneService.findOne(+movieId);
 
     if (!movie) {
       throw new NotFoundException(`movie with ${movieId} does not exist.`);
     }
 
-    return new MovieEntity(
-      await this.movieFavorite.addMovieFav(movieId, userId),
-    );
+    await this.movieFavorite.addMovieFav(movieId, userId);
+
+    return new MovieEntity(movie);
+
     // console.log(movie);
   }
 
@@ -77,9 +79,18 @@ export class MovieResolver {
     description: 'Remove from favorites',
   })
   async removeFromFavorite(
-    @Args('movieId', { type: () => Int }, CheckMovieExistPipe) movieId: number,
-    @Args('userId', { type: () => Int }) userId: number,
+    // @Args('movieId', { type: () => Int }, CheckMovieExistPipe) movieId: number,
+    // @Args('userId', { type: () => Int }) userId: number,
+    @Args('input') movieBasicInput: MovieBasicInput,
   ): Promise<MovieEntity> {
+    const { movieId, userId } = movieBasicInput;
+    if (!movieId || !userId) {
+      throw new NotFoundException(
+        `Problem: movieId (${movieId}) or userId (${userId}) is missing.`,
+      );
+    }
+    // console.log(12231312);
+
     const movie = await this.movieFindOneService.findOne(movieId);
 
     if (!movie) {
@@ -130,15 +141,14 @@ export class MovieResolver {
   }
 
   @UseGuards(AuthGuard)
-  @Mutation((returns) => MovieEntity, { description: 'Rate movie' })
+  @Mutation(() => MovieEntity, { description: 'Rate movie' })
   async rateMovie(
-    @Args('id', { type: () => Int, nullable: false }, CheckMovieExistPipe)
+    @Args('id', { nullable: false }, CheckMovieExistPipe)
     movieId: number,
-    // @Args('userId', { type: () => Number, nullable: false })
-    @User('id') user: User,
-    @Args('rating', { type: () => Int, nullable: false })
+    @Args('rating', { nullable: false })
     value: number,
-    // user: number,
+    @User('id')
+    user: User,
   ) {
     return await this.movieRateService.rateMovie(movieId, user.id, value);
   }

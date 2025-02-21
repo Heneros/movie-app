@@ -26,7 +26,7 @@ export const User = createParamDecorator(
     const token = authHeader?.split('Bearer ')[1];
     const payload = jwt.verify(token, process.env.JWT_SECRET) as JwtPayload;
 
-    // console.log(payload.id);
+    // console.log(payload);
     return (request.user as User) || payload;
   },
 );

@@ -16,6 +16,7 @@ import { ResendEmailService } from './services/resendEmailValidation.service';
 import { ResetPasswordService } from './services/resetPassword.service';
 import { LogoutAuthService } from './services/logout.service';
 import { RequestResetPasswordService } from './services/requestResetPassword.service';
+import { AuthResolver } from './auth.resolver';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { RequestResetPasswordService } from './services/requestResetPassword.ser
     ResetPasswordService,
     RequestResetPasswordService,
     LogoutAuthService,
+    AuthResolver,
   ],
 })
 export class AuthModule {}

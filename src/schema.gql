@@ -7,6 +7,14 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+input MovieBasicInput {
+  """Id movie"""
+  movieId: Int!
+
+  """Id user"""
+  userId: Int!
+}
+
 """Movie"""
 type MovieEntity {
   actorsList: [String!]!
@@ -32,10 +40,10 @@ type Mutation {
   addToFavorite(movieId: Float!, userId: Float!): MovieEntity!
 
   """Rate movie"""
-  rateMovie(id: Int!, rating: Int!): MovieEntity!
+  rateMovie(id: Float!, rating: Float!): MovieEntity!
 
   """Remove from favorites"""
-  removeFromFavorite(movieId: Int!, userId: Int!): MovieEntity!
+  removeFromFavorite(input: MovieBasicInput!): MovieEntity!
 }
 
 type Query {

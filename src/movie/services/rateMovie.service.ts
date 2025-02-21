@@ -24,6 +24,7 @@ export class MovieRateService {
       },
     });
 
+    // console.log(existingRating);
     let rating;
 
     if (existingRating) {
@@ -51,7 +52,7 @@ export class MovieRateService {
     });
 
     const total = ratings.reduce((sum, r) => sum + r.value, 0);
-    const avg = rating.length > 0 ? total / ratings.length : 0;
+    const avg = ratings.length > 0 ? total / ratings.length : 0;
     // console.log(avg);
 
     return await this.prisma.movie.update({

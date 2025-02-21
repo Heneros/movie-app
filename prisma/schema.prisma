@@ -10,7 +10,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("DATABASE_URL_TEST")
 }
 
 
@@ -19,7 +19,6 @@ model Movie {
   title String @unique
   description String
   category String
-  rating Int
   preview String 
   published   Boolean  @default(false)
   createdAt DateTime @default(now())
