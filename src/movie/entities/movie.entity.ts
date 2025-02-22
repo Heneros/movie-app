@@ -21,9 +21,9 @@ export class MovieEntity implements Movie {
   @Field({ nullable: false })
   category: string;
 
-  @ApiProperty()
-  @Field((type) => Int, { nullable: false })
-  rating: number;
+  // @ApiProperty()
+  // @Field((type) => Int, { nullable: false })
+  // rating: number;
 
   @ApiProperty()
   @Field({ nullable: false })

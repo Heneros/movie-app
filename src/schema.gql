@@ -28,7 +28,6 @@ type MovieEntity {
   movieId: Float
   preview: String!
   published: Boolean
-  rating: Int!
   title: String!
   updatedAt: DateTime
   userId: Float

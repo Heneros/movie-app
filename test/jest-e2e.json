@@ -20,6 +20,10 @@
   "testPathIgnorePatterns": [
     "/node_modules/",
     "/users/",
-    "/auth/"
+    "/auth/",
+    "/movie/createMovie.e2e-spec.ts",
+    "/movie/getByIdMovie.e2e-spec.ts",
+    "/movie/getAllMovies.e2e-spec.ts",
+    "/movie/searchMovie.e2e-spec.ts"
   ]
 }

@@ -1,5 +1,10 @@
 import { PrismaService } from '@/prisma/prisma.service';
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { PAGINATION_LIMIT } from '@/data/defaultData';
@@ -30,6 +35,10 @@ export class MovieFindAllService {
         id: 'asc',
       },
     });
+
+ if (allMovies.length === 0) {
+   throw new NotFoundException('No movies Exist');
+ }
 
     await this.cacheManager.set(cacheKey, allMovies, 3500);
     return allMovies;

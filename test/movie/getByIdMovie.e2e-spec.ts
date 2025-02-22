@@ -4,7 +4,7 @@ import * as request from 'supertest';
 import * as bcrypt from 'bcrypt';
 import { clearDatabase } from '../helpers/db-helper';
 
-describe('Movies - Create movies(e2e)', () => {
+describe('Movies - Get movie By Id(e2e)', () => {
   let prisma: PrismaService;
   let testUser;
   let userToken;
@@ -32,20 +32,26 @@ describe('Movies - Create movies(e2e)', () => {
     userToken = responseUser.body.newRefreshToken;
   });
 
-  it('Should Create Movie POST - Success', async () => {
+  it('Should GET By id Movie GET - Success', async () => {
     const response = await request(app.getHttpServer())
       .post(`/movie/`)
       .set('Authorization', `Bearer ${userToken} `)
       .send({
-        title: 'How we do?',
+        title: 'Think Twice?',
         category: 'Horror',
         preview: 'preview_url',
         description: 'Horror movie about missing in forest',
-      })
-      .expect(201);
+      });
 
-    expect(response.body).toMatchObject({
-      title: 'How we do?',
+    movieId = response.body.id;
+
+    const responseGet = await request(app.getHttpServer())
+      .get(`/movie/${movieId}`)
+      //   .set('Authorization', `Bearer ${userToken} `)
+      .send();
+
+    expect(responseGet.body).toMatchObject({
+      title: 'Think Twice?',
       category: 'Horror',
       preview: 'preview_url',
       description: 'Horror movie about missing in forest',
@@ -53,30 +59,18 @@ describe('Movies - Create movies(e2e)', () => {
     // console.log(response.body);
   });
 
-  it('Should Create Movie POST - Fail', async () => {
+  it('Should Create Movie GET - Fail', async () => {
     const response = await request(app.getHttpServer())
-      .post(`/movie/`)
-      .set('Authorization', `Bearer ${userToken} `)
-      .send({
-        title: '',
-        category: '',
-        preview: '',
-        description: '',
-      })
-      .expect(400);
+      .get(`/movie/1232313`)
+      .send()
+      .expect(404);
 
-    expect(response.body).toMatchObject({
-      error: 'Bad Request',
-      statusCode: 400,
-      message: expect.arrayContaining([
-        'title must be longer than or equal to 5 characters',
-        'title should not be empty',
-        'description should not be empty',
-        'preview should not be empty',
-        'category should not be empty',
-      ]),
-    });
     // console.log(response.body);
+    expect(response.body).toHaveProperty(
+      'message',
+      'movie with 1232313 does not exist.',
+    );
+    expect(response.status).toBe(404);
   });
   afterEach(async () => {
     await clearDatabase(prisma);

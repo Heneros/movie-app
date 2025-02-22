@@ -118,7 +118,7 @@ export class MovieController {
     return drafts.map((draft) => new MovieEntity(draft));
   }
 
-  @Public()
+  // @Public()
   @Get(':id')
   @ApiOkResponse({ type: MovieEntity })
   async findOne(@Param('id', ParseIntPipe) id: number) {

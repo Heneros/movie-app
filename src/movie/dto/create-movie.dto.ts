@@ -24,12 +24,12 @@ export class CreateMovieDto {
   @ApiProperty({ required: false })
   description: string;
 
-  @IsInt()
-  @IsNotEmpty()
-  @MaxLength(1)
-  @MaxLength(10)
-  @ApiProperty()
-  rating: number;
+  // @IsInt()
+  // @IsNotEmpty()
+  // @MaxLength(1)
+  // @MaxLength(10)
+  // @ApiProperty()
+  // rating: number;
 
   @IsString()
   @IsNotEmpty()

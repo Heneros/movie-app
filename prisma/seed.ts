@@ -45,7 +45,7 @@ async function main() {
     create: {
       title: 'Kill Bill',
       category: 'Action',
-      rating: 5,
+      // rating: 5,
       preview: 'URL_to_preview_image_or_video',
       description: 'Good Movie',
       published: false,
@@ -62,7 +62,7 @@ async function main() {
     create: {
       title: 'Anna',
       category: 'Action',
-      rating: 5,
+      // rating: 5,
       preview: 'URL_to_preview_image_or_video',
       description: 'Wonderful movie',
       published: false,
@@ -96,7 +96,7 @@ async function main() {
 
       title: 'Back to the Future',
       category: 'Science Fiction',
-      rating: 7,
+      // rating: 7,
       preview: 'URL_to_preview_image_or_video',
       description:
         'In the 1980s, an experiment by a weird scientist turns out to be faulty. ',
