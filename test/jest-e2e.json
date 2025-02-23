@@ -24,6 +24,8 @@
     "/movie/createMovie.e2e-spec.ts",
     "/movie/getByIdMovie.e2e-spec.ts",
     "/movie/getAllMovies.e2e-spec.ts",
-    "/movie/searchMovie.e2e-spec.ts"
+    "/movie/searchMovie.e2e-spec.ts",
+    "/movie/getDraftsMovie.e2e-spec.ts",
+    "/movie/updateMovie.e2e-spec.ts"
   ]
 }

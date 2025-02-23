@@ -1,6 +1,7 @@
 import {
   CanActivate,
   ExecutionContext,
+  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -70,7 +71,18 @@ export class AuthGuard implements CanActivate {
         });
         if (!user) return false;
 
+        const hasRole = user.roles.some((role) => roles.includes(role));
+        if (!hasRole) {
+          return false;
+          // throw new ForbiddenException(
+          //   'You do not have permission to perform this action',
+          // );
+        }
+
+        // console.log(payload);
+
         if (roles.some((role) => payload.roles.includes(role))) {
+          // console.log(request.user);
           request.user = payload;
           return true;
         }

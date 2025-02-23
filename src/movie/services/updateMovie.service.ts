@@ -8,11 +8,15 @@ import { UpdateMovieDto } from '../dto/update-movie.dto';
 export class MovieUpdateService {
   constructor(private prisma: PrismaService) {}
 
-
   update(id: number, updateMovieDto: UpdateMovieDto) {
-    return this.prisma.movie.update({
-      where: { id },
-      data: updateMovieDto,
-    });
+    try {
+      return this.prisma.movie.update({
+        where: { id },
+        data: updateMovieDto,
+      });
+    } catch (error) {
+      console.error('Error updating movie:', error);
+      throw new BadRequestException('Invalid data format');
+    }
   }
 }

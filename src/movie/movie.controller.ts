@@ -145,6 +145,7 @@ export class MovieController {
   }
 
   @Patch(':id')
+  @UseGuards(AuthGuard)
   @Roles('Admin', 'Editor')
   @ApiOkResponse({ type: MovieEntity })
   async update(
@@ -158,6 +159,7 @@ export class MovieController {
 
   @Delete(':id')
   @Roles('Admin', 'Editor')
+  @UseGuards(AuthGuard)
   @ApiOkResponse({ type: MovieEntity })
   async remove(@Param('id', ParseIntPipe) id: number) {
     const movie = await this.movieFindOneService.findOne(id);

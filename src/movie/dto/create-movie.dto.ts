@@ -9,6 +9,7 @@ import {
   MinLength,
   IsNumber,
   MaxLength,
+  IsArray,
 } from 'class-validator';
 
 export class CreateMovieDto {
@@ -45,6 +46,12 @@ export class CreateMovieDto {
   @IsOptional()
   @ApiProperty({ required: false })
   authorId: number;
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  @ApiProperty({ required: false })
+  actorsList: string[];
 
   @IsBoolean()
   @IsOptional()
