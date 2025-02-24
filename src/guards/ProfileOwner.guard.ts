@@ -19,21 +19,15 @@ export class ProfileOwnerGuard implements CanActivate {
     let idFromParams: number | null = null;
 
     if (context.getType().toString() === 'http') {
-      context = context.switchToHttp().getRequest();
-      idFromParams = +request.params.id;
+      request = context.switchToHttp().getRequest();
+      idFromParams = +request.params.id || +request.params.userId;
+      // console.log(idFromParams);
     } else {
       const gqlContext = GqlExecutionContext.create(context);
       request = gqlContext.getContext().req;
       const args = gqlContext.getArgs();
 
- 
       idFromParams = +args.userId || +args.id || args.input.userId;
-
-      // const {
-      //   input: { movieId, userId },
-      // } = args.input;
-
-      // console.log(args, args.id, args.movieId, args.userId);
     }
 
     const authHeader = request.headers?.authorization;

@@ -11,7 +11,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { MovieService } from './movie.service';
-import { ProfileOwnerGuard } from '@/users/guard/ProfileOwner.guard';
+import { ProfileOwnerGuard } from '@/guards/ProfileOwner.guard';
 import { MovieFindOneService } from './services/findOneMovie.service';
 import { PAGINATION_LIMIT } from '@/data/defaultData';
 import { Movie } from '@prisma/client';

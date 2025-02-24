@@ -28,7 +28,6 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { UserEntity } from './entities/user.entity';
-import { JwtAuthGuard } from '@/auth/jwt-auth.guard';
 import { AuthGuard } from '@/guards/auth.guard';
 import { Roles } from '@/decorators/roles.decorator';
 import { PAGINATION_LIMIT } from '@/data/defaultData';
@@ -36,7 +35,7 @@ import { GetAllUsersService } from './services/getAllUsers.service';
 import { Request, Response } from 'express';
 import { CheckUserExistPipe } from './pipe/CheckUserExist.pipe';
 import { UpdateUserService } from './services/updateMyProfile.service';
-import { ProfileOwnerGuard } from './guard/ProfileOwner.guard';
+import { ProfileOwnerGuard } from '../guards/ProfileOwner.guard';
 import { GetIdUsersService } from './services/getIdUser.service';
 import { RemoveUserAccountService } from './services/removeUser.service';
 import { RemoveMyAccountService } from './services/removeMyAccount.services';

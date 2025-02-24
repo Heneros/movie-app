@@ -61,11 +61,16 @@ describe('Movies - Add to favorite movies(e2e)', () => {
       .send({ userId: testUser.id })
       .expect(201);
 
+
+      
+
     expect(responseGet.body).toMatchObject({
       userId: testUser.id,
       movieId: movieId,
     });
   });
+
+
 
   /////////////Fail
   it('Should Fail add Same Movie to favorite -  Fail', async () => {

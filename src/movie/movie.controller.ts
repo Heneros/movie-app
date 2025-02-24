@@ -45,6 +45,7 @@ import { MovieRemoveService } from './services/removeMovie.service';
 import { MovieFindDraftsService } from './services/findDraftsMovie.service';
 import { MovieRateService } from './services/rateMovie.service';
 import { CheckMovieExistPipe } from './guard/checkIfMovieExist.guard';
+import { ProfileOwnerGuard } from '@/guards/ProfileOwner.guard';
 
 @Controller('movie')
 @ApiTags('Movie')
@@ -184,7 +185,7 @@ export class MovieController {
   }
 
   @Delete(':id/removeFav')
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, ProfileOwnerGuard)
   @ApiOperation({ summary: 'Add to favorite list user.' })
   @ApiOkResponse({ type: MovieEntity })
   async removeMovieFavorite(
@@ -204,10 +205,15 @@ export class MovieController {
   }
 
   @Get(':id/allFavorites')
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, ProfileOwnerGuard)
   @ApiOperation({ summary: 'All favorite list user.' })
   @ApiOkResponse({ type: [MovieEntity] })
-  async allFavorites(@Param('id', ParseIntPipe) @User() user: User) {
+  async allFavorites(
+    @Param('id', ParseIntPipe)
+    // userId: number,
+    @User('id')
+    user: User,
+  ) {
     // const userIdSt = userId;
 
     const favoriteMovies = await this.movieFavorite.getAllFavorites(user.id);

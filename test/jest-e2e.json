@@ -28,6 +28,8 @@
     "/movie/getDraftsMovie.e2e-spec.ts",
     "/movie/updateMovie.e2e-spec.ts",
     "/movie/deleteMovie.e2e-spec.ts",
-    "/movie/addMovietoFavorite.e2e-spec.ts"
+    "/movie/addMovietoFavorite.e2e-spec.ts",
+    "/movie/removeMovieFromFavorite.e2e-spec.ts",
+    "/movie/getAllFavorite.e2e-spec.ts"
   ]
 }
