@@ -12,11 +12,14 @@ import {
   ValidationPipe,
   UseInterceptors,
   UseGuards,
+  BadRequestException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { MovieService } from './movie.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
   ApiOkResponse,
@@ -46,6 +49,7 @@ import { MovieFindDraftsService } from './services/findDraftsMovie.service';
 import { MovieRateService } from './services/rateMovie.service';
 import { CheckMovieExistPipe } from './guard/checkIfMovieExist.guard';
 import { ProfileOwnerGuard } from '@/guards/ProfileOwner.guard';
+import { RateMovieDto } from './dto/rate-movie.dto';
 
 @Controller('movie')
 @ApiTags('Movie')
@@ -83,7 +87,6 @@ export class MovieController {
     return movies.map((movie) => new MovieEntity(movie));
   }
 
-  // @Public()
   @Get('search')
   @ApiProperty({ description: 'Search movie by title' })
   @ApiQuery({
@@ -97,14 +100,21 @@ export class MovieController {
     type: [MovieEntity],
   })
   async search(
-    @Query(new ValidationPipe())
-    searchMovieDto: SearchMovieDto,
+    @Query('title')
+    searchText: string,
+    @Query('page') pageString?: string,
   ): Promise<MovieEntity[]> {
-    const movies = await this.movieSearchService.searchByTitle(searchMovieDto);
+    const page = pageString ? parseInt(pageString, 10) : 1;
+    const skip = (page - 1) * PAGINATION_LIMIT;
+
+    const movies = (await this.movieSearchService.searchByTitle(
+      searchText,
+      skip,
+    )) as Movie[];
 
     if (!movies || movies.length === 0) {
       throw new NotFoundException(
-        `Movies with title '${searchMovieDto.title}' do not exist.`,
+        `Movies with title '${searchText}' do not exist.`,
       );
     }
 
@@ -112,9 +122,17 @@ export class MovieController {
   }
 
   @Get('drafts')
+  @Roles('Admin', 'Editor')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOkResponse({ type: MovieEntity, isArray: true })
-  async findDrafts() {
-    const drafts = await this.movieFindDraftsService.findDrafts();
+  async findDrafts(@Query('page') pageString?: string) {
+    const page = pageString ? parseInt(pageString, 10) : 1;
+    const skip = (page - 1) * PAGINATION_LIMIT;
+
+    const drafts = (await this.movieFindDraftsService.findDrafts(
+      skip,
+    )) as Movie[];
 
     return drafts.map((draft) => new MovieEntity(draft));
   }
@@ -134,6 +152,7 @@ export class MovieController {
   @UseGuards(AuthGuard)
   @ApiCreatedResponse({ type: MovieEntity })
   @Roles('Admin', 'Editor')
+  @ApiBearerAuth('access-token')
   async create(@Body() createMovieDto: CreateMovieDto, @User() user: User) {
     if (!user || !user.id) {
       throw new Error('User not found or unauthorized');
@@ -148,6 +167,7 @@ export class MovieController {
   @Patch(':id')
   @UseGuards(AuthGuard)
   @Roles('Admin', 'Editor')
+  @ApiBearerAuth('access-token')
   @ApiOkResponse({ type: MovieEntity })
   async update(
     @Param('id', ParseIntPipe) id: number,
@@ -161,6 +181,7 @@ export class MovieController {
   @Delete(':id')
   @Roles('Admin', 'Editor')
   @UseGuards(AuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOkResponse({ type: MovieEntity })
   async remove(@Param('id', ParseIntPipe) id: number) {
     const movie = await this.movieFindOneService.findOne(id);
@@ -173,6 +194,7 @@ export class MovieController {
 
   @Post(':id/addFav')
   @UseGuards(AuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Add to favorite list user.' })
   @ApiOkResponse({ type: MovieEntity })
   async addMovieFav(
@@ -188,6 +210,7 @@ export class MovieController {
   @UseGuards(AuthGuard, ProfileOwnerGuard)
   @ApiOperation({ summary: 'Add to favorite list user.' })
   @ApiOkResponse({ type: MovieEntity })
+  @ApiBearerAuth('access-token')
   async removeMovieFavorite(
     @Param('id', ParseIntPipe) movieId: number,
     @Body('userId') userObjectId: number,
@@ -206,22 +229,23 @@ export class MovieController {
 
   @Get(':id/allFavorites')
   @UseGuards(AuthGuard, ProfileOwnerGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'All favorite list user.' })
   @ApiOkResponse({ type: [MovieEntity] })
   async allFavorites(
-    @Param('id', ParseIntPipe)
-    // userId: number,
-    @User('id')
-    user: User,
-  ) {
-    // const userIdSt = userId;
-
+    @User('id') user: User,
+    @Query('page') pageString?: string,
+  ): Promise<MovieEntity[]> {
+    const page = pageString ? parseInt(pageString, 10) : 1;
+    const skip = (page - 1) * PAGINATION_LIMIT;
     const favoriteMovies = await this.movieFavorite.getAllFavorites(user.id);
 
     // console.log('allFavorites', user);
     const movieIds = favoriteMovies.map((fav) => fav.movieId);
 
     const movies = await this.prisma.movie.findMany({
+      skip,
+      take: PAGINATION_LIMIT,
       where: {
         id: { in: movieIds },
       },
@@ -234,14 +258,18 @@ export class MovieController {
   @UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Rate Movie' })
   @ApiOkResponse({ type: [MovieEntity] })
+  @ApiBearerAuth('access-token')
   async rateMovie(
     @Param('id', ParseIntPipe, CheckMovieExistPipe) movieId: number,
     @User('id') user: User,
-    @Body('rating', ParseIntPipe) value: number,
-  ) {
-    // console.log(value);
+    @Body() rateMovieDto: RateMovieDto,
+  ): Promise<Movie> {
+    // console.log(rateMovieDto);
 
-    return await this.movieRateService.rateMovie(movieId, user.id, value);
-    // const userIdSt = userId;
+    return await this.movieRateService.rateMovie(
+      movieId,
+      user.id,
+      rateMovieDto.rating,
+    );
   }
 }

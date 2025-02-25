@@ -7,7 +7,6 @@ import { PrismaClientExceptionFilter } from './prisma-client-exception/prisma-cl
 import * as session from 'express-session';
 import * as cookieParser from 'cookie-parser';
 import * as passport from 'passport';
-import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -95,15 +94,15 @@ async function bootstrap() {
 
   await app.listen(3000);
 
-  const microservice =
-    await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
-      transport: Transport.TCP,
-      options: {
-        host: 'localhost',
-        port: 4000,
-      },
-    });
-  await microservice.listen();
-  console.log('TCP Microservice is running');
+  // const microservice =
+  //   await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
+  //     transport: Transport.TCP,
+  //     options: {
+  //       host: 'localhost',
+  //       port: 4000,
+  //     },
+  //   });
+  // await microservice.listen();
+  // console.log('TCP Microservice is running');
 }
 bootstrap();

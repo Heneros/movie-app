@@ -14,7 +14,7 @@ import { AuthModule } from './auth/auth.module';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { MailModule } from './mail/mail.module';
 import { ConfigModule } from '@nestjs/config';
-import { GraphQLModule } from '@nestjs/graphql';
+import { GqlModuleOptions, GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 
 @Module({
@@ -28,12 +28,30 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
       isGlobal: true,
     }),
 
-    GraphQLModule.forRoot<ApolloDriverConfig>({
+    GraphQLModule.forRootAsync<ApolloDriverConfig>({
       driver: ApolloDriver,
-      autoSchemaFile: path.join(process.cwd(), 'src/schema.gql'),
-      playground: true,
-      sortSchema: true,
-      context: ({ req }) => ({ headers: req.headers }),
+      useFactory: () => {
+        const schemaModuleOptions: Partial<GqlModuleOptions> = {};
+
+        if (process.env.NODE_ENV !== 'production' || process.env.IS_OFFLINE) {
+          schemaModuleOptions.autoSchemaFile = 'src/user.schema.gql';
+        } else {
+          schemaModuleOptions.typePaths = ['*.gql'];
+        }
+
+        return {
+          context: ({ req }) => ({ req }),
+          useGlobalPrefix: true,
+          playground: true,
+          introspection: true,
+          ...schemaModuleOptions,
+        };
+      },
+
+      // autoSchemaFile: path.join(process.cwd(), 'src/schema.gql'),
+      // playground: true,
+      // sortSchema: true,
+      // context: ({ req }) => ({ headers: req.headers }),
     }),
 
     CacheModule.register({

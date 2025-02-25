@@ -44,10 +44,10 @@ type Query {
   getAllMovies(page: Float! = 1): [MovieEntity!]!
 
   """Search movies"""
-  searchMovies(title: String!): [MovieEntity!]!
+  searchMovies(title: String!, pageString: String!): [MovieEntity!]!
 
   """Get Drafts movies"""
-  findDrafts: [MovieEntity!]!
+  findDrafts(pageString: String!): [MovieEntity!]!
 
   """Find By id movie"""
   findById(id: Float!): MovieEntity!

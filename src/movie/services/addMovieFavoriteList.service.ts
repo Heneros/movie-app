@@ -1,3 +1,4 @@
+import { PAGINATION_LIMIT } from '@/data/defaultData';
 import { PrismaService } from '@/prisma/prisma.service';
 import { BadRequestException, Injectable } from '@nestjs/common';
 
@@ -55,8 +56,10 @@ export class MovieFavorite {
     return movieFound;
   }
 
-  async getAllFavorites(userId: number) {
+  async getAllFavorites(userId: number, skip: number = 0) {
     return await this.prisma.userFavoriteMovies.findMany({
+      skip,
+      take: PAGINATION_LIMIT,
       where: {
         userId,
       },

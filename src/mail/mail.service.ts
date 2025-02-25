@@ -8,6 +8,7 @@ interface EmailVerificationToken {
   url?: string;
 }
 
+
 interface ResendEmail {
   name: string;
   link: string;

@@ -115,8 +115,13 @@ export class MovieResolver {
   }
 
   @Query(() => [MovieEntity], { description: 'Search movies' })
-  async searchMovies(@Args('title', { type: () => String }) title: string) {
-    const movies = await this.movieSearchService.searchByTitle({ title });
+  async searchMovies(
+    @Args('title', { type: () => String }) title: string,
+    @Args('pageString', { type: () => String }) pageString?: string,
+  ) {
+    const page = pageString ? parseInt(pageString, 10) : 1;
+    const skip = (page - 1) * PAGINATION_LIMIT;
+    const movies = await this.movieSearchService.searchByTitle(title, skip);
 
     if (!movies || movies.length === 0) {
       throw new NotFoundException(`Movies with title '${title}' do not exist.`);
@@ -126,8 +131,12 @@ export class MovieResolver {
   }
 
   @Query(() => [MovieEntity], { description: 'Get Drafts movies' })
-  async findDrafts() {
-    const drafts = await this.movieFindDraftsService.findDrafts();
+  async findDrafts(
+    @Args('pageString', { type: () => String }) pageString?: string,
+  ) {
+    const page = pageString ? parseInt(pageString, 10) : 1;
+    const skip = (page - 1) * PAGINATION_LIMIT;
+    const drafts = await this.movieFindDraftsService.findDrafts(skip);
 
     return drafts.map((draft) => new MovieEntity(draft));
   }

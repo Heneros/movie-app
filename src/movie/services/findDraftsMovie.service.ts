@@ -1,3 +1,4 @@
+import { PAGINATION_LIMIT } from '@/data/defaultData';
 import { PrismaService } from '@/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
 
@@ -5,7 +6,11 @@ import { Injectable } from '@nestjs/common';
 export class MovieFindDraftsService {
   constructor(private prisma: PrismaService) {}
 
-  findDrafts() {
-    return this.prisma.movie.findMany({ where: { published: false } });
+  findDrafts(skip: number) {
+    return this.prisma.movie.findMany({
+      skip,
+      take: PAGINATION_LIMIT,
+      where: { published: false },
+    });
   }
 }

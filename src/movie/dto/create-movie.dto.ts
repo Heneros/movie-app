@@ -10,37 +10,37 @@ import {
   IsNumber,
   MaxLength,
   IsArray,
+  Length,
+  ValidateNested,
+  ArrayNotEmpty,
 } from 'class-validator';
 
 export class CreateMovieDto {
   @IsString()
   @IsNotEmpty()
   @MinLength(5)
-  @ApiProperty()
-  title: string;
+  @Length(2, 30, { message: 'Name must be between 2 and 30 characters' })
+  @ApiProperty({ required: true, description: 'Title Movie' })
+  public readonly title: string;
 
   @IsString()
-  @IsOptional()
+  // @IsOptional()
   @IsNotEmpty()
+  @Length(10, 350, {
+    message: 'Description must be between 10 and 350 characters',
+  })
   @ApiProperty({ required: false })
-  description: string;
-
-  // @IsInt()
-  // @IsNotEmpty()
-  // @MaxLength(1)
-  // @MaxLength(10)
-  // @ApiProperty()
-  // rating: number;
+  public readonly description: string;
 
   @IsString()
   @IsNotEmpty()
   @ApiProperty()
-  preview: string;
+  public readonly preview: string;
 
   @IsString()
   @IsNotEmpty()
-  @ApiProperty()
-  category: string;
+  @ApiProperty({ description: 'Category Movie' })
+  public readonly category: string;
 
   @IsNumber()
   @IsOptional()
@@ -48,13 +48,15 @@ export class CreateMovieDto {
   authorId: number;
 
   @IsArray()
+  // @ValidateNested()
+  @ArrayNotEmpty({ message: 'Actors array should not be empty' })
   @IsString({ each: true })
-  @IsOptional()
+  // @IsOptional()
   @ApiProperty({ required: false })
-  actorsList: string[];
+  public readonly actorsList: string[];
 
   @IsBoolean()
   @IsOptional()
   @ApiProperty({ required: false, default: false })
-  published?: boolean = false;
+  published: boolean = false;
 }
