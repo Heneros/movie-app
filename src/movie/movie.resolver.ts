@@ -1,10 +1,18 @@
-import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Int,
+  Mutation,
+  Query,
+  Resolver,
+  Subscription,
+} from '@nestjs/graphql';
 import { MovieEntity } from './entities/movie.entity';
 import { MovieFavorite } from './services/addMovieFavoriteList.service';
 
 import { PrismaService } from '@/prisma/prisma.service';
 import { AuthGuard } from '@/guards/auth.guard';
 import {
+  Inject,
   NotFoundException,
   ParseIntPipe,
   UseGuards,
@@ -23,6 +31,7 @@ import { MovieFindDraftsService } from './services/findDraftsMovie.service';
 import { User } from '@/decorators/user.decorator';
 import { MovieRateService } from './services/rateMovie.service';
 import { MovieBasicInput } from './input/movie.input';
+import { PubSub, PubSubEngine } from 'graphql-subscriptions';
 
 @Resolver((of) => MovieEntity)
 export class MovieResolver {
@@ -36,7 +45,16 @@ export class MovieResolver {
     private movieRateService: MovieRateService,
     private movieFavorite: MovieFavorite,
     private prisma: PrismaService,
+    @Inject('PUB_SUB') private pubSub: PubSubEngine,
   ) {}
+
+  @Subscription(() => MovieEntity, {
+    name: 'movieRatingUpdated',
+  })
+  movieRatingUpdated() {
+    // return this.pubSub.asyncIterator('MOVIE_RATING_UPDATED');
+    return this.pubSub.asyncIterableIterator<MovieEntity>('MOVIE_RATING_UPDATED');
+  }
 
   @UseGuards(AuthGuard, ProfileOwnerGuard)
   @Mutation((returns) => MovieEntity, {
@@ -105,7 +123,7 @@ export class MovieResolver {
   async getAllMovies(
     @Args('page', { type: () => Number, defaultValue: 1, nullable: false })
     page: number,
-  ) {
+  ): Promise<MovieEntity[]> {
     const currentPage = page ?? 1;
     const skip = (currentPage - 1) * PAGINATION_LIMIT;
 
@@ -159,6 +177,15 @@ export class MovieResolver {
     @User('id')
     user: User,
   ) {
-    return await this.movieRateService.rateMovie(movieId, user.id, value);
+    const movie = await this.movieRateService.rateMovie(
+      movieId,
+      user.id,
+      value,
+    );
+
+    await this.pubSub.publish('MOVIE_RATING_UPDATED', {
+      movieRatingUpdated: movie,
+    });
+    return movie;
   }
 }

@@ -2,6 +2,9 @@ import { HttpAdapterHost, NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import 'reflect-metadata';
+
+import { createServer } from 'http';
+
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { PrismaClientExceptionFilter } from './prisma-client-exception/prisma-client-exception.filter';
 import * as session from 'express-session';
@@ -10,7 +13,8 @@ import * as passport from 'passport';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
+  // const httpServer = createServer(app.getHttpAdapter().getInstance());
+  // const httpServer = createServer(app.getHttpAdapter().getInstance());
   app.use(
     session({
       secret: process.env.SECRET_SESSION,
@@ -89,10 +93,11 @@ async function bootstrap() {
   });
 
   const { httpAdapter } = app.get(HttpAdapterHost);
-
   app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
 
   await app.listen(3000);
+
+  // await new Promise<void>((resolve) => httpServer.listen(3000, resolve));
 
   // const microservice =
   //   await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {

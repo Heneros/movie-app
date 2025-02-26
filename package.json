@@ -29,18 +29,18 @@
     "test:e2e": "jest --config ./test/jest-e2e.json --runInBand"
   },
   "dependencies": {
+    "@nestjs/common": "^11.0.10",
+    "@nestjs/core": "^11.0.10",
+    "@nestjs/platform-express": "^11.0.10",
+    "@nestjs/graphql": "^13.0.3",
     "@apollo/server": "^4.11.3",
     "@nestjs-modules/mailer": "^2.0.2",
     "@nestjs/apollo": "^13.0.2",
     "@nestjs/cache-manager": "^3.0.0",
-    "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.0",
-    "@nestjs/core": "^11.0.1",
-    "@nestjs/graphql": "^13.0.2",
     "@nestjs/jwt": "^10.2.0",
     "@nestjs/mapped-types": "*",
     "@nestjs/passport": "^10.0.3",
-    "@nestjs/platform-express": "^10.0.0",
     "@nestjs/platform-socket.io": "^10.4.15",
     "@nestjs/schedule": "^5.0.1",
     "@nestjs/throttler": "^6.3.0",
@@ -58,6 +58,8 @@
     "express": "^4.21.0",
     "express-session": "^1.18.1",
     "graphql": "^16.10.0",
+    "graphql-subscriptions": "^3.0.0",
+    "graphql-ws": "^6.0.4",
     "ioredis": "^5.4.2",
     "jsonwebtoken": "^9.0.2",
     "nodemailer": "^6.10.0",
@@ -66,7 +68,8 @@
     "passport-local": "^1.0.0",
     "passport-session": "^1.0.2",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "ws": "^8.18.1"
   },
   "devDependencies": {
     "@faker-js/faker": "^9.5.0",

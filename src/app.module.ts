@@ -16,6 +16,7 @@ import { MailModule } from './mail/mail.module';
 import { ConfigModule } from '@nestjs/config';
 import { GqlModuleOptions, GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { PubSub } from 'graphql-subscriptions';
 
 @Module({
   imports: [
@@ -28,32 +29,22 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
       isGlobal: true,
     }),
 
-    GraphQLModule.forRootAsync<ApolloDriverConfig>({
+    GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
-      useFactory: () => {
-        const schemaModuleOptions: Partial<GqlModuleOptions> = {};
-
-        if (process.env.NODE_ENV !== 'production' || process.env.IS_OFFLINE) {
-          schemaModuleOptions.autoSchemaFile = 'src/user.schema.gql';
-        } else {
-          schemaModuleOptions.typePaths = ['*.gql'];
-        }
-
-        return {
-          context: ({ req }) => ({ req }),
-          useGlobalPrefix: true,
-          playground: true,
-          introspection: true,
-          ...schemaModuleOptions,
-        };
+      autoSchemaFile: path.join(process.cwd(), 'src/schema.gql'),
+      // subscriptions: {
+      //   'graphql-ws': {
+      //     path: '/graphql',
+      //   },
+      // },
+      subscriptions: {
+        'subscriptions-transport-ws': true, 
       },
-
-      // autoSchemaFile: path.join(process.cwd(), 'src/schema.gql'),
-      // playground: true,
-      // sortSchema: true,
-      // context: ({ req }) => ({ headers: req.headers }),
+      include: [MovieModule],
+      context: ({ req }) => ({ req }),
+      playground: true,
+      introspection: true,
     }),
-
     CacheModule.register({
       store: redisStore,
       socket: {
@@ -79,6 +70,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
       provide: APP_INTERCEPTOR,
       useClass: ClassSerializerInterceptor,
     },
+
     // {
     //   provide: APP_GUARD,
     //   useClass: ThrottlerGuard,
