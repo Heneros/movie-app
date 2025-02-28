@@ -3,38 +3,35 @@ import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import 'reflect-metadata';
 
-import { createServer } from 'http';
-
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { PrismaClientExceptionFilter } from './prisma-client-exception/prisma-client-exception.filter';
 import * as session from 'express-session';
 import * as cookieParser from 'cookie-parser';
 import * as passport from 'passport';
-import { IoAdapter } from '@nestjs/platform-socket.io';
+// import { IoAdapter } from '@nestjs/platform-socket.io';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   // const httpServer = createServer(app.getHttpAdapter().getInstance());
   // const httpServer = createServer(app.getHttpAdapter().getInstance());
-  app.use(
-    session({
-      secret: process.env.SECRET_SESSION,
-      resave: false,
-      saveUninitialized: false,
-      cookie: {
-        httpOnly: process.env.NODE_ENV === 'production',
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 31 * 1000 * 60 * 60 * 24,
-      },
-    }),
-  );
+  // app.use(
+  //   session({
+  //     secret: process.env.SECRET_SESSION,
+  //     resave: false,
+  //     saveUninitialized: false,
+  //     cookie: {
+  //       httpOnly: process.env.NODE_ENV === 'production',
+  //       secure: process.env.NODE_ENV === 'production',
+  //       maxAge: 31 * 1000 * 60 * 60 * 24,
+  //     },
+  //   }),
+  // );
 
-  app.use(cookieParser());
+  // app.use(cookieParser());
 
-  app.use(passport.initialize());
-  app.use(passport.session());
-  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
-  app.useWebSocketAdapter(new IoAdapter(app));
+  // app.use(passport.initialize());
+  // app.use(passport.session());
+  // app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -96,7 +93,7 @@ async function bootstrap() {
   });
 
   const { httpAdapter } = app.get(HttpAdapterHost);
-  app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
+  // app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
 
   await app.listen(3000);
 

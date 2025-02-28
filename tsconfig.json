@@ -8,6 +8,10 @@
     "allowSyntheticDefaultImports": true,
     "target": "ES2021",
     "sourceMap": true,
+    "typeRoots": [
+      "./types",
+      "./node_modules/@types"
+    ],
     "outDir": "./dist/",
     "baseUrl": ".",
     "incremental": true,

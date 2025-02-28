@@ -8,7 +8,7 @@ import { UsersModule } from '@/users/users.module';
 
 import { jwtConstants } from '@/data/defaultData';
 import { MailService } from '@/mail/mail.service';
-import { SchedulerRegistry } from '@nestjs/schedule';
+// import { SchedulerRegistry } from '@nestjs/schedule';
 import { CreateUserService } from './services/createUser.service';
 import { LoginAuthService } from './services/login.service';
 import { VerifyEmailService } from './services/verifyEmail.service';
@@ -33,7 +33,7 @@ import { AuthResolver } from './auth.resolver';
   exports: [AuthModule],
   providers: [
     AuthService,
-    SchedulerRegistry,
+
     MailService,
     CreateUserService,
     LoginAuthService,

@@ -18,6 +18,8 @@ import { GqlModuleOptions, GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { PubSub } from 'graphql-subscriptions';
 
+const pubSub = new PubSub();
+
 @Module({
   imports: [
     UsersModule,
@@ -32,19 +34,16 @@ import { PubSub } from 'graphql-subscriptions';
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: path.join(process.cwd(), 'src/schema.gql'),
-      // subscriptions: {
-      //   'graphql-ws': {
-      //     path: '/graphql',
-      //   },
-      // },
+
       subscriptions: {
-        'graphql-ws': true,
-        'subscriptions-transport-ws': {
+        // 'subscriptions-transport-ws': true,
+        // 'graphql-ws': true,
+        'graphql-ws': {
           path: '/graphql',
         },
       },
 
-      installSubscriptionHandlers: true,
+      // installSubscriptionHandlers: true,
       include: [MovieModule],
       // context: ({ req }) => ({ req }),
       playground: true,
@@ -57,6 +56,7 @@ import { PubSub } from 'graphql-subscriptions';
         port: 6379,
       },
     }),
+
     // ThrottlerModule.forRoot([
     //   {
     //     name: 'long',
@@ -67,6 +67,7 @@ import { PubSub } from 'graphql-subscriptions';
   ],
 
   controllers: [AppController],
+
   providers: [
     AppService,
 
@@ -75,6 +76,7 @@ import { PubSub } from 'graphql-subscriptions';
       provide: APP_INTERCEPTOR,
       useClass: ClassSerializerInterceptor,
     },
+
 
     // {
     //   provide: APP_GUARD,
@@ -85,5 +87,6 @@ import { PubSub } from 'graphql-subscriptions';
     //   useClass: EmailValidationPipe,
     // },
   ],
+  
 })
 export class AppModule {}

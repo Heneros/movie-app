@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Get,
-
   Param,
   Patch,
   Post,
@@ -19,6 +18,7 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { AuthEntity } from './entity/auth.entity';
@@ -59,7 +59,7 @@ export class AuthController {
   @Public()
   @Post('register')
   @ApiOperation({ summary: 'Create user' })
-  @ApiCreatedResponse({
+  @ApiResponse({
     status: 201,
     description:
       'The user has been successfully created. Check out your email to verify account',
@@ -71,12 +71,12 @@ export class AuthController {
 
   @Get('verify/:emailToken/:userId')
   @ApiOperation({ summary: 'Verify email. Enter id user and token' })
-  @ApiCreatedResponse({
+  @ApiResponse({
     status: 200,
     description: 'The user has been successfully verified email.',
     type: UserEntity,
   })
-  @ApiNotFoundResponse({
+  @ApiResponse({
     status: 404,
     description: 'Invalid or expired token.',
   })
@@ -99,7 +99,7 @@ export class AuthController {
   // @Public()
   @Post('login')
   @ApiOperation({ summary: 'Log in. Only for verified accounts' })
-  @ApiCreatedResponse({
+  @ApiResponse({
     status: 200,
     description: 'User successfully authorize',
     type: AuthRegister,
@@ -114,7 +114,7 @@ export class AuthController {
 
   @Post('/resend_email_token')
   @ApiOperation({ summary: 'Action to resend email and receive token' })
-  @ApiCreatedResponse({
+  @ApiResponse({
     status: 200,
     description: 'Email was successfully sent to user.',
     type: UserEntity,
@@ -128,7 +128,7 @@ export class AuthController {
   @ApiOperation({
     summary: 'Request for users who wants receive in email to change password',
   })
-  @ApiCreatedResponse({
+  @ApiResponse({
     status: 200,
     description: 'On email was sent request to reset password',
     type: UserEntity,
@@ -145,7 +145,7 @@ export class AuthController {
   @ApiOperation({
     summary: 'For users, who receive link in email. And know user id.',
   })
-  @ApiCreatedResponse({
+  @ApiResponse({
     status: 200,
     description: 'Password was successfully reset!',
     type: AuthEntity,

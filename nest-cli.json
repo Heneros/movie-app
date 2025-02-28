@@ -11,8 +11,6 @@
       }
     ],
     "watchAssets": true,
-    "deleteOutDir": true,
-    "webpack": true,
-    "tsConfigPath": "tsconfig.app.json"
+    "deleteOutDir": true
   }
 }

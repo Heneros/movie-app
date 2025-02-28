@@ -32,6 +32,7 @@ import { User } from '@/decorators/user.decorator';
 import { MovieRateService } from './services/rateMovie.service';
 import { MovieBasicInput } from './input/movie.input';
 import { PubSub, PubSubEngine } from 'graphql-subscriptions';
+import { TestEntity } from './entities/test.entity';
 
 const pubSub = new PubSub();
 
@@ -49,20 +50,6 @@ export class MovieResolver {
     private prisma: PrismaService,
     @Inject('PUB_SUB') private pubSub: PubSubEngine,
   ) {}
-
-  @Subscription(() => MovieEntity, {
-    name: 'movieRatingUpdated',
-
-    resolve: (payload) => console.log(payload),
-    // filter: (payload, variables) => true,
-  })
-  async movieRatingUpdated() {
-    // console.log('test', 333);
-    //  return await pubSub.asyncIterableIterator<MovieEntity>(
-    //    'MOVIE_RATING_UPDATED',
-    //  );
-    return pubSub.asyncIterableIterator('MOVIE_RATING_UPDATED');
-  }
 
   @UseGuards(AuthGuard, ProfileOwnerGuard)
   @Mutation((returns) => MovieEntity, {
@@ -188,10 +175,22 @@ export class MovieResolver {
       value,
     );
 
-    pubSub.publish('MOVIE_RATING_UPDATED', {
+    await this.pubSub.publish('movieRatingUpdated', {
       movieRatingUpdated: movie,
     });
-    console.log(movie, 123);
+
     return movie;
+  }
+
+  @Subscription(() => TestEntity, {
+    name: 'movieRatingUpdated',
+
+    resolve: (payload) => {
+      console.log('Resolving payload:', payload);
+      payload.movieRatingUpdated;
+    },
+  })
+  movieRatingUpdated() {
+    return this.pubSub.asyncIterableIterator('movieRatingUpdated');
   }
 }

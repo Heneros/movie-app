@@ -13,10 +13,13 @@ import { MovieUpdateService } from './services/updateMovie.service';
 import { MovieRemoveService } from './services/removeMovie.service';
 import { MovieFindDraftsService } from './services/findDraftsMovie.service';
 import { MovieRateService } from './services/rateMovie.service';
-import { PubSub } from 'graphql-subscriptions';
+import { PubSub, PubSubEngine } from 'graphql-subscriptions';
+
+const pubSub = new PubSub();
 
 @Module({
   controllers: [MovieController],
+
   providers: [
     MovieService,
     MovieFavorite,
@@ -31,9 +34,11 @@ import { PubSub } from 'graphql-subscriptions';
     MovieResolver,
     {
       provide: 'PUB_SUB',
-      useValue: new PubSub(),
+      useValue: pubSub,
     },
   ],
+
   imports: [PrismaModule, CacheModule.register()],
+  exports: ['PUB_SUB'],
 })
 export class MovieModule {}
