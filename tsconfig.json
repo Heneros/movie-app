@@ -17,10 +17,6 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
-    "lib": [
-      "ESNext.AsyncIterable",
-      "DOM"
-    ],
     "paths": {
       "@/*": [
         "src/*"

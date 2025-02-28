@@ -5,7 +5,7 @@
 
 - Prisma 
 - PostgreSQL
-- Graphql
+- Graphql(code first)
 - Mongodb
 - Redis
 - Nginx 
@@ -21,44 +21,53 @@
 
 
 
-## Features should be:
-- Bash write script
-- Redis(search movie result) should be
-- Load Balancer to db and redis
-- roles admin/user/editor  - done
-- CRUD operations with movies is only available for admins and editor
-- search movie
-- Each movie has a category, preview, title, synopsis, and rating
+## Features implemented:
+
 - user can register/login validation have
+- CRUD operations with movies is only available for admins and editor
+- RBAC
+- Deactivate user acc
+- Delete user acc 
+- search movie
+- Favorite movie
+- User can rate movie and change overall rating of the film display
+
+
+
+## Features should be:
+
+- Passport google/outlook/discord/github.
+- Bash write script
+- Mailing to user about new movies, comments,
+- Redis(search movie result) should be
+- Export and import data(csv and pdf). should send to user mailbox to download data
+- Load Balancer to db and redis
 - filter movies. By year/category/key actors/rationg
 - 2FA authentication
 - TMDb API, Quotable API 
-- Session management   - done
 - Moderation reviews with moderation
 - Automatic moderation   
 - Integration with calender
-- Export and import data(csv and pdf)
-- Mailing to user about new movies, comments,
 - Metrics for user and movie 
 - Watch later movie
-- Favorite movie
+
 - Notification about new movie and reply on my  
 - Friends you add/delete friend
 - Service Workers
 - Honeypot endpoints
 - CSRF tokens
 - XSS protection
-- Deactivate user acc
-- Delete user acc
 - Implement cursor and offset pagination
 - Chat with specific user.
-- Custom pipe
 - CRON-tasks.
 - HttpModule NestJS for request to API 
 - Weekly newsletter with movie recommendations.
 - Nginx configure for load balancer app
 - Authorization through code. You should receive in mail box code and enter to proceed authorization
 - AES encryption 
-- User can rate movie and change overall rating of the film display
-- Implement cors
+
 - Add field to table Users ban true or false. By default false
+
+## In future:
+
+-

@@ -33,6 +33,8 @@ import { MovieRateService } from './services/rateMovie.service';
 import { MovieBasicInput } from './input/movie.input';
 import { PubSub, PubSubEngine } from 'graphql-subscriptions';
 
+const pubSub = new PubSub();
+
 @Resolver((of) => MovieEntity)
 export class MovieResolver {
   constructor(
@@ -50,10 +52,16 @@ export class MovieResolver {
 
   @Subscription(() => MovieEntity, {
     name: 'movieRatingUpdated',
+
+    resolve: (payload) => console.log(payload),
+    // filter: (payload, variables) => true,
   })
-  movieRatingUpdated() {
-    // return this.pubSub.asyncIterator('MOVIE_RATING_UPDATED');
-    return this.pubSub.asyncIterableIterator<MovieEntity>('MOVIE_RATING_UPDATED');
+  async movieRatingUpdated() {
+    // console.log('test', 333);
+    //  return await pubSub.asyncIterableIterator<MovieEntity>(
+    //    'MOVIE_RATING_UPDATED',
+    //  );
+    return pubSub.asyncIterableIterator('MOVIE_RATING_UPDATED');
   }
 
   @UseGuards(AuthGuard, ProfileOwnerGuard)
@@ -73,7 +81,6 @@ export class MovieResolver {
     await this.movieFavorite.addMovieFav(movieId, userId);
 
     return new MovieEntity(movie);
-
     // console.log(movie);
   }
 
@@ -97,8 +104,6 @@ export class MovieResolver {
     description: 'Remove from favorites',
   })
   async removeFromFavorite(
-    // @Args('movieId', { type: () => Int }, CheckMovieExistPipe) movieId: number,
-    // @Args('userId', { type: () => Int }) userId: number,
     @Args('input') movieBasicInput: MovieBasicInput,
   ): Promise<MovieEntity> {
     const { movieId, userId } = movieBasicInput;
@@ -183,9 +188,10 @@ export class MovieResolver {
       value,
     );
 
-    await this.pubSub.publish('MOVIE_RATING_UPDATED', {
+    pubSub.publish('MOVIE_RATING_UPDATED', {
       movieRatingUpdated: movie,
     });
+    console.log(movie, 123);
     return movie;
   }
 }

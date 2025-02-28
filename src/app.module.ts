@@ -38,10 +38,15 @@ import { PubSub } from 'graphql-subscriptions';
       //   },
       // },
       subscriptions: {
-        'subscriptions-transport-ws': true, 
+        'graphql-ws': true,
+        'subscriptions-transport-ws': {
+          path: '/graphql',
+        },
       },
+
+      installSubscriptionHandlers: true,
       include: [MovieModule],
-      context: ({ req }) => ({ req }),
+      // context: ({ req }) => ({ req }),
       playground: true,
       introspection: true,
     }),
