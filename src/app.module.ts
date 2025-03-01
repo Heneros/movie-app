@@ -43,7 +43,7 @@ const pubSub = new PubSub();
         },
       },
 
-      // installSubscriptionHandlers: true,
+      installSubscriptionHandlers: true,
       include: [MovieModule],
       // context: ({ req }) => ({ req }),
       playground: true,
@@ -76,7 +76,10 @@ const pubSub = new PubSub();
       provide: APP_INTERCEPTOR,
       useClass: ClassSerializerInterceptor,
     },
-
+    {
+      provide: 'PUB_SUB',
+      useValue: pubSub,
+    },
 
     // {
     //   provide: APP_GUARD,
@@ -87,6 +90,5 @@ const pubSub = new PubSub();
     //   useClass: EmailValidationPipe,
     // },
   ],
-  
 })
 export class AppModule {}

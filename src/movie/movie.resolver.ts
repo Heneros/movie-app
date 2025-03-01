@@ -33,6 +33,7 @@ import { MovieRateService } from './services/rateMovie.service';
 import { MovieBasicInput } from './input/movie.input';
 import { PubSub, PubSubEngine } from 'graphql-subscriptions';
 import { TestEntity } from './entities/test.entity';
+import { MovieGateway } from './MovieGateway';
 
 const pubSub = new PubSub();
 
@@ -49,7 +50,9 @@ export class MovieResolver {
     private movieFavorite: MovieFavorite,
     private prisma: PrismaService,
     @Inject('PUB_SUB') private pubSub: PubSubEngine,
-  ) {}
+  ) {
+    console.log('MovieModule PubSub instance created:', this.pubSub);
+  }
 
   @UseGuards(AuthGuard, ProfileOwnerGuard)
   @Mutation((returns) => MovieEntity, {
@@ -182,15 +185,28 @@ export class MovieResolver {
     return movie;
   }
 
-  @Subscription(() => TestEntity, {
+  @Subscription(() => MovieEntity, {
     name: 'movieRatingUpdated',
-
-    resolve: (payload) => {
-      console.log('Resolving payload:', payload);
-      payload.movieRatingUpdated;
-    },
+    resolve: (payload) => payload.movieRatingUpdated,
   })
   movieRatingUpdated() {
     return this.pubSub.asyncIterableIterator('movieRatingUpdated');
+  }
+
+  @Subscription(() => String, {
+    name: 'simpleSubscription',
+  })
+  simpleSubscription() {
+    console.log('Subscription triggered');
+
+    return this.pubSub.asyncIterableIterator('simpleEvent');
+  }
+
+  @Query(() => String)
+  triggerSimpleEvent() {
+    console.log('Event triggered');
+
+    this.pubSub.publish('simpleEvent', { simpleSubscription: 'Simple event' });
+    return 'Event triggered';
   }
 }
