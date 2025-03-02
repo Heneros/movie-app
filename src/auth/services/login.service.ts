@@ -4,6 +4,7 @@ import { PrismaService } from '@/prisma/prisma.service';
 import { LogInDto } from '../dto/login.dto';
 import * as bcrypt from 'bcrypt';
 import { isDevelopment, tempLoginDate } from '@/data/defaultData';
+import { Request, Response } from 'express';
 // import { isDevelopment, tempLoginDate } from '@/data/defaultData';
 
 @Injectable()
@@ -13,7 +14,7 @@ export class LoginAuthService {
     private jwtService: JwtService,
   ) {}
 
-  async login(logInDto: LogInDto, req, res) {
+  async login(logInDto: LogInDto, req: Request, res: Response) {
     const user = await this.prisma.user.findUnique({
       where: { email: logInDto.email },
     });
@@ -31,7 +32,7 @@ export class LoginAuthService {
     const payload = { id: user.id, name: user.name, roles: user.roles };
 
     const newRefreshToken = await this.jwtService.signAsync(payload);
-    const cookies = req.cookies;
+    const cookies = req?.cookies;
 
     let newRefreshTokenArray = !cookies?.jwtMovie
       ? user.refreshToken
@@ -84,18 +85,28 @@ export class LoginAuthService {
     //   throw new UnauthorizedException('Session is not initialized');
     // }
 
+    // console.log('Cookies:', req.cookies);
+
     // req.session.user = payload;
 
     res.cookie('jwtMovie', newRefreshToken, {
       httpOnly: isDevelopment ? false : true,
-      strict: isDevelopment ? 'none' : 'strict',
+      // strict: isDevelopment ? 'none' : 'strict',
       maxAge: 31 * 24 * 60 * 60 * 1000,
       secure: isDevelopment ? false : true,
     });
 
-    res.status(200).json({
-      message: 'Login successful',
-      newRefreshToken,
-    });
+    return {
+      // newRefreshToken, id: user.id, user: user, email: user.id
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      roles: user.roles,
+      refreshToken: newRefreshToken,
+    };
+    // res.status(200).json({
+    //   message: 'Login successful',
+    //   newRefreshToken,
+    // });
   }
 }

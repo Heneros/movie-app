@@ -16,7 +16,7 @@ export class VerifyEmailService {
     private mailService: MailService,
   ) {}
 
-  async verifyEmail(res: Response, verifyEmailDto: VerifyEmailDto) {
+  async verifyEmail(verifyEmailDto: VerifyEmailDto) {
     const user = await this.prisma.user.findUnique({
       where: { id: verifyEmailDto.userId },
     });
@@ -44,7 +44,7 @@ export class VerifyEmailService {
       throw new BadRequestException('Expired token or invalid token');
     }
 
-    await this.prisma.user.update({
+    const userLogin = await this.prisma.user.update({
       where: { id: user.id },
       data: {
         isEmailVerified: true,
@@ -69,6 +69,8 @@ export class VerifyEmailService {
       emailVerificationToken,
     );
 
-    res.status(200).json({ message: 'Your email is verified!' });
+    return userLogin;
+
+    // res.status(200).json({ message: 'Your email is verified!' });
   }
 }

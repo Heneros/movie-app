@@ -63,9 +63,16 @@ export class ResetPasswordService {
         payload,
       );
 
-      res
-        .status(200)
-        .json({ message: 'Your password was reset successfully!' });
+      return {
+        message: 'Your password was reset successfully!',
+        name: user.name,
+        email: user.email,
+        id: user.id,
+      };
+
+      // res
+      //   .status(200)
+      //   .json({ message: 'Your password was reset successfully!' });
     }
   }
 }

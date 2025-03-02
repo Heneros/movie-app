@@ -60,8 +60,15 @@ export class RequestResetPasswordService {
       payload,
     );
 
-    res.status(200).json({
-      message: 'Password Reset Request',
-    });
+    // res.status(200).json({
+    //   message: 'Password Reset Request',
+    // });
+
+    return {
+      name: user.name,
+      email: user.email,
+      id: user.id,
+      user: user.id,
+    };
   }
 }

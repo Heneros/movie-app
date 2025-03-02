@@ -5,7 +5,7 @@ import { PrismaService } from '@/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { roundsOfHashing, tempRegisterDate } from '@/data/defaultData';
 import { MailService } from '@/mail/mail.service';
-import { Response } from 'express';
+// import { Response } from 'express';
 
 @Injectable()
 export class CreateUserService {
@@ -14,7 +14,7 @@ export class CreateUserService {
     private mailService: MailService,
   ) {}
 
-  async create(res: Response, createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto) {
     if (createUserDto.password !== createUserDto.passwordConfirm) {
       throw new BadRequestException('Confirm password.', {
         cause: new Error(),
@@ -71,10 +71,15 @@ export class CreateUserService {
       emailVerificationToken,
     );
 
-    res
-      .status(201)
-      .json({ message: 'Welcome to Movie App! Confirm your Email ' });
+    // res
+    //   .status(201)
+    //   .json({ message: 'Welcome to Movie App! Confirm your Email ' });
 
-    return { email: createUserDto.email, emailVerificationToken };
+    return {
+      id: createdUser.id,
+      email: createUserDto.email,
+      emailVerificationToken: emailVerificationToken.token,
+      createdUser,
+    };
   }
 }

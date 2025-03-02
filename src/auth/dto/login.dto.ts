@@ -1,3 +1,4 @@
+import { InputType } from '@nestjs/graphql';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsEmail,
@@ -8,6 +9,7 @@ import {
   MinLength,
 } from 'class-validator';
 
+@InputType()
 export class LogInDto {
   @IsEmail()
   @IsNotEmpty()

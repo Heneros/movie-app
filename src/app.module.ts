@@ -43,9 +43,9 @@ const pubSub = new PubSub();
         },
       },
 
-      installSubscriptionHandlers: true,
-      include: [MovieModule],
-      // context: ({ req }) => ({ req }),
+      context: ({ req, res }) => ({ req, res }),
+      // installSubscriptionHandlers: true,
+      include: [MovieModule, AuthModule],
       playground: true,
       introspection: true,
     }),

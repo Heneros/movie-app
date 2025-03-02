@@ -65,6 +65,10 @@ export class ResendEmailService {
       './confirmation',
       payload,
     );
+
     res.status(200).json({ message: 'Email was successfully sent' });
+    return {
+      email: user.email,
+    };
   }
 }

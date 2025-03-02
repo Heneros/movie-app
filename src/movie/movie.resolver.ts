@@ -35,7 +35,7 @@ import { PubSub, PubSubEngine } from 'graphql-subscriptions';
 import { TestEntity } from './entities/test.entity';
 import { MovieGateway } from './MovieGateway';
 
-const pubSub = new PubSub();
+
 
 @Resolver((of) => MovieEntity)
 export class MovieResolver {
@@ -76,7 +76,8 @@ export class MovieResolver {
 
   @UseGuards(AuthGuard, ProfileOwnerGuard)
   @Query((returns) => [MovieEntity], { description: 'Get All favorites ' })
-  async getAllFavorites(@Args('id', { type: () => Int }) userId: number) {
+  async getAllFavorites(
+    @Args('id', { type: () => Int }) userId: number) {
     const favoriteMovies = await this.movieFavorite.getAllFavorites(userId);
 
     const movieIds = favoriteMovies.map((fav) => fav.movieId);
@@ -201,6 +202,8 @@ export class MovieResolver {
 
     return this.pubSub.asyncIterableIterator('simpleEvent');
   }
+
+  
 
   @Query(() => String)
   triggerSimpleEvent() {

@@ -33,7 +33,6 @@ import { AuthResolver } from './auth.resolver';
   exports: [AuthModule],
   providers: [
     AuthService,
-
     MailService,
     CreateUserService,
     LoginAuthService,

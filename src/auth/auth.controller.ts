@@ -30,15 +30,18 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 import { ResendEmailDto } from './dto/resend-email.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
-import { AuthRegister } from './entity/register.entity';
 import { EmailValidationPipe } from './pipe/EmailValidation.pipe';
 import { CreateUserService } from './services/createUser.service';
 import { LoginAuthService } from './services/login.service';
 import { VerifyEmailService } from './services/verifyEmail.service';
 import { ResendEmailService } from './services/resendEmailValidation.service';
 import { ResetPasswordService } from './services/resetPassword.service';
-import { LogoutAuthService } from './services/logout.service';
+import {
+  LogoutAuthService,
+  RequestWithSession,
+} from './services/logout.service';
 import { RequestResetPasswordService } from './services/requestResetPassword.service';
+import { Context } from '@nestjs/graphql';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -56,7 +59,6 @@ export class AuthController {
     private readonly requestResetPasswordService: RequestResetPasswordService,
   ) {}
 
-  @Public()
   @Post('register')
   @ApiOperation({ summary: 'Create user' })
   @ApiResponse({
@@ -65,8 +67,8 @@ export class AuthController {
       'The user has been successfully created. Check out your email to verify account',
     type: AuthEntity,
   })
-  async create(@Body() createUserDto: CreateUserDto, @Res() res: Response) {
-    return await this.createUserService.create(res, createUserDto);
+  async create(@Body() createUserDto: CreateUserDto) {
+    return await this.createUserService.create(createUserDto);
   }
 
   @Get('verify/:emailToken/:userId')
@@ -80,20 +82,8 @@ export class AuthController {
     status: 404,
     description: 'Invalid or expired token.',
   })
-  async verifyEmail(
-    @Param() verifyEmailDto: VerifyEmailDto,
-    @Res() res: Response,
-  ) {
-    await this.verifyEmailService.verifyEmail(res, verifyEmailDto);
-    // try {
-    //
-    //   return res.status(200).send({ message: 'Email successfully verified!' });
-    // } catch (error) {
-    //   if (error instanceof NotFoundException || BadRequestException) {
-    //     return res.status(404).send({ message: error.message });
-    //   }
-    //   return res.status(500).send({ message: 'An unexpected error occurred' });
-    // }
+  async verifyEmail(@Param() verifyEmailDto: VerifyEmailDto) {
+    await this.verifyEmailService.verifyEmail(verifyEmailDto);
   }
 
   // @Public()
@@ -102,14 +92,16 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     description: 'User successfully authorize',
-    type: AuthRegister,
+    type: AuthEntity,
   })
-  login(
+  async login(
     @Body(EmailValidationPipe) logInDto: LogInDto,
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    return this.loginAuthService.login(logInDto, req, res);
+    const token = await this.loginAuthService.login(logInDto, req, res);
+    return res.status(200).json({ message: 'Success', token });
+    // return this.loginAuthService.login(logInDto, req, res);
   }
 
   @Post('/resend_email_token')
@@ -120,7 +112,10 @@ export class AuthController {
     type: UserEntity,
   })
   @ApiOkResponse({ type: AuthEntity })
-  resendEmailValidation(@Body() email: ResendEmailDto, @Res() res: Response) {
+  resendEmailValidation(
+    @Body(EmailValidationPipe) email: ResendEmailDto,
+    @Res() res: Response,
+  ) {
     return this.resendEmailService.resendEmailValidation(res, email);
   }
 
@@ -166,7 +161,16 @@ export class AuthController {
   @ApiOperation({
     summary: 'Log out for application ',
   })
-  logout(@Req() req: Request, @Res() res: Response) {
-    return this.logoutAuthService.logout(req, res);
+  async logout(@Req() req, @Res({ passthrough: true }) res: Response) {
+    res.clearCookie('jwtMovie');
+    res.clearCookie('connect.sid', {
+      path: '/',
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+    });
+
+    const result = await this.logoutAuthService.logout(req);
+    return result;
   }
 }

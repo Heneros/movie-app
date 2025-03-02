@@ -2,45 +2,55 @@ import { HttpAdapterHost, NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import 'reflect-metadata';
+import cookieParser from 'cookie-parser';
+import session from 'express-session';
+import passport from 'passport';
 
-import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
+import {
+  BadRequestException,
+  ClassSerializerInterceptor,
+  ValidationPipe,
+} from '@nestjs/common';
 import { PrismaClientExceptionFilter } from './prisma-client-exception/prisma-client-exception.filter';
-import * as session from 'express-session';
-import * as cookieParser from 'cookie-parser';
-import * as passport from 'passport';
-// import { IoAdapter } from '@nestjs/platform-socket.io';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   // const httpServer = createServer(app.getHttpAdapter().getInstance());
   // const httpServer = createServer(app.getHttpAdapter().getInstance());
-  // app.use(
-  //   session({
-  //     secret: process.env.SECRET_SESSION,
-  //     resave: false,
-  //     saveUninitialized: false,
-  //     cookie: {
-  //       httpOnly: process.env.NODE_ENV === 'production',
-  //       secure: process.env.NODE_ENV === 'production',
-  //       maxAge: 31 * 1000 * 60 * 60 * 24,
-  //     },
-  //   }),
-  // );
 
-  // app.use(cookieParser());
+  app.use(cookieParser());
+  app.use(
+    session({
+      secret: process.env.SECRET_SESSION,
+      resave: false,
+      saveUninitialized: false,
+      cookie: {
+        httpOnly: process.env.NODE_ENV === 'production',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 31 * 1000 * 60 * 60 * 24,
+      },
+    }),
+  );
 
-  // app.use(passport.initialize());
-  // app.use(passport.session());
-  // app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
+  app.use(passport.initialize());
+  app.use(passport.session());
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
       transform: true,
       forbidNonWhitelisted: true,
-
       transformOptions: {
         enableImplicitConversion: true,
+      },
+      exceptionFactory: (errors) => {
+        return new BadRequestException(
+          errors.map((err) => ({
+            field: err.property,
+            errors: Object.values(err.constraints),
+          })),
+        );
       },
     }),
   );
@@ -96,8 +106,6 @@ async function bootstrap() {
   app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
 
   await app.listen(3000);
-
-  // await new Promise<void>((resolve) => httpServer.listen(3000, resolve));
 
   // const microservice =
   //   await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {

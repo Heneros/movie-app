@@ -1,7 +1,9 @@
+import { InputType } from '@nestjs/graphql';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
+@InputType()
 export class VerifyEmailDto {
   @Type(() => Number)
   @IsNumber()
