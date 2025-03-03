@@ -12,8 +12,8 @@ services:
     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     POSTGRES_DB: ${POSTGRES_DB}
     PGDATA: /var/lib/postgresql/data
-  #  volumes:
-  #  - master_data:/var/lib/postgresql/data
+   volumes:
+   - master_data:/var/lib/postgresql/data
   #  - ./config/postgresql.conf:/etc/postgresql/postgresql.conf
   #  - ./config/pg_hba.conf:/etc/postgresql/pg_hba.conf
    ports:
@@ -53,6 +53,7 @@ services:
     #   "
     # volumes: 
     #   - slave_data:/var/lib/postgresql/data
+
     depends_on:
       - postgres_master
     networks:

@@ -1,4 +1,4 @@
-FROM postgres:latest
+FROM postgres:17.4
 
 
 COPY ./postgresql.conf /etc/postgresql/postgresql.conf
