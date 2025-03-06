@@ -62,7 +62,6 @@ type Query {
 
   """Find By id movie"""
   findById(id: Float!): MovieEntity!
-  triggerSimpleEvent: String!
 }
 
 type Mutation {
@@ -129,9 +128,4 @@ input MovieBasicInput {
 
   """Id user"""
   userId: Int!
-}
-
-type Subscription {
-  movieRatingUpdated: MovieEntity!
-  simpleSubscription: String!
 }

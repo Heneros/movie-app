@@ -16,9 +16,8 @@ import { MailModule } from './mail/mail.module';
 import { ConfigModule } from '@nestjs/config';
 import { GqlModuleOptions, GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { PubSub } from 'graphql-subscriptions';
 
-const pubSub = new PubSub();
+import { WinstonModule } from 'nest-winston';
 
 @Module({
   imports: [
@@ -30,7 +29,7 @@ const pubSub = new PubSub();
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-
+    WinstonModule.forRoot({}),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: path.join(process.cwd(), 'src/schema.gql'),
@@ -75,10 +74,6 @@ const pubSub = new PubSub();
     {
       provide: APP_INTERCEPTOR,
       useClass: ClassSerializerInterceptor,
-    },
-    {
-      provide: 'PUB_SUB',
-      useValue: pubSub,
     },
 
     // {

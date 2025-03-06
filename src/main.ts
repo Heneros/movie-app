@@ -9,12 +9,16 @@ import passport from 'passport';
 import {
   BadRequestException,
   ClassSerializerInterceptor,
+  ConsoleLogger,
   ValidationPipe,
 } from '@nestjs/common';
 import { PrismaClientExceptionFilter } from './prisma-client-exception/prisma-client-exception.filter';
+import { LoggerFactory } from './Logger';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: LoggerFactory('MyApp'),
+  });
   // const httpServer = createServer(app.getHttpAdapter().getInstance());
   // const httpServer = createServer(app.getHttpAdapter().getInstance());
 

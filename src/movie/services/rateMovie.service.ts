@@ -10,7 +10,7 @@ export class MovieRateService {
     movieId: number,
     userId: number,
     value: number,
-  ): Promise<Movie> {
+  ): Promise<Movie | null> {
     const existingRating = await this.prisma.rating.findUnique({
       where: {
         userId_movieId: { movieId, userId },

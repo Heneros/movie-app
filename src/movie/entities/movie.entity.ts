@@ -45,6 +45,8 @@ export class MovieEntity implements Movie {
   @Field({ nullable: true })
   authorId: number;
 
+
+  
   @ApiProperty({ required: false, type: UserEntity })
   @Field((type) => [UserEntity])
   // @Field((type) => [String])
@@ -66,6 +68,7 @@ export class MovieEntity implements Movie {
   @Field({ nullable: true })
   avgRating: number;
 
+  @ApiProperty()
   @Field((type) => Int, { nullable: true })
   value: number;
 

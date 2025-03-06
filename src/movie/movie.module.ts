@@ -14,7 +14,6 @@ import { MovieRemoveService } from './services/removeMovie.service';
 import { MovieFindDraftsService } from './services/findDraftsMovie.service';
 import { MovieRateService } from './services/rateMovie.service';
 import { PubSub } from 'graphql-subscriptions';
-import { MovieGateway } from './MovieGateway';
 
 @Module({
   controllers: [MovieController],
@@ -31,13 +30,8 @@ import { MovieGateway } from './MovieGateway';
     MovieFindDraftsService,
     MovieRateService,
     MovieResolver,
-    MovieGateway,
-    {
-      provide: 'PUB_SUB',
-      useValue: new PubSub(),
-    },
   ],
-  exports: ['PUB_SUB'],
+
   imports: [PrismaModule, CacheModule.register()],
 })
 export class MovieModule {}

@@ -23,7 +23,6 @@ import {
 } from '@nestjs/swagger';
 import { AuthEntity } from './entity/auth.entity';
 import { LogInDto } from './dto/login.dto';
-import { Public } from '@/decorators/public.decorator';
 import { TimeoutInterceptor } from '@/interceptor/timeout.interceptor';
 import { UserEntity } from '@/users/entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';

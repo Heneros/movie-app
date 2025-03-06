@@ -31,11 +31,7 @@ import { MovieFindDraftsService } from './services/findDraftsMovie.service';
 import { User } from '@/decorators/user.decorator';
 import { MovieRateService } from './services/rateMovie.service';
 import { MovieBasicInput } from './input/movie.input';
-import { PubSub, PubSubEngine } from 'graphql-subscriptions';
-import { TestEntity } from './entities/test.entity';
-import { MovieGateway } from './MovieGateway';
-
-
+import { PubSubEngine } from 'graphql-subscriptions';
 
 @Resolver((of) => MovieEntity)
 export class MovieResolver {
@@ -49,10 +45,7 @@ export class MovieResolver {
     private movieRateService: MovieRateService,
     private movieFavorite: MovieFavorite,
     private prisma: PrismaService,
-    @Inject('PUB_SUB') private pubSub: PubSubEngine,
-  ) {
-    console.log('MovieModule PubSub instance created:', this.pubSub);
-  }
+  ) {}
 
   @UseGuards(AuthGuard, ProfileOwnerGuard)
   @Mutation((returns) => MovieEntity, {
@@ -76,8 +69,7 @@ export class MovieResolver {
 
   @UseGuards(AuthGuard, ProfileOwnerGuard)
   @Query((returns) => [MovieEntity], { description: 'Get All favorites ' })
-  async getAllFavorites(
-    @Args('id', { type: () => Int }) userId: number) {
+  async getAllFavorites(@Args('id', { type: () => Int }) userId: number) {
     const favoriteMovies = await this.movieFavorite.getAllFavorites(userId);
 
     const movieIds = favoriteMovies.map((fav) => fav.movieId);
@@ -179,37 +171,6 @@ export class MovieResolver {
       value,
     );
 
-    await this.pubSub.publish('movieRatingUpdated', {
-      movieRatingUpdated: movie,
-    });
-
     return movie;
-  }
-
-  @Subscription(() => MovieEntity, {
-    name: 'movieRatingUpdated',
-    resolve: (payload) => payload.movieRatingUpdated,
-  })
-  movieRatingUpdated() {
-    return this.pubSub.asyncIterableIterator('movieRatingUpdated');
-  }
-
-  @Subscription(() => String, {
-    name: 'simpleSubscription',
-  })
-  simpleSubscription() {
-    console.log('Subscription triggered');
-
-    return this.pubSub.asyncIterableIterator('simpleEvent');
-  }
-
-  
-
-  @Query(() => String)
-  triggerSimpleEvent() {
-    console.log('Event triggered');
-
-    this.pubSub.publish('simpleEvent', { simpleSubscription: 'Simple event' });
-    return 'Event triggered';
   }
 }
