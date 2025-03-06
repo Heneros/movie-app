@@ -25,6 +25,15 @@
       "@/*": [
         "src/*"
       ],
+      "@/src/movie/*": [
+        "src/movie/*"
+      ],
+      "@/src/users/*": [
+        "src/users/*"
+      ],
+      "@/src/auth/*": [
+        "src/auth/*"
+      ],
       "test/*": [
         "test/*"
       ]

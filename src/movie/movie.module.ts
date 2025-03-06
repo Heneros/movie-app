@@ -14,10 +14,11 @@ import { MovieRemoveService } from './services/removeMovie.service';
 import { MovieFindDraftsService } from './services/findDraftsMovie.service';
 import { MovieRateService } from './services/rateMovie.service';
 import { PubSub } from 'graphql-subscriptions';
+import { MovieCreateReviewService } from './services/reviews/createReview.service';
+import { MovieGetReviewsByMovieService } from './services/reviews/getReviewsByMovie.service';
 
 @Module({
   controllers: [MovieController],
-
   providers: [
     MovieService,
     MovieFavorite,
@@ -29,9 +30,10 @@ import { PubSub } from 'graphql-subscriptions';
     MovieRemoveService,
     MovieFindDraftsService,
     MovieRateService,
+    MovieCreateReviewService,
+    MovieGetReviewsByMovieService,
     MovieResolver,
   ],
-
   imports: [PrismaModule, CacheModule.register()],
 })
 export class MovieModule {}

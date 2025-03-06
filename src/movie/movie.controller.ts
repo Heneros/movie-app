@@ -50,6 +50,10 @@ import { MovieRateService } from './services/rateMovie.service';
 import { CheckMovieExistPipe } from './guard/checkIfMovieExist.guard';
 import { ProfileOwnerGuard } from '@/guards/ProfileOwner.guard';
 import { RateMovieDto } from './dto/rate-movie.dto';
+import { MovieCreateReviewService } from './services/reviews/createReview.service';
+import { CreateMovieReviewDto } from './dto/create-review.dto';
+import { MovieGetReviewsByMovieService } from './services/reviews/getReviewsByMovie.service';
+import { MovieReviewEntity } from './entities/movieReview.entity';
 
 @Controller('movie')
 @ApiTags('Movie')
@@ -66,6 +70,8 @@ export class MovieController {
     private readonly movieRemoveService: MovieRemoveService,
     private readonly movieFindDraftsService: MovieFindDraftsService,
     private readonly movieRateService: MovieRateService,
+    private readonly movieCreateReviewService: MovieCreateReviewService,
+    private readonly movieGetReviewsByMovieService: MovieGetReviewsByMovieService,
 
     private readonly prisma: PrismaService,
   ) {}
@@ -271,5 +277,37 @@ export class MovieController {
       user.id,
       rateMovieDto.rating,
     );
+  }
+
+  @Get(':id/review')
+  @ApiOperation({ summary: 'Create review movie' })
+  @ApiOkResponse({ type: [MovieEntity] })
+  @ApiBearerAuth('access-token')
+  async getReviewsByMovie(
+    @Param('id', ParseIntPipe, CheckMovieExistPipe) movieId: number,
+  ) {
+    // console.log(rateMovieDto);
+
+    return await this.movieGetReviewsByMovieService.getReviewsByMovie(movieId);
+  }
+
+  @Post(':id/review')
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Create review movie' })
+  @ApiOkResponse({ type: [MovieReviewEntity] })
+  @ApiBearerAuth('access-token')
+  async createReview(
+    @Param('id', ParseIntPipe, CheckMovieExistPipe) movieId: number,
+    @User('id') user: User,
+    @Body() createMovieReviewDto: CreateMovieReviewDto,
+  ): Promise<CreateMovieReviewDto | void> {
+    // console.log(rateMovieDto);
+
+    const newReview = await this.movieCreateReviewService.createReview(
+      movieId,
+      user.id,
+      createMovieReviewDto,
+    );
+    return newReview;
   }
 }

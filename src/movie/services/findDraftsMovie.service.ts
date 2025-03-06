@@ -7,7 +7,7 @@ import { Movie } from '@prisma/client';
 export class MovieFindDraftsService {
   constructor(private prisma: PrismaService) {}
 
-  findDrafts(skip: number) {
+  findDrafts(skip: number){
     try {
       return this.prisma.movie.findMany({
         skip,

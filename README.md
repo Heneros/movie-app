@@ -20,7 +20,7 @@
 
 
 
-## Features implemented:
+## Features app have:
 
 - user can register/login validation have
 - CRUD operations with movies is only available for admins and editor
@@ -30,7 +30,7 @@
 - search movie
 - Favorite movie
 - User can rate movie and change overall rating of the film display
-
+-
 
 
 ## Features should be:
@@ -41,7 +41,7 @@
 - Redis(search movie result) should be
 - Export and import data(csv and pdf). should send to user mailbox to download data
 - Load Balancer to db and redis
-- filter movies. By year/category/key actors/rationg
+- filter movies. By year/category/key actors/rating
 - 2FA authentication
 - TMDb API, Quotable API 
 - Moderation reviews with moderation
@@ -49,7 +49,6 @@
 - Integration with calender
 - Metrics for user and movie 
 - Watch later movie
-
 - Notification about new movie and reply on my  
 - Friends you add/delete friend
 - Service Workers
@@ -69,4 +68,9 @@
 
 ## In future:
 
--
+- Premium status to user after purchase subscription through Paypal or Stripe. User can purchase every month pr year.  It should - include: 
+can edit after 1 minute review, 
+animated avatar, 
+show list all reviews/comments without button  "open more"
+everyday recieve letter to mail box about favorite movies, he subscribed
+

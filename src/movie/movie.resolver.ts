@@ -24,14 +24,13 @@ import { MovieFindOneService } from './services/findOneMovie.service';
 import { PAGINATION_LIMIT } from '@/data/defaultData';
 import { Movie } from '@prisma/client';
 import { MovieFindAllService } from './services/findAllMovie.service';
-import { SearchMovieDto } from './dto/search-movie.dto';
 import { MovieSearchService } from './services/searchMovie.service';
 import { CheckMovieExistPipe } from './guard/checkIfMovieExist.guard';
 import { MovieFindDraftsService } from './services/findDraftsMovie.service';
 import { User } from '@/decorators/user.decorator';
 import { MovieRateService } from './services/rateMovie.service';
 import { MovieBasicInput } from './input/movie.input';
-import { PubSubEngine } from 'graphql-subscriptions';
+
 
 @Resolver((of) => MovieEntity)
 export class MovieResolver {

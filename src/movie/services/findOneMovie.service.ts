@@ -6,9 +6,7 @@ import { Movie } from '@prisma/client';
 
 @Injectable()
 export class MovieFindOneService {
-  private readonly logger = new Logger(MovieFindOneService.name, {
-    timestamp: true,
-  });
+
   constructor(private prisma: PrismaService) {}
 
   async findOne(id: number): Promise<Movie | null> {
