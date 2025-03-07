@@ -46,6 +46,10 @@ export class MovieCreateReviewService {
                 },
             );
 
+            if (error instanceof BadRequestException) {
+                throw error;
+            }
+
             throw new Error('Review already exist');
         }
     }

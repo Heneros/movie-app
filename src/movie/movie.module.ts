@@ -16,24 +16,26 @@ import { MovieRateService } from './services/rateMovie.service';
 import { PubSub } from 'graphql-subscriptions';
 import { MovieCreateReviewService } from './services/reviews/createReview.service';
 import { MovieGetReviewsByMovieService } from './services/reviews/getReviewsByMovie.service';
+import { MovieGetAllReviewService } from './services/reviews/getAllReviews.service';
 
 @Module({
-  controllers: [MovieController],
-  providers: [
-    MovieService,
-    MovieFavorite,
-    MovieSearchService,
-    MovieCreateService,
-    MovieFindAllService,
-    MovieFindOneService,
-    MovieUpdateService,
-    MovieRemoveService,
-    MovieFindDraftsService,
-    MovieRateService,
-    MovieCreateReviewService,
-    MovieGetReviewsByMovieService,
-    MovieResolver,
-  ],
-  imports: [PrismaModule, CacheModule.register()],
+    controllers: [MovieController],
+    providers: [
+        MovieService,
+        MovieFavorite,
+        MovieSearchService,
+        MovieCreateService,
+        MovieFindAllService,
+        MovieFindOneService,
+        MovieUpdateService,
+        MovieRemoveService,
+        MovieFindDraftsService,
+        MovieRateService,
+        MovieCreateReviewService,
+        MovieGetReviewsByMovieService,
+        MovieGetAllReviewService,
+        MovieResolver,
+    ],
+    imports: [PrismaModule, CacheModule.register()],
 })
 export class MovieModule {}
