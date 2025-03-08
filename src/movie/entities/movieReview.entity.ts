@@ -5,15 +5,15 @@ import { Field, Int, ObjectType } from '@nestjs/graphql';
 
 @ObjectType({ description: 'MovieReview' })
 export class MovieReviewEntity {
-  @ApiProperty()
-  @Field(() => String, { nullable: false })
-  review: string;
+    @ApiProperty()
+    @Field(() => String, { nullable: false })
+    review: string;
 
-  @ApiProperty()
-  @Field(() => Boolean, { nullable: false })
-  positive: boolean;
+    @ApiProperty()
+    @Field(() => Boolean, { nullable: false })
+    positive: boolean;
 
-  @ApiProperty()
-  @Field(() => String, { nullable: false })
-  createdAt: Date;
+    @ApiProperty()
+    @Field(() => String, { nullable: false })
+    createdAt: Date;
 }

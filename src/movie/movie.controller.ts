@@ -14,6 +14,7 @@ import {
     UseGuards,
     BadRequestException,
     InternalServerErrorException,
+    Put,
 } from '@nestjs/common';
 import { MovieService } from './movie.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
@@ -54,6 +55,9 @@ import { MovieCreateReviewService } from './services/reviews/createReview.servic
 import { CreateMovieReviewDto } from './dto/create-review.dto';
 import { MovieGetReviewsByMovieService } from './services/reviews/getReviewsByMovie.service';
 import { MovieReviewEntity } from './entities/movieReview.entity';
+import { MovieGetAllReviewService } from './services/reviews/getAllReviews.service';
+import { MovieUpdateReviewService } from './services/reviews/updatereview.service';
+import { MovieRemoveReviewService } from './services/reviews/removeByIdReview.service';
 
 @Controller('movie')
 @ApiTags('Movie')
@@ -72,6 +76,9 @@ export class MovieController {
         private readonly movieRateService: MovieRateService,
         private readonly movieCreateReviewService: MovieCreateReviewService,
         private readonly movieGetReviewsByMovieService: MovieGetReviewsByMovieService,
+        private readonly movieGetAllReviewService: MovieGetAllReviewService,
+        private readonly movieUpdateReviewService: MovieUpdateReviewService,
+        private readonly movieRemoveReviewService: MovieRemoveReviewService,
 
         private readonly prisma: PrismaService,
     ) {}
@@ -146,15 +153,6 @@ export class MovieController {
     }
 
     // @Public()
-    @Get(':id')
-    @ApiOkResponse({ type: MovieEntity })
-    async findOne(@Param('id', ParseIntPipe) id: number) {
-        const movie = await this.movieFindOneService.findOne(+id);
-        if (!movie) {
-            throw new NotFoundException(`movie with ${id} does not exist.`);
-        }
-        return new MovieEntity(movie);
-    }
 
     @Post()
     @UseGuards(AuthGuard)
@@ -171,7 +169,27 @@ export class MovieController {
             await this.movieCreateService.create(createMovieDto),
         );
     }
+    @Get('allReviews')
+    @Roles('Admin', 'Editor')
+    @UseGuards(AuthGuard)
+    @ApiOperation({ summary: 'Create review movie' })
+    @ApiOkResponse({ type: [MovieReviewEntity] })
+    async getAllReviews(
+        @Query('page') page: number = 1,
+    ): Promise<MovieReviewEntity[] | null> {
+        // console.log('test12');
+        return await this.movieGetAllReviewService.getAllReviews(page);
+    }
 
+    @Get(':id')
+    @ApiOkResponse({ type: MovieEntity })
+    async findOne(@Param('id', ParseIntPipe) id: number) {
+        const movie = await this.movieFindOneService.findOne(+id);
+        if (!movie) {
+            throw new NotFoundException(`movie with ${id} does not exist.`);
+        }
+        return new MovieEntity(movie);
+    }
     @Patch(':id')
     @UseGuards(AuthGuard)
     @Roles('Admin', 'Editor')
@@ -286,15 +304,17 @@ export class MovieController {
     }
 
     @Get(':id/review')
-    @ApiOperation({ summary: 'Create review movie' })
+    @ApiOperation({ summary: 'Get all reviews from movie' })
     @ApiOkResponse({ type: [MovieEntity] })
     @ApiBearerAuth('access-token')
     async getReviewsByMovie(
+        @Query('page') page: number = 1,
         @Param('id', ParseIntPipe, CheckMovieExistPipe) movieId: number,
     ) {
         // console.log(rateMovieDto);
 
         return await this.movieGetReviewsByMovieService.getReviewsByMovie(
+            page,
             movieId,
         );
     }
@@ -313,6 +333,42 @@ export class MovieController {
             movieId,
             user.id,
             createMovieReviewDto,
+        );
+        return newReview;
+    }
+
+    @Put(':id/review')
+    @UseGuards(AuthGuard)
+    @ApiOperation({
+        summary: 'Update review movie. You can edit during 15 minutes',
+    })
+    @ApiOkResponse({ type: [MovieReviewEntity] })
+    @ApiBearerAuth('access-token')
+    async updateReview(
+        @Param('id', ParseIntPipe) reviewId: number,
+        @User('id') user: User,
+        @Body() createMovieReviewDto: CreateMovieReviewDto,
+    ): Promise<CreateMovieReviewDto | null> {
+        const newReview = await this.movieUpdateReviewService.updateReviewMovie(
+            reviewId,
+            user.id,
+            createMovieReviewDto,
+        );
+        return newReview;
+    }
+
+    @Delete(':id/review')
+    @UseGuards(AuthGuard)
+    @ApiOperation({ summary: 'Delete review movie' })
+    @ApiOkResponse({ type: [MovieReviewEntity] })
+    @ApiBearerAuth('access-token')
+    async removeReview(
+        @Param('id', ParseIntPipe) reviewId: number,
+        @User('id') user: User,
+    ): Promise<CreateMovieReviewDto | null> {
+        const newReview = await this.movieRemoveReviewService.removeReviewMovie(
+            reviewId,
+            user.id,
         );
         return newReview;
     }
