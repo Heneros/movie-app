@@ -1,7 +1,7 @@
 import { Controller, Get, UseInterceptors } from '@nestjs/common';
 // import { RedisService } from './cache.service';
 import { AppService } from './app.service';
-import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
+// import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 
 @Controller()
 export class AppController {

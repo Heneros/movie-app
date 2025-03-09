@@ -2,130 +2,27 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type UserEntity {
-  id: Float!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  name: String
-  email: String
-  refreshToken: [String!]!
-  isEmailVerified: Boolean!
-}
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
-
-"""Movie"""
-type MovieEntity {
-  id: Int!
-  title: String!
-  description: String!
-  category: String!
-  preview: String!
-  published: Boolean
-  createdAt: DateTime
-  updatedAt: DateTime
-  authorId: Float
-  author: [UserEntity!]!
-  actorsList: [String!]!
-  movieId: Float
-  userId: Float
-  avgRating: Float
-  value: Int
-}
-
-type AuthEntity {
-  id: Int!
-  accessToken: String!
-  name: String!
-  email: String!
-  emailVerificationToken: String!
+type Movie {
+  """Example field (placeholder)"""
+  exampleField: Int!
 }
 
 type Query {
-  """Verification user"""
-  verifyUser(userId: Int!, emailToken: String!): AuthEntity!
-
-  """Get All favorites """
-  getAllFavorites(id: Int!): [MovieEntity!]!
-
-  """Get All movies"""
-  getAllMovies(page: Float! = 1): [MovieEntity!]!
-
-  """Search movies"""
-  searchMovies(title: String!, pageString: String!): [MovieEntity!]!
-
-  """Get Drafts movies"""
-  findDrafts(pageString: String!): [MovieEntity!]!
-
-  """Find By id movie"""
-  findById(id: Float!): MovieEntity!
+  movie(id: Int!): Movie!
 }
 
 type Mutation {
-  """Registration user"""
-  createUser(input: AuthBasicInput!): AuthEntity!
-
-  """Login user"""
-  loginUser(input: LoginInput!): AuthEntity!
-
-  """Resend email to user"""
-  resendEmail(email: ResendEmailDto!): AuthEntity!
-
-  """Request for users who wants receive in email to change password"""
-  requestResetPassword(email: ResendEmailDto!): AuthEntity!
-
-  """For users, who receive link in email. And want to reset password"""
-  resetPassword(data: ResetPasswordDto!): AuthEntity!
-
-  """Logout user"""
-  logout: String!
-
-  """Add to favorite list"""
-  addToFavorite(movieId: Float!, userId: Float!): MovieEntity!
-
-  """Remove from favorites"""
-  removeFromFavorite(input: MovieBasicInput!): MovieEntity!
-
-  """Rate movie"""
-  rateMovie(id: Float!, rating: Float!): MovieEntity!
+  createMovie(createMovieInput: String!): Movie!
+  updateMovie(updateMovieInput: UpdateMovieInput!): Movie!
+  removeMovie(id: Int!): Movie!
 }
 
-input AuthBasicInput {
-  """Email of user """
-  email: String!
-
-  """Name of user """
-  name: String!
-
-  """Password of user """
-  password: String!
-
-  """Confirm password of user """
-  passwordConfirm: String!
+input UpdateMovieInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
 }
 
-input LoginInput {
-  email: String!
-  password: String!
-}
-
-input ResendEmailDto {
-  email: String!
-}
-
-input ResetPasswordDto {
-  password: String!
-  passwordConfirm: String!
-  userId: Int!
-}
-
-input MovieBasicInput {
-  """Id movie"""
-  movieId: Int!
-
-  """Id user"""
-  userId: Int!
+type Subscription {
+  getMsg: String!
 }
