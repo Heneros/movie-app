@@ -22,19 +22,21 @@
 
 ## Features app have:
 
-- user can register. with vallidation.
+- user can registration. with vallidation. after send data, user receive email from smtp. and should verify his account.  
 - login  
 - Reset Password
-- Resend Email during 15 minutes.
+- Resend Email during 15 minutes, if user forget to validate.
 - OAuth Access Token. Create During 31d when user log in.
 - Logout.
 - CRUD operations with movies is only available for admins and editor
-- Deactivate user acc
-- Delete user acc 
+- Deactivate user account
+- Delete user account 
 - search movie
 - Add to Favorite movie
 - Remove from Favorite list movie
 - User can rate movie and change overall rating of the film display
+- Reviews movie. positive or negative. 
+- Edit review during 15 minutes. Latter gonna be edit without limitless for premium users. 
 - ApiLimiter  
 
 
@@ -78,4 +80,5 @@ can edit after 1 minute review,
 animated avatar, 
 show list all reviews/comments without button  "open more"
 everyday recieve letter to mail box about favorite movies, he subscribed
+
 

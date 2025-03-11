@@ -2,9 +2,9 @@ import { HttpAdapterHost, NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import 'reflect-metadata';
-import cookieParser from 'cookie-parser';
-import session from 'express-session';
-import passport from 'passport';
+import * as cookieParser from 'cookie-parser';
+import * as session from 'express-session';
+import * as passport from 'passport';
 
 import {
     BadRequestException,
@@ -13,13 +13,16 @@ import {
     ValidationPipe,
 } from '@nestjs/common';
 import { PrismaClientExceptionFilter } from './prisma-client-exception/prisma-client-exception.filter';
-import { ThrottlerGuard } from '@nestjs/throttler';
+
 // import { LoggerFactory } from './Logger';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule, {
         // logger: LoggerFactory('MovieApp'),
     });
+
+    
+
     // const httpServer = createServer(app.getHttpAdapter().getInstance());
     app.enableShutdownHooks();
     app.use(cookieParser());
