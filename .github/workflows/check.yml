@@ -53,6 +53,8 @@ jobs:
                   fi
                 done
 
+            - name: Set up env variables
+              runs: echo ${{secrets.JWT_SECRET}}
             - name: Install prisma packages 
               env:
                 DATABASE_URL: "postgres://postgres:postgres@localhost:5432/moviedb"

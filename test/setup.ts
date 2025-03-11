@@ -1,7 +1,7 @@
 import {
-  ClassSerializerInterceptor,
-  INestApplication,
-  ValidationPipe,
+    ClassSerializerInterceptor,
+    INestApplication,
+    ValidationPipe,
 } from '@nestjs/common';
 import * as request from 'supertest';
 import * as fs from 'fs';
@@ -20,41 +20,41 @@ import { AuthModule } from '../src/auth/auth.module';
 export let app: INestApplication;
 
 export const mockMailService = {
-  sendEmail: jest.fn().mockImplementation(() => Promise.resolve(true)),
-  resendEmail: jest.fn().mockImplementation(() => Promise.resolve(true)),
+    sendEmail: jest.fn().mockImplementation(() => Promise.resolve(true)),
+    resendEmail: jest.fn().mockImplementation(() => Promise.resolve(true)),
 };
 
 beforeAll(async () => {
-  const moduleFixture: TestingModule = await Test.createTestingModule({
-    imports: [AppModule, PrismaModule, AuthModule, MailModule],
-    providers: [
-      {
-        provide: APP_INTERCEPTOR,
-        useClass: ClassSerializerInterceptor,
-      },
-    ],
-  })
-    .overrideProvider(MailService)
-    .useValue(mockMailService)
-    .compile();
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+        imports: [AppModule, PrismaModule, AuthModule, MailModule],
+        providers: [
+            {
+                provide: APP_INTERCEPTOR,
+                useClass: ClassSerializerInterceptor,
+            },
+        ],
+    })
+        .overrideProvider(MailService)
+        .useValue(mockMailService)
+        .compile();
 
-  app = moduleFixture.createNestApplication();
+    app = moduleFixture.createNestApplication();
 
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      transform: true,
-      forbidNonWhitelisted: true,
-    }),
-  );
+    app.useGlobalPipes(
+        new ValidationPipe({
+            whitelist: true,
+            transform: true,
+            forbidNonWhitelisted: true,
+        }),
+    );
 
-  await app.init();
-  const prisma = app.get(PrismaService);
-  await clearDatabase(prisma);
+    await app.init();
+    const prisma = app.get(PrismaService);
+    await clearDatabase(prisma);
 });
 
 afterAll(async () => {
-  const prisma = app.get(PrismaService);
-  await clearDatabase(prisma);
-  await app.close();
+    const prisma = app.get(PrismaService);
+    await clearDatabase(prisma);
+    await app.close();
 });
