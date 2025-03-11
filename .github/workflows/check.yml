@@ -24,6 +24,9 @@ jobs:
             - name: Lint
               run: npm run lint
 
+            - name: Run Tests
+              run: npm run tests:e2e
+
             - run:  echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
             - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
               
