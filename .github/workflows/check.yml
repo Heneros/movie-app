@@ -54,23 +54,19 @@ jobs:
                 done
 
             - name: Install prisma packages 
+              env:
+                DATABASE_URL: "postgres://postgres:postgres@localhost:5432/moviedb"
               run: |
                    npm install @prisma/client@6.4.0 
                    npm install prisma --save-dev
                    npx prisma migrate dev
-
-
-            - name: run migrations
-              env: 
-                DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/moviedb"
-              run: npx prisma migrate deploy
 
             - name: Lint
               run: npm run lint
 
             - name: Run Tests
               env: 
-                DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/moviedb"
+                DATABASE_URL: "postgres://postgres:postgres@localhost:5432/moviedb"
               run: npm run test:e2e
 
             - run:  echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
