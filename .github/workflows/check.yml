@@ -26,6 +26,8 @@ jobs:
               ports:
                 - 5432:5432
         steps:
+
+
             # Downloads a copy of the code in your repository before running CI tests
             - name: Checkout
               uses: actions/checkout@v3  
@@ -50,6 +52,13 @@ jobs:
                     sleep 5
                   fi
                 done
+
+            - name: Install prisma packages 
+              run: |
+                   npm install @prisma/client@6.4.0 
+                   npm install prisma --save-dev
+                   npm prisma migrate dev
+
 
             - name: run migrations
               env: 
