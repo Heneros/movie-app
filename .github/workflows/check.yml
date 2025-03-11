@@ -1,12 +1,30 @@
-name: Check
-on: push 
+name: MovieApp.Nest.js
+on: 
+    push:
+        branches: [master]
+    pull_request:
+        branches: [master]
+
+
 jobs:
     test:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
               uses: actions/checkout@v3  
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                node-version: 20.12.2
+
             - name: Install deps
               run: npm ci
+
             - name: Lint
               run: npm run lint
+
+            - run:  echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+            - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+              
+            
