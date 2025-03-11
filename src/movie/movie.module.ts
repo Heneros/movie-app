@@ -13,27 +13,48 @@ import { MovieUpdateService } from './services/updateMovie.service';
 import { MovieRemoveService } from './services/removeMovie.service';
 import { MovieFindDraftsService } from './services/findDraftsMovie.service';
 import { MovieRateService } from './services/rateMovie.service';
-import { PubSub } from 'graphql-subscriptions';
+import { MovieCreateReviewService } from './services/reviews/createReview.service';
+import { MovieGetReviewsByMovieService } from './services/reviews/getReviewsByMovie.service';
+import { MovieGetAllReviewService } from './services/reviews/getAllReviews.service';
+import { MovieUpdateReviewService } from './services/reviews/updatereview.service';
+import { MovieRemoveReviewService } from './services/reviews/removeByIdReview.service';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
-  controllers: [MovieController],
-  providers: [
-    MovieService,
-    MovieFavorite,
-    MovieSearchService,
-    MovieCreateService,
-    MovieFindAllService,
-    MovieFindOneService,
-    MovieUpdateService,
-    MovieRemoveService,
-    MovieFindDraftsService,
-    MovieRateService,
-    MovieResolver,
-    {
-      provide: 'PUB_SUB',
-      useValue: new PubSub(),
-    },
-  ],
-  imports: [PrismaModule, CacheModule.register()],
+    controllers: [MovieController],
+    providers: [
+        MovieService,
+        MovieFavorite,
+        MovieSearchService,
+        MovieCreateService,
+        MovieFindAllService,
+        MovieFindOneService,
+        MovieUpdateService,
+        MovieRemoveService,
+        MovieFindDraftsService,
+        MovieRateService,
+        MovieCreateReviewService,
+        MovieGetReviewsByMovieService,
+        MovieGetAllReviewService,
+        MovieUpdateReviewService,
+        MovieRemoveReviewService,
+        MovieResolver,
+
+        // {
+        //   provide: 'PUB_SUB',
+        //   useValue: new PubSub(),
+        // },
+    ],
+    imports: [
+        PrismaModule,
+        CacheModule.register(),
+        ThrottlerModule.forRoot([
+            {
+                // name: 'long',
+                ttl: 6000,
+                limit: 10,
+            },
+        ]),
+    ],
 })
 export class MovieModule {}

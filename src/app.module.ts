@@ -38,16 +38,23 @@ import { WinstonModule } from 'nest-winston';
             autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
             installSubscriptionHandlers: true,
             subscriptions: {
-                'graphql-ws': true,
+                'graphql-ws': {
+                    onConnect: (ctx) => {
+                        console.log('✅ WebSocket connected:');
+                    },
+                    onDisconnect: () => {
+                        console.log('❌ WebSocket disconnected');
+                    },
+                },
             },
         }),
 
         ThrottlerModule.forRoot([
-            {
-                name: 'long',
-                ttl: 6000,
-                limit: 100,
-            },
+            // {
+            //     // name: 'long',
+            //     ttl: 60,
+            //     limit: 5,
+            // },
         ]),
     ],
     controllers: [],
@@ -55,22 +62,14 @@ import { WinstonModule } from 'nest-winston';
         // AppService,
         //  MovieResolver,
         // MailService,
+        // {
+        //     provide: APP_INTERCEPTOR,
+        //     useClass: ClassSerializerInterceptor,
+        // },
         {
-            provide: APP_INTERCEPTOR,
-            useClass: ClassSerializerInterceptor,
+            provide: APP_GUARD,
+            useClass: ThrottlerGuard,
         },
-        // {
-        //     provide: 'PUB_SUB',
-        //     useValue: new PubSub(),
-        // },
-        // {
-        //   provide: APP_GUARD,
-        //   useClass: ThrottlerGuard,
-        // },
-        // {
-        //   provide: APP_PIPE,
-        //   useClass: EmailValidationPipe,
-        // },
     ],
 })
 export class AppModule {}

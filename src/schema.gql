@@ -27,11 +27,11 @@ type MovieEntity {
   published: Boolean
   createdAt: DateTime
   updatedAt: DateTime
-  authorId: Float
+  authorId: Int
   author: [UserEntity!]!
   actorsList: [String!]!
-  movieId: Float
-  userId: Float
+  movieId: Int
+  userId: Int
   avgRating: Float
   value: Int
 }
@@ -54,6 +54,8 @@ type Query {
 }
 
 type Mutation {
+  createMovie(createMovieInput: String!): MovieEntity!
+
   """Add to favorite list"""
   addToFavorite(movieId: Float!, userId: Float!): MovieEntity!
 

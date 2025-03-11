@@ -19,29 +19,29 @@ import { RequestResetPasswordService } from './services/requestResetPassword.ser
 import { AuthResolver } from './auth.resolver';
 
 @Module({
-  imports: [
-    PrismaModule,
-    PassportModule,
-    JwtModule.register({
-      global: true,
-      secret: jwtConstants.secret,
-      signOptions: { expiresIn: '31d' },
-    }),
-    UsersModule,
-  ],
-  controllers: [AuthController],
-  exports: [AuthModule],
-  providers: [
-    AuthService,
-    MailService,
-    CreateUserService,
-    LoginAuthService,
-    VerifyEmailService,
-    ResendEmailService,
-    ResetPasswordService,
-    RequestResetPasswordService,
-    LogoutAuthService,
-    AuthResolver,
-  ],
+    imports: [
+        PrismaModule,
+        PassportModule,
+        JwtModule.register({
+            global: true,
+            secret: jwtConstants.secret,
+            signOptions: { expiresIn: '31d' },
+        }),
+        UsersModule,
+    ],
+    controllers: [AuthController],
+    exports: [AuthModule],
+    providers: [
+        AuthService,
+        MailService,
+        CreateUserService,
+        LoginAuthService,
+        VerifyEmailService,
+        ResendEmailService,
+        ResetPasswordService,
+        RequestResetPasswordService,
+        LogoutAuthService,
+        AuthResolver,
+    ],
 })
 export class AuthModule {}

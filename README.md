@@ -22,15 +22,20 @@
 
 ## Features app have:
 
-- user can register/login validation have
+- user can register. with vallidation.
+- login  
+- Reset Password
+- Resend Email during 15 minutes.
+- OAuth Access Token. Create During 31d when user log in.
+- Logout.
 - CRUD operations with movies is only available for admins and editor
-- RBAC
 - Deactivate user acc
 - Delete user acc 
 - search movie
-- Favorite movie
+- Add to Favorite movie
+- Remove from Favorite list movie
 - User can rate movie and change overall rating of the film display
--
+- ApiLimiter  
 
 
 ## Features should be:

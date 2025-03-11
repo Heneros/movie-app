@@ -13,6 +13,7 @@ import {
     ValidationPipe,
 } from '@nestjs/common';
 import { PrismaClientExceptionFilter } from './prisma-client-exception/prisma-client-exception.filter';
+import { ThrottlerGuard } from '@nestjs/throttler';
 // import { LoggerFactory } from './Logger';
 
 async function bootstrap() {
