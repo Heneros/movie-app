@@ -57,7 +57,7 @@ jobs:
               run: |
                    npm install @prisma/client@6.4.0 
                    npm install prisma --save-dev
-                   npm prisma migrate dev
+                   npx prisma migrate dev
 
 
             - name: run migrations
