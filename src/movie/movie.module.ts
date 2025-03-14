@@ -24,10 +24,11 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { RemoveMovieFavHandler } from './handlers/favorite/removeMovieFavorite.handler';
 import { GetAllFavoritesHandler } from './handlers/favorite/getAllFavorite.handler';
 import { UpdateMovieHandler } from './handlers/updateMovie.handler';
-import { SearchMovieQuery } from './queries/searchMovie.query';
 import { SearchMovieHandler } from './handlers/searchMovie.handler';
-import { FindAllMovieHandler } from './handlers/findAllMovie.handler';
-import { FindDraftsMovieHandler } from './handlers/FindDraftsMovie.handler';
+
+import { CreateMovieHandler } from './handlers/createMovie.handler';
+import { RemoveMovieHandler } from './handlers/removeMovie.handler';
+import { RateMovieHandler } from './handlers/rateMovie.handler';
 
 @Module({
     controllers: [MovieController],
@@ -54,9 +55,9 @@ import { FindDraftsMovieHandler } from './handlers/FindDraftsMovie.handler';
         GetAllFavoritesHandler,
         UpdateMovieHandler,
         SearchMovieHandler,
-        FindAllMovieHandler,
-        FindDraftsMovieHandler,
-
+        RateMovieHandler,
+        CreateMovieHandler,
+        RemoveMovieHandler,
         // {
         //   provide: 'PUB_SUB',
         //   useValue: new PubSub(),

@@ -48,9 +48,15 @@ import { GetAllFavoritesQuery } from './queries/getAllFavorite.query';
 import { UpdateMovieCommand } from './commands/updateMovie.command';
 import { SearchMovieQuery } from './queries/searchMovie.query';
 import { plainToInstance } from 'class-transformer';
-import { FindAllMovieHandler } from './handlers/findAllMovie.handler';
 import { FindAllMovieQuery } from './queries/findAllMovie.query';
 import { FindDraftsMovieQuery } from './queries/findDrafts.query';
+import { FindOneMovieQuery } from './queries/findOneMovie.query';
+import { CreateMovieCommand } from './commands/createMovie.command';
+import { RemoveMovieHandler } from './handlers/removeMovie.handler';
+import { RemoveMovieCommand } from './commands/removeMovie.command';
+import { AddMovieFavCommand } from './commands/favorite/addMovieFavorite.command';
+import { RemoveMovieFavCommand } from './commands/favorite/removeMovieFavorite.command';
+import { RateMovieCommand } from './commands/rateMovie.command';
 
 @Controller('movie')
 @ApiTags('Movie')
@@ -124,8 +130,8 @@ export class MovieController {
             );
         }
 
-        return movies;
-
+        // return movies;
+        return movies.map((draft) => new MovieEntity(draft));
         // return movies.map((movie) => new MovieEntity(movie));
     }
 
@@ -144,7 +150,7 @@ export class MovieController {
         const movies = await this.queryBus.execute(
             new FindDraftsMovieQuery(skip),
         );
-        console.log(movies);
+        // console.log(movies);
 
         return movies.map((draft) => new MovieEntity(draft));
     }
@@ -152,18 +158,19 @@ export class MovieController {
     // @Public()
     @Get(':id')
     @ApiOkResponse({ type: MovieEntity })
-    async findOne(@Param('id', ParseIntPipe) id: number) {
-        const movie = await this.movieFindOneService.findOne(+id);
-        if (!movie) {
-            throw new NotFoundException(`movie with ${id} does not exist.`);
-        }
+    async findOne(@Param('id', ParseIntPipe, CheckMovieExistPipe) id: number) {
+        // const movie = await this.movieFindOneService.findOne(+id);
+        const movie = await this.queryBus.execute(new FindOneMovieQuery(id));
+        // if (!movie) {
+        //     throw new NotFoundException(`movie with ${id} does not exist.`);
+        // }
         return new MovieEntity(movie);
     }
 
     @Post()
     @UseGuards(AuthGuard)
-    @ApiCreatedResponse({ type: MovieEntity })
     @Roles('Admin', 'Editor')
+    @ApiCreatedResponse({ type: MovieEntity })
     @ApiBearerAuth('access-token')
     async create(@Body() createMovieDto: CreateMovieDto, @User() user: User) {
         if (!user || !user.id) {
@@ -171,9 +178,10 @@ export class MovieController {
         }
         createMovieDto.authorId = user.id;
 
-        return new MovieEntity(
-            await this.movieCreateService.create(createMovieDto),
+        const movie = await this.commandBus.execute(
+            new CreateMovieCommand(createMovieDto),
         );
+        return new MovieEntity(movie);
     }
 
     @Patch(':id')
@@ -195,33 +203,52 @@ export class MovieController {
     @UseGuards(AuthGuard)
     @ApiBearerAuth('access-token')
     @ApiOkResponse({ type: MovieEntity })
-    async remove(@Param('id', ParseIntPipe) id: number) {
+    @ApiOperation({ summary: 'Delete movie' })
+    @ApiCreatedResponse({
+        description: 'The movie has been successfully deleted.',
+        type: MovieEntity,
+    })
+    async remove(@Param('id', ParseIntPipe, CheckMovieExistPipe) id: number) {
         const movie = await this.movieFindOneService.findOne(id);
 
         if (!movie) {
             throw new NotFoundException(`movie with ${id} does not exist.`);
         }
-        return new MovieEntity(await this.movieRemoveService.remove(id));
+        return new MovieEntity(
+            await this.commandBus.execute(new RemoveMovieCommand(id)),
+        );
+        // return new MovieEntity(await this.movieRemoveService.remove(id));
     }
 
     @Post(':id/addFav')
     @UseGuards(AuthGuard)
     @ApiBearerAuth('access-token')
     @ApiOperation({ summary: 'Add to favorite list user.' })
-    @ApiOkResponse({ type: MovieEntity })
+    @ApiOkResponse({
+        description: 'Add favorite movie to list',
+        type: MovieEntity,
+    })
     async addMovieFav(
         @Param('id', CheckMovieExistPipe, ParseIntPipe) movieId: number,
         @Body('userId') userId: number,
     ) {
         return new MovieEntity(
-            await this.movieFavorite.addMovieFav(movieId, userId),
+            await this.commandBus.execute(
+                new AddMovieFavCommand(movieId, userId),
+            ),
         );
+        // return new MovieEntity(
+        //     await this.movieFavorite.addMovieFav(movieId, userId),
+        // );
     }
 
     @Delete(':id/removeFav')
     @UseGuards(AuthGuard, ProfileOwnerGuard)
     @ApiOperation({ summary: 'Add to favorite list user.' })
-    @ApiOkResponse({ type: MovieEntity })
+    @ApiOkResponse({
+        description: 'Remove favorite movie from list',
+        type: MovieEntity,
+    })
     @ApiBearerAuth('access-token')
     async removeMovieFavorite(
         @Param('id', ParseIntPipe) movieId: number,
@@ -237,7 +264,9 @@ export class MovieController {
 
         const userId = userObjectId;
         return new MovieEntity(
-            await this.movieFavorite.removeMovieFav(movieId, userId),
+            await this.commandBus.execute(
+                new RemoveMovieFavCommand(movieId, userId),
+            ),
         );
     }
 
@@ -282,10 +311,8 @@ export class MovieController {
     ): Promise<Movie> {
         // console.log(rateMovieDto);
 
-        return await this.movieRateService.rateMovie(
-            movieId,
-            user.id,
-            rateMovieDto.rating,
+        return await this.commandBus.execute(
+            new RateMovieCommand(movieId, user.id, rateMovieDto.rating),
         );
     }
 }

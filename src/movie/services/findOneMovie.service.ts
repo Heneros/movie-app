@@ -1,14 +1,13 @@
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '@/prisma/prisma.service';
-import { PAGINATION_LIMIT } from '@/data/defaultData';
 import { Movie } from '@prisma/client';
 
 @Injectable()
 export class MovieFindOneService {
     constructor(private prisma: PrismaService) {}
 
-    async findOne(id: number): Promise<Movie | null> {
+    async findOne(id: number): Promise<Movie> {
         try {
             return await this.prisma.movie.findUnique({
                 where: {
