@@ -39,11 +39,13 @@ export class MovieFindAllService {
             },
         });
 
+
+
         if (allMovies.length === 0) {
             throw new NotFoundException('No movies Exist');
         }
 
         await this.cacheManager.set(cacheKey, allMovies, 3500);
-        return allMovies;
+        return { allMovies };
     }
 }

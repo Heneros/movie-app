@@ -51,6 +51,8 @@ import { CheckMovieExistPipe } from './guard/checkIfMovieExist.guard';
 import { ProfileOwnerGuard } from '@/guards/ProfileOwner.guard';
 import { RateMovieDto } from './dto/rate-movie.dto';
 import { Throttle } from '@nestjs/throttler';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { GetAllFavoritesQuery } from './queries/getAllFavorite.query';
 
 @Controller('movie')
 @ApiTags('Movie')
@@ -68,6 +70,8 @@ export class MovieController {
         private readonly movieRemoveService: MovieRemoveService,
         private readonly movieFindDraftsService: MovieFindDraftsService,
         private readonly movieRateService: MovieRateService,
+        private readonly commandBug: CommandBus,
+        private readonly queryBus: QueryBus,
 
         private readonly prisma: PrismaService,
     ) {}
@@ -246,8 +250,8 @@ export class MovieController {
     ): Promise<MovieEntity[]> {
         const page = pageString ? parseInt(pageString, 10) : 1;
         const skip = (page - 1) * PAGINATION_LIMIT;
-        const favoriteMovies = await this.movieFavorite.getAllFavorites(
-            user.id,
+        const favoriteMovies = await this.queryBus.execute(
+            new GetAllFavoritesQuery(user.id, skip),
         );
 
         // console.log('allFavorites', user);

@@ -19,6 +19,10 @@ import { MovieGetAllReviewService } from './services/reviews/getAllReviews.servi
 import { MovieUpdateReviewService } from './services/reviews/updatereview.service';
 import { MovieRemoveReviewService } from './services/reviews/removeByIdReview.service';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { AddMovieFavoriteHandler } from './handlers/favorite/addMovieFavorite.handler';
+import { CqrsModule } from '@nestjs/cqrs';
+import { RemoveMovieFavHandler } from './handlers/favorite/removeMovieFavorite.handler';
+import { GetAllFavoritesHandler } from './handlers/favorite/getAllFavorite.handler';
 
 @Module({
     controllers: [MovieController],
@@ -39,7 +43,9 @@ import { ThrottlerModule } from '@nestjs/throttler';
         MovieUpdateReviewService,
         MovieRemoveReviewService,
         MovieResolver,
-
+        AddMovieFavoriteHandler,
+        RemoveMovieFavHandler,
+        GetAllFavoritesHandler,
         // {
         //   provide: 'PUB_SUB',
         //   useValue: new PubSub(),
@@ -47,6 +53,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
     ],
     imports: [
         PrismaModule,
+        CqrsModule,
         CacheModule.register(),
         ThrottlerModule.forRoot([
             {

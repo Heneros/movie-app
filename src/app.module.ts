@@ -19,6 +19,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { PubSub } from 'graphql-subscriptions';
 
 import { WinstonModule } from 'nest-winston';
+import { CqrsModule } from '@nestjs/cqrs';
 
 @Module({
     imports: [
@@ -38,24 +39,11 @@ import { WinstonModule } from 'nest-winston';
             autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
             installSubscriptionHandlers: true,
             subscriptions: {
-                'graphql-ws': {
-                    onConnect: (ctx) => {
-                        console.log('✅ WebSocket connected:');
-                    },
-                    onDisconnect: () => {
-                        console.log('❌ WebSocket disconnected');
-                    },
-                },
+                'graphql-ws': true,
             },
         }),
-
-        ThrottlerModule.forRoot([
-            // {
-            //     // name: 'long',
-            //     ttl: 60,
-            //     limit: 5,
-            // },
-        ]),
+        ThrottlerModule.forRoot([]),
+        CqrsModule.forRoot(),
     ],
     controllers: [],
     providers: [
