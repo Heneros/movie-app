@@ -9,18 +9,13 @@ import {
     ParseIntPipe,
     NotFoundException,
     Query,
-    ValidationPipe,
-    UseInterceptors,
     UseGuards,
-    BadRequestException,
-    InternalServerErrorException,
 } from '@nestjs/common';
 import { MovieService } from './movie.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import {
     ApiBearerAuth,
-    ApiBody,
     ApiCreatedResponse,
     ApiOkResponse,
     ApiOperation,
@@ -32,9 +27,6 @@ import { MovieEntity } from './entities/movie.entity';
 import { Roles } from '@/decorators/roles.decorator';
 import { PAGINATION_LIMIT } from '@/data/defaultData';
 import { User } from '@/decorators/user.decorator';
-import { Public } from '@/decorators/public.decorator';
-import { SearchMovieDto } from './dto/search-movie.dto';
-import { TimeoutInterceptor } from '@/interceptor/timeout.interceptor';
 import { Movie } from '@prisma/client';
 import { MovieFavorite } from './services/addMovieFavoriteList.service';
 import { AuthGuard } from '@/guards/auth.guard';
@@ -53,10 +45,15 @@ import { RateMovieDto } from './dto/rate-movie.dto';
 import { Throttle } from '@nestjs/throttler';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { GetAllFavoritesQuery } from './queries/getAllFavorite.query';
+import { UpdateMovieCommand } from './commands/updateMovie.command';
+import { SearchMovieQuery } from './queries/searchMovie.query';
+import { plainToInstance } from 'class-transformer';
+import { FindAllMovieHandler } from './handlers/findAllMovie.handler';
+import { FindAllMovieQuery } from './queries/findAllMovie.query';
+import { FindDraftsMovieQuery } from './queries/findDrafts.query';
 
 @Controller('movie')
 @ApiTags('Movie')
-
 // @UseInterceptors(TimeoutInterceptor)
 export class MovieController {
     constructor(
@@ -70,7 +67,7 @@ export class MovieController {
         private readonly movieRemoveService: MovieRemoveService,
         private readonly movieFindDraftsService: MovieFindDraftsService,
         private readonly movieRateService: MovieRateService,
-        private readonly commandBug: CommandBus,
+        private readonly commandBus: CommandBus,
         private readonly queryBus: QueryBus,
 
         private readonly prisma: PrismaService,
@@ -88,11 +85,13 @@ export class MovieController {
         const page = pageString ? parseInt(pageString, 10) : 1;
         const skip = (page - 1) * PAGINATION_LIMIT;
 
-        const movies = (await this.movieFindAllService.findAll(
-            skip,
-        )) as Movie[];
-
-        return movies.map((movie) => new MovieEntity(movie));
+        // const movies = (await this.movieFindAllService.findAll(
+        //     skip,
+        // )) as Movie[];
+        const movies = await this.queryBus.execute(new FindAllMovieQuery(skip));
+        // console.log(movies);
+        // return movies;
+        return movies.allMovies.map((movie: Movie) => new MovieEntity(movie));
     }
 
     @Get('search')
@@ -109,18 +108,15 @@ export class MovieController {
         type: [MovieEntity],
     })
     async search(
-        @Query('title')
-        searchText: string,
+        @Query('title') searchText: string,
         @Query('page') pageString?: string,
     ): Promise<MovieEntity[]> {
         const page = pageString ? parseInt(pageString, 10) : 1;
         const skip = (page - 1) * PAGINATION_LIMIT;
 
-        console.log(123423);
-        const movies = (await this.movieSearchService.searchByTitle(
-            searchText,
-            skip,
-        )) as Movie[];
+        const movies = await this.queryBus.execute(
+            new SearchMovieQuery(searchText, skip),
+        );
 
         if (!movies || movies.length === 0) {
             throw new NotFoundException(
@@ -128,23 +124,29 @@ export class MovieController {
             );
         }
 
-        return movies.map((movie) => new MovieEntity(movie));
+        return movies;
+
+        // return movies.map((movie) => new MovieEntity(movie));
     }
 
     @Get('drafts')
-    @Roles('Admin', 'Editor')
     @UseGuards(AuthGuard)
+    @Roles('Admin', 'Editor')
     @ApiBearerAuth('access-token')
     @ApiOkResponse({ type: MovieEntity, isArray: true })
     async findDrafts(@Query('page') pageString?: string) {
         const page = pageString ? parseInt(pageString, 10) : 1;
         const skip = (page - 1) * PAGINATION_LIMIT;
 
-        const drafts = (await this.movieFindDraftsService.findDrafts(
-            skip,
-        )) as Movie[];
+        // const drafts = (await this.movieFindDraftsService.findDrafts(
+        //     skip,
+        // )) as Movie[];
+        const movies = await this.queryBus.execute(
+            new FindDraftsMovieQuery(skip),
+        );
+        console.log(movies);
 
-        return drafts.map((draft) => new MovieEntity(draft));
+        return movies.map((draft) => new MovieEntity(draft));
     }
 
     // @Public()
@@ -183,8 +185,8 @@ export class MovieController {
         @Param('id', ParseIntPipe) id: number,
         @Body() updateMovieDto: UpdateMovieDto,
     ) {
-        return new MovieEntity(
-            await this.movieUpdateService.update(id, updateMovieDto),
+        return await this.commandBus.execute(
+            new UpdateMovieCommand(id, updateMovieDto),
         );
     }
 

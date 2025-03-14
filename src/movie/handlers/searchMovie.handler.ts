@@ -1,15 +1,16 @@
+import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
+import { SearchMovieQuery } from '../queries/searchMovie.query';
 import { PrismaService } from '@/prisma/prisma.service';
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { Movie } from '@prisma/client';
+import { BadRequestException } from '@nestjs/common';
 import { PAGINATION_LIMIT } from '@/data/defaultData';
 
-@Injectable()
-export class MovieSearchService {
-    constructor(private prisma: PrismaService) {}
-    async searchByTitle(
-        searchText: string,
-        skip: number = 0,
-    ): Promise<Movie[]> {
+@QueryHandler(SearchMovieQuery)
+export class SearchMovieHandler implements IQueryHandler<SearchMovieQuery> {
+    constructor(private readonly prisma: PrismaService) {}
+
+    async execute(query: SearchMovieQuery) {
+        const { searchText, skip } = query;
+
         try {
             return await this.prisma.movie.findMany({
                 skip,
@@ -20,9 +21,9 @@ export class MovieSearchService {
                         mode: 'insensitive',
                     },
                 },
-                include: {
-                    author: true,
-                },
+                // include: {
+                //     author: true,
+                // },
             });
         } catch (error) {
             console.error('Error searching movies:', error);

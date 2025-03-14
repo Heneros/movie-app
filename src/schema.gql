@@ -2,21 +2,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type UserEntity {
-  id: Float!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  name: String
-  email: String
-  refreshToken: [String!]!
-  isEmailVerified: Boolean!
-}
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
-
 """Movie"""
 type MovieEntity {
   id: Int!
@@ -28,13 +13,18 @@ type MovieEntity {
   createdAt: DateTime
   updatedAt: DateTime
   authorId: Int
-  author: [UserEntity!]!
+  author: [String!]!
   actorsList: [String!]!
   movieId: Int
   userId: Int
   avgRating: Float
   value: Int
 }
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
 
 type Query {
   """Get All favorites """

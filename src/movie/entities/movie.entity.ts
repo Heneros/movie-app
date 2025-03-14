@@ -2,6 +2,8 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Movie } from '@prisma/client';
 import { UserEntity } from '@/users/entities/user.entity';
 import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
+import { Exclude } from 'class-transformer';
+import { UpdateUserDto } from '@/users/dto/update-user.dto';
 
 @ObjectType({ description: 'Movie' })
 export class MovieEntity implements Movie {
@@ -42,8 +44,8 @@ export class MovieEntity implements Movie {
     authorId: number;
 
     @ApiProperty({ required: false, type: UserEntity })
-    @Field(() => [UserEntity])
-    author: UserEntity;
+    @Field(() => [String], { nullable: false })
+    author: UpdateUserDto;
 
     @ApiProperty()
     @Field(() => [String])
@@ -58,7 +60,7 @@ export class MovieEntity implements Movie {
     userId: number;
 
     @ApiProperty()
-    @Field(() => Float, { nullable: true }) // Убедитесь, что avgRating это числовой тип
+    @Field(() => Float, { nullable: true })
     avgRating: number;
 
     @Field(() => Int, { nullable: true })
@@ -67,7 +69,7 @@ export class MovieEntity implements Movie {
     constructor({ author, ...data }: Partial<MovieEntity>) {
         Object.assign(this, data);
         if (author) {
-            this.author = new UserEntity(author);
+            this.author = new UpdateUserDto(author);
         }
     }
 }

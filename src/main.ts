@@ -21,8 +21,6 @@ async function bootstrap() {
         // logger: LoggerFactory('MovieApp'),
     });
 
-    
-
     // const httpServer = createServer(app.getHttpAdapter().getInstance());
     app.enableShutdownHooks();
     app.use(cookieParser());
