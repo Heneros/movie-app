@@ -10,6 +10,7 @@ import {
     NotFoundException,
     Query,
     UseGuards,
+    BadRequestException,
 } from '@nestjs/common';
 import { MovieService } from './movie.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
@@ -44,7 +45,7 @@ import { ProfileOwnerGuard } from '@/guards/ProfileOwner.guard';
 import { RateMovieDto } from './dto/rate-movie.dto';
 import { Throttle } from '@nestjs/throttler';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { GetAllFavoritesQuery } from './queries/getAllFavorite.query';
+import { GetAllFavoritesQuery } from './queries/favorite/getAllFavorite.query';
 import { UpdateMovieCommand } from './commands/updateMovie.command';
 import { SearchMovieQuery } from './queries/searchMovie.query';
 import { plainToInstance } from 'class-transformer';
@@ -57,6 +58,8 @@ import { RemoveMovieCommand } from './commands/removeMovie.command';
 import { AddMovieFavCommand } from './commands/favorite/addMovieFavorite.command';
 import { RemoveMovieFavCommand } from './commands/favorite/removeMovieFavorite.command';
 import { RateMovieCommand } from './commands/rateMovie.command';
+import { MovieRepository } from './repositories/movie.repository';
+import { CheckUserExistPipe } from '@/users/pipe/CheckUserExist.pipe';
 
 @Controller('movie')
 @ApiTags('Movie')
@@ -73,6 +76,8 @@ export class MovieController {
         private readonly movieRemoveService: MovieRemoveService,
         private readonly movieFindDraftsService: MovieFindDraftsService,
         private readonly movieRateService: MovieRateService,
+
+        private readonly movieRepository: MovieRepository,
         private readonly commandBus: CommandBus,
         private readonly queryBus: QueryBus,
 
@@ -150,7 +155,6 @@ export class MovieController {
         const movies = await this.queryBus.execute(
             new FindDraftsMovieQuery(skip),
         );
-        // console.log(movies);
 
         return movies.map((draft) => new MovieEntity(draft));
     }
@@ -209,8 +213,8 @@ export class MovieController {
         type: MovieEntity,
     })
     async remove(@Param('id', ParseIntPipe, CheckMovieExistPipe) id: number) {
-        const movie = await this.movieFindOneService.findOne(id);
-
+        // const movie = await this.movieFindOneService.findOne(id);
+        const movie = await this.queryBus.execute(new FindOneMovieQuery(id));
         if (!movie) {
             throw new NotFoundException(`movie with ${id} does not exist.`);
         }
@@ -230,16 +234,13 @@ export class MovieController {
     })
     async addMovieFav(
         @Param('id', CheckMovieExistPipe, ParseIntPipe) movieId: number,
-        @Body('userId') userId: number,
+        @User('userId') user: User,
     ) {
         return new MovieEntity(
             await this.commandBus.execute(
-                new AddMovieFavCommand(movieId, userId),
+                new AddMovieFavCommand(movieId, user.id),
             ),
         );
-        // return new MovieEntity(
-        //     await this.movieFavorite.addMovieFav(movieId, userId),
-        // );
     }
 
     @Delete(':id/removeFav')
@@ -252,17 +253,21 @@ export class MovieController {
     @ApiBearerAuth('access-token')
     async removeMovieFavorite(
         @Param('id', ParseIntPipe) movieId: number,
-        @Body('userId') userObjectId: number,
+        @User('userId') user: User,
     ) {
-        const movie = await this.movieFindOneService.findOne(movieId);
-
+        // const movie = await this.movieFindOneService.findOne(movieId);
+        // console.log('movieId, user ', movieId, user);
+        const movie = await this.queryBus.execute(
+            new FindOneMovieQuery(movieId),
+        );
         if (!movie) {
             throw new NotFoundException(
                 `movie with ${movieId} does not exist.`,
             );
         }
+  
+        const userId = user.id;
 
-        const userId = userObjectId;
         return new MovieEntity(
             await this.commandBus.execute(
                 new RemoveMovieFavCommand(movieId, userId),
@@ -276,25 +281,24 @@ export class MovieController {
     @ApiOperation({ summary: 'All favorite list user.' })
     @ApiOkResponse({ type: [MovieEntity] })
     async allFavorites(
-        @User('id') user: User,
+        @User('userId') user: User,
         @Query('page') pageString?: string,
     ): Promise<MovieEntity[]> {
         const page = pageString ? parseInt(pageString, 10) : 1;
         const skip = (page - 1) * PAGINATION_LIMIT;
+
+        const userId = user.id;
         const favoriteMovies = await this.queryBus.execute(
-            new GetAllFavoritesQuery(user.id, skip),
+            new GetAllFavoritesQuery(userId, skip),
         );
 
-        // console.log('allFavorites', user);
+        // return favoriteMovies;
         const movieIds = favoriteMovies.map((fav) => fav.movieId);
 
-        const movies = await this.prisma.movie.findMany({
+        const movies = await this.movieRepository.findManyMovieIn(
             skip,
-            take: PAGINATION_LIMIT,
-            where: {
-                id: { in: movieIds },
-            },
-        });
+            movieIds,
+        );
 
         return movies.map((movie) => new MovieEntity(movie));
     }

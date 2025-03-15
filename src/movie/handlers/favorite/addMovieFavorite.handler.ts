@@ -2,28 +2,24 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { AddMovieFavCommand } from '../../commands/favorite/addMovieFavorite.command';
 import { PrismaService } from '@/prisma/prisma.service';
 import { BadRequestException } from '@nestjs/common';
+import { MovieRepository } from '@/movie/repositories/movie.repository';
 
 @CommandHandler(AddMovieFavCommand)
 export class AddMovieFavoriteHandler
     implements ICommandHandler<AddMovieFavCommand>
 {
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(private readonly movieRepository: MovieRepository) {}
 
     async execute(command: AddMovieFavCommand) {
         const { movieId, userId } = command;
+        const isFavorite = await this.movieRepository.findMovieUniqueWithAuthor(
+            userId,
+            movieId,
+        );
 
-        const movieFound = await this.prisma.userFavoriteMovies.findUnique({
-            where: {
-                userId_movieId: { movieId, userId },
-            },
-        });
-
-        if (movieFound) {
+        if (isFavorite) {
             throw new BadRequestException('Movie already exists in favorites');
         }
-
-        return this.prisma.userFavoriteMovies.create({
-            data: { movieId, userId },
-        });
+        return this.movieRepository.addMovieFavWithAuthor(movieId, userId);
     }
 }

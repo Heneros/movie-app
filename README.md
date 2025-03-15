@@ -21,12 +21,12 @@
 
 
 ## Features app have:
-
+- CQRS architecture.
 - user can registration. with vallidation. after send data, user receive email from smtp. and should verify his account.  
 - login  
-- Reset Password
-- Resend Email during 15 minutes, if user forget to validate.
-- OAuth Access Token. Create During 31d when user log in.
+- Reset Password, user enter his email and receive valid link duration 15 minutes. in this link user enter new password and send back to site, after this user update his password in account 
+- Resend Email during 15 minutes, if user forget to validate email.
+- OAuth Access Token. Create token in db during 31days when user log in. when token expired, user can perform any actions in site
 - Logout.
 - CRUD operations with movies is only available for admins and editor
 - Deactivate user account
@@ -40,8 +40,7 @@
 - ApiLimiter  
 
 
-## Features should be:
-
+## Features and functionality app should be:
 - Passport google/outlook/discord/github.
 - Bash write script
 - Mailing to user about new movies, comments,

@@ -47,7 +47,6 @@ export class ProfileOwnerGuard implements CanActivate {
       const decodedToken = this.jwtService.verify(token);
       userIdFromToken = decodedToken.id || decodedToken.userId;
 
-      // console.log(userIdFromToken, idFromParams);
     } catch (error) {
       throw new UnauthorizedException('Invalid token');
     }

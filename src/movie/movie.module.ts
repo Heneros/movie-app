@@ -29,6 +29,9 @@ import { SearchMovieHandler } from './handlers/searchMovie.handler';
 import { CreateMovieHandler } from './handlers/createMovie.handler';
 import { RemoveMovieHandler } from './handlers/removeMovie.handler';
 import { RateMovieHandler } from './handlers/rateMovie.handler';
+import { FindAllMovieHandler } from './handlers/findAllMovie.handler';
+import { MovieRepository } from './repositories/movie.repository';
+import { FindOneHandler } from './handlers/findOneMovie.handler';
 
 @Module({
     controllers: [MovieController],
@@ -48,8 +51,9 @@ import { RateMovieHandler } from './handlers/rateMovie.handler';
         MovieGetAllReviewService,
         MovieUpdateReviewService,
         MovieRemoveReviewService,
-        MovieResolver,
 
+        MovieResolver,
+        MovieRepository,
         AddMovieFavoriteHandler,
         RemoveMovieFavHandler,
         GetAllFavoritesHandler,
@@ -58,6 +62,8 @@ import { RateMovieHandler } from './handlers/rateMovie.handler';
         RateMovieHandler,
         CreateMovieHandler,
         RemoveMovieHandler,
+        FindAllMovieHandler,
+        FindOneHandler,
         // {
         //   provide: 'PUB_SUB',
         //   useValue: new PubSub(),

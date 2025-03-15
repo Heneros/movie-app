@@ -1,5 +1,6 @@
 import { PAGINATION_LIMIT } from '@/data/defaultData';
-import { GetAllFavoritesQuery } from '@/movie/queries/getAllFavorite.query';
+import { GetAllFavoritesQuery } from '@/movie/queries/favorite/getAllFavorite.query';
+import { MovieRepository } from '@/movie/repositories/movie.repository';
 import { PrismaService } from '@/prisma/prisma.service';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
@@ -7,14 +8,14 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 export class GetAllFavoritesHandler
     implements IQueryHandler<GetAllFavoritesQuery>
 {
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(
+        // private readonly prisma: PrismaService,
+        private readonly movieRepository: MovieRepository,
+    ) {}
 
     async execute(query: GetAllFavoritesQuery) {
         const { userId, skip } = query;
-        return this.prisma.userFavoriteMovies.findMany({
-            skip,
-            take: PAGINATION_LIMIT,
-            where: { userId },
-        });
+        // console.log('user.id, skip', userId, skip);
+        return await this.movieRepository.findManyInFav(userId, skip);
     }
 }
