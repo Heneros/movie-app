@@ -2,6 +2,7 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { FindOneMovieQuery } from '../queries/findOneMovie.query';
 
 import { MovieRepository } from '@/movie/repositories/movie.repository';
+import { BadRequestException } from '@nestjs/common';
 
 @QueryHandler(FindOneMovieQuery)
 export class FindOneHandler implements IQueryHandler<FindOneMovieQuery> {
@@ -11,9 +12,14 @@ export class FindOneHandler implements IQueryHandler<FindOneMovieQuery> {
         const { id } = query;
         // console.log('movieId, user ', id);
         try {
-            return await this.movieRepository.findUniqueMovie({
-                id,
+            const movieId = await this.movieRepository.findUniqueMovie({
+                id: id,
             });
+            if (!movieId) {
+                throw new BadRequestException('Movie dont exist');
+            }
+
+            return movieId;
         } catch (error) {
             console.error('Error finding movie:', error);
             return null;

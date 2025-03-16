@@ -12,8 +12,8 @@ export class RemoveMovieFavHandler
 
     async execute(command: RemoveMovieFavCommand) {
         const { movieId, userId } = command;
+        // console.log('movieId, userId', movieId, userId);
 
-        // console.log('', movieId, userId);
         const movieFound = await this.movieRepository.findManyInFav(
             movieId,
             userId,

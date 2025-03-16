@@ -243,20 +243,19 @@ export class MovieController {
         );
     }
 
-    @Delete(':id/removeFav')
+    @Delete(':userId/removeFav')
     @UseGuards(AuthGuard, ProfileOwnerGuard)
-    @ApiOperation({ summary: 'Add to favorite list user.' })
+    @ApiOperation({ summary: 'Remove from favorite list user.' })
     @ApiOkResponse({
         description: 'Remove favorite movie from list',
         type: MovieEntity,
     })
     @ApiBearerAuth('access-token')
     async removeMovieFavorite(
-        @Param('id', ParseIntPipe) movieId: number,
-        @User('userId') user: User,
-    ) {
-        // const movie = await this.movieFindOneService.findOne(movieId);
-        // console.log('movieId, user ', movieId, user);
+        @Param('userId', ParseIntPipe) userId: number,
+        @Body('movieId', ParseIntPipe) movieId: number,
+    ): Promise<MovieEntity> {
+        // console.log('movieId, ', id);
         const movie = await this.queryBus.execute(
             new FindOneMovieQuery(movieId),
         );
@@ -265,8 +264,8 @@ export class MovieController {
                 `movie with ${movieId} does not exist.`,
             );
         }
-  
-        const userId = user.id;
+
+        // const userId = user.id;
 
         return new MovieEntity(
             await this.commandBus.execute(

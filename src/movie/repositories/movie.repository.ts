@@ -1,5 +1,5 @@
 import { PrismaService } from '@/prisma/prisma.service';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateMovieDto } from '../dto/create-movie.dto';
 import { Movie } from '@prisma/client';
 import { PAGINATION_LIMIT } from '@/data/defaultData';
@@ -33,7 +33,20 @@ export class MovieRepository {
         return !!movie;
     }
 
-    async findMovieUniqueWithAuthor(userId: number, movieId: number) {
+    // async findOneUniqueMovie(criteria: {
+    //     id?: number;
+    //     title?: string;
+    // }): Promise<boolean> {
+    //     const { id } = criteria;
+    //     const movie = await this.prisma.userFavoriteMovies.findUnique({
+    //         where: {
+    //             userId: id,
+    //         },
+    //     });
+    //     return !!movie;
+    // }
+
+    async findMovieUniqueWithAuthor(userId: number, movieId?: number) {
         const favorite = await this.prisma.userFavoriteMovies.findUnique({
             where: {
                 userId_movieId: {
@@ -51,13 +64,15 @@ export class MovieRepository {
         });
     }
 
-    async findManyInFav(userId: number, skip: number) {
-        // console.log('user.id, skip test', userId, skip);
+    async findManyInFav(userId: number, skip: number, movieId?: number) {
+        console.log(movieId, userId);
         return await this.prisma.userFavoriteMovies.findMany({
             skip,
             take: PAGINATION_LIMIT,
-
-            where: { userId: userId },
+            where: {
+                userId: userId,
+                movieId: movieId,
+            },
         });
     }
 
@@ -73,10 +88,25 @@ export class MovieRepository {
     }
 
     async removeFromFav(movieId: number, userId: number) {
-        // console.log('user.id, skip test', userId, skip);
+        // console.log('user.id, skip test', userId);
+        const favorite = await this.prisma.userFavoriteMovies.findUnique({
+            where: {
+                userId_movieId: {
+                    userId,
+                    movieId,
+                },
+            },
+        });
+
+        if (!favorite) {
+            throw new NotFoundException(
+                `Movie with ID ${movieId} is not in the favorites of user ${userId}.`,
+            );
+        }
+
         return await this.prisma.userFavoriteMovies.delete({
             where: {
-                userId_movieId: { movieId, userId },
+                userId_movieId: { movieId: movieId, userId },
             },
         });
     }
