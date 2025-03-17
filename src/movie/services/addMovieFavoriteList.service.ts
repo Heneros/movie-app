@@ -30,8 +30,8 @@ export class MovieFavorite {
   }
 
   async removeMovieFav(movieId: number, userId: number) {
-    console.log(movieId, userId);
-    console.log(`Removing movie ${movieId} from favorites for user ${userId}`);
+    // console.log(movieId, userId);
+    // console.log(`Removing movie ${movieId} from favorites for user ${userId}`);
 
     const movieFound = await this.prisma.userFavoriteMovies.findUnique({
       where: {

@@ -3,6 +3,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateMovieDto } from '../dto/create-movie.dto';
 import { Movie } from '@prisma/client';
 import { PAGINATION_LIMIT } from '@/data/defaultData';
+import { UpdateMovieDto } from '../dto/update-movie.dto';
 
 @Injectable()
 export class MovieRepository {
@@ -33,19 +34,6 @@ export class MovieRepository {
         return !!movie;
     }
 
-    // async findOneUniqueMovie(criteria: {
-    //     id?: number;
-    //     title?: string;
-    // }): Promise<boolean> {
-    //     const { id } = criteria;
-    //     const movie = await this.prisma.userFavoriteMovies.findUnique({
-    //         where: {
-    //             userId: id,
-    //         },
-    //     });
-    //     return !!movie;
-    // }
-
     async findMovieUniqueWithAuthor(userId: number, movieId?: number) {
         const favorite = await this.prisma.userFavoriteMovies.findUnique({
             where: {
@@ -65,7 +53,7 @@ export class MovieRepository {
     }
 
     async findManyInFav(userId: number, skip: number, movieId?: number) {
-        console.log(movieId, userId);
+        // console.log(movieId, userId);
         return await this.prisma.userFavoriteMovies.findMany({
             skip,
             take: PAGINATION_LIMIT,
@@ -77,7 +65,6 @@ export class MovieRepository {
     }
 
     async findManyMovieIn(skip: number, movieIds: number[]) {
-        // console.log('user.id, skip test', userId, skip);
         return await this.prisma.movie.findMany({
             skip,
             take: PAGINATION_LIMIT,
@@ -87,14 +74,21 @@ export class MovieRepository {
         });
     }
 
-    async removeFromFav(movieId: number, userId: number) {
-        // console.log('user.id, skip test', userId);
-        const favorite = await this.prisma.userFavoriteMovies.findUnique({
+    async findUniqueFavMov(userId, movieId) {
+        return await this.prisma.userFavoriteMovies.findUnique({
             where: {
                 userId_movieId: {
                     userId,
                     movieId,
                 },
+            },
+        });
+        // return movie;
+    }
+    async removeFromFav(movieId: number, userId: number) {
+        const favorite = await this.prisma.userFavoriteMovies.findUnique({
+            where: {
+                userId_movieId: { movieId, userId },
             },
         });
 
@@ -106,8 +100,81 @@ export class MovieRepository {
 
         return await this.prisma.userFavoriteMovies.delete({
             where: {
-                userId_movieId: { movieId: movieId, userId },
+                userId_movieId: { movieId, userId },
             },
+        });
+    }
+
+    async updateMovie(criteria: {
+        id: number;
+        avg?: number;
+        updateMovieDto?: UpdateMovieDto;
+    }) {
+        const { id, updateMovieDto, avg } = criteria;
+        console.log('id, updateMovieDto, avg', id, avg);
+        return await this.prisma.movie.update({
+            where: { id },
+            data: {
+                ...(updateMovieDto || {}),
+                ...(avg !== undefined ? { avgRating: avg } : {}),
+            },
+        });
+    }
+
+    async findAllMovie(skip: number) {
+        return await this.prisma.movie.findMany({
+            skip,
+            take: PAGINATION_LIMIT,
+            orderBy: {
+                id: 'asc',
+            },
+        });
+    }
+
+    async findUniqueRating(movieId: number, userId: number) {
+        return await this.prisma.rating.findUnique({
+            where: {
+                userId_movieId: { movieId, userId },
+            },
+        });
+    }
+
+    async updateRating(id: number, value: number) {
+        return this.prisma.rating.update({
+            where: { id },
+            data: { value },
+        });
+    }
+    async createRating(movieId: number, userId: number, value: number) {
+        const movieExists = await this.prisma.movie.findUnique({
+            where: { id: movieId },
+            select: { id: true },
+        });
+
+        if (!movieExists) {
+            throw new NotFoundException(`Movie with ID ${movieId} not found.`);
+        }
+
+        return this.prisma.rating.create({
+            data: {
+                value,
+                user: { connect: { id: userId } },
+                movie: { connect: { id: movieId } },
+            },
+        });
+        // return this.prisma.rating.create({
+        //     data: {
+        //         value,
+        //         user: { connect: { id: userId } },
+        //         movie: { connect: { id: movieId } },
+        //     },
+        // });
+    }
+
+    async getAllRatingsForMovie(movieId: number) {
+        return this.prisma.rating.findMany({
+            where: { movieId },
+            select: { value: true },
         });
     }
 }

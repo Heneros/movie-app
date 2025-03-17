@@ -253,20 +253,8 @@ export class MovieController {
     @ApiBearerAuth('access-token')
     async removeMovieFavorite(
         @Param('userId', ParseIntPipe) userId: number,
-        @Body('movieId', ParseIntPipe) movieId: number,
+        @Body('movieId', ParseIntPipe, CheckMovieExistPipe) movieId: number,
     ): Promise<MovieEntity> {
-        // console.log('movieId, ', id);
-        const movie = await this.queryBus.execute(
-            new FindOneMovieQuery(movieId),
-        );
-        if (!movie) {
-            throw new NotFoundException(
-                `movie with ${movieId} does not exist.`,
-            );
-        }
-
-        // const userId = user.id;
-
         return new MovieEntity(
             await this.commandBus.execute(
                 new RemoveMovieFavCommand(movieId, userId),

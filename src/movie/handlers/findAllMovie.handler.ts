@@ -6,11 +6,13 @@ import { PAGINATION_LIMIT } from '@/data/defaultData';
 import { Movie } from '@prisma/client';
 import { PrismaService } from '@/prisma/prisma.service';
 import { Inject, NotFoundException } from '@nestjs/common';
+import { MovieRepository } from './../repositories/movie.repository';
 
 @QueryHandler(FindAllMovieQuery)
 export class FindAllMovieHandler implements IQueryHandler<FindAllMovieQuery> {
     constructor(
-        private readonly prisma: PrismaService,
+        // private readonly prisma: PrismaService,
+        private readonly movieRepository: MovieRepository,
         @Inject(CACHE_MANAGER) private cacheManager: Cache,
     ) {}
 
@@ -29,13 +31,7 @@ export class FindAllMovieHandler implements IQueryHandler<FindAllMovieQuery> {
             return cachedData;
         }
 
-        const allMovies = await this.prisma.movie.findMany({
-            skip,
-            take: PAGINATION_LIMIT,
-            orderBy: {
-                id: 'asc',
-            },
-        });
+        const allMovies = await this.movieRepository.findAllMovie(skip);
 
         if (allMovies.length === 0) {
             throw new NotFoundException('No movies Exist');
