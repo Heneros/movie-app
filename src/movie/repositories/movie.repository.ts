@@ -7,174 +7,218 @@ import { UpdateMovieDto } from '../dto/update-movie.dto';
 
 @Injectable()
 export class MovieRepository {
-    constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) {}
 
-    async createMovie(createMovieDto: CreateMovieDto): Promise<Movie> {
-        return this.prisma.movie.create({
-            data: {
-                ...createMovieDto,
-            },
-        });
+  async createMovie(createMovieDto: CreateMovieDto): Promise<Movie> {
+    return this.prisma.movie.create({
+      data: {
+        ...createMovieDto,
+      },
+    });
+  }
+
+  async findUniqueMovie(criteria: {
+    id?: number;
+    title?: string;
+  }): Promise<boolean> {
+    const { id, title } = criteria;
+    const movie = await this.prisma.movie.findUnique({
+      where: {
+        ...(id && { id }),
+        ...(title && { title }),
+      },
+      include: {
+        author: true,
+      },
+    });
+    return !!movie;
+  }
+
+  async findMovieUniqueWithAuthor(userId: number, movieId?: number) {
+    const favorite = await this.prisma.userFavoriteMovies.findUnique({
+      where: {
+        userId_movieId: {
+          userId: userId,
+          movieId: movieId,
+        },
+      },
+    });
+
+    return !!favorite;
+  }
+  async addMovieFavWithAuthor(movieId: number, userId: number) {
+    return this.prisma.userFavoriteMovies.create({
+      data: { movieId, userId },
+    });
+  }
+
+  async findManyInFav(userId: number, skip: number, movieId?: number) {
+    // console.log(movieId, userId);
+    return await this.prisma.userFavoriteMovies.findMany({
+      skip,
+      take: PAGINATION_LIMIT,
+      where: {
+        userId: userId,
+        movieId: movieId,
+      },
+    });
+  }
+
+  async findManyMovieIn(skip: number, movieIds: number[]) {
+    return await this.prisma.movie.findMany({
+      skip,
+      take: PAGINATION_LIMIT,
+      where: {
+        id: { in: movieIds },
+      },
+    });
+  }
+
+  async findUniqueFavMov(userId, movieId) {
+    return await this.prisma.userFavoriteMovies.findUnique({
+      where: {
+        userId_movieId: {
+          userId,
+          movieId,
+        },
+      },
+    });
+    // return movie;
+  }
+  async removeFromFav(movieId: number, userId: number) {
+    const favorite = await this.prisma.userFavoriteMovies.findUnique({
+      where: {
+        userId_movieId: { movieId, userId },
+      },
+    });
+
+    if (!favorite) {
+      throw new NotFoundException(
+        `Movie with ID ${movieId} is not in the favorites of user ${userId}.`,
+      );
     }
 
-    async findUniqueMovie(criteria: {
-        id?: number;
-        title?: string;
-    }): Promise<boolean> {
-        const { id, title } = criteria;
-        const movie = await this.prisma.movie.findUnique({
-            where: {
-                ...(id && { id }),
-                ...(title && { title }),
-            },
-            include: {
-                author: true,
-            },
-        });
-        return !!movie;
+    return await this.prisma.userFavoriteMovies.delete({
+      where: {
+        userId_movieId: { movieId, userId },
+      },
+    });
+  }
+
+  async updateMovie(criteria: {
+    id: number;
+    avg?: number;
+    updateMovieDto?: UpdateMovieDto;
+  }) {
+    const { id, updateMovieDto, avg } = criteria;
+    console.log('id, updateMovieDto, avg', id, avg);
+    return await this.prisma.movie.update({
+      where: { id },
+      data: {
+        ...(updateMovieDto || {}),
+        ...(avg !== undefined ? { avgRating: avg } : {}),
+      },
+    });
+  }
+
+  async findAllMovie(skip: number) {
+    return await this.prisma.movie.findMany({
+      skip,
+      take: PAGINATION_LIMIT,
+      orderBy: {
+        id: 'asc',
+      },
+    });
+  }
+
+  async findUniqueRating(movieId: number, userId: number) {
+    return await this.prisma.rating.findUnique({
+      where: {
+        userId_movieId: { movieId, userId },
+      },
+    });
+  }
+
+  async updateRating(id: number, value: number) {
+    return this.prisma.rating.update({
+      where: { id },
+      data: { value },
+    });
+  }
+  async createRating(movieId: number, userId: number, value: number) {
+    const movieExists = await this.prisma.movie.findUnique({
+      where: { id: movieId },
+      select: { id: true },
+    });
+
+    if (!movieExists) {
+      throw new NotFoundException(`Movie with ID ${movieId} not found.`);
     }
 
-    async findMovieUniqueWithAuthor(userId: number, movieId?: number) {
-        const favorite = await this.prisma.userFavoriteMovies.findUnique({
-            where: {
-                userId_movieId: {
-                    userId: userId,
-                    movieId: movieId,
-                },
-            },
-        });
+    return this.prisma.rating.create({
+      data: {
+        value,
+        user: { connect: { id: userId } },
+        movie: { connect: { id: movieId } },
+      },
+    });
+  }
 
-        return !!favorite;
-    }
-    async addMovieFavWithAuthor(movieId: number, userId: number) {
-        return this.prisma.userFavoriteMovies.create({
-            data: { movieId, userId },
-        });
-    }
+  async getAllRatingsForMovie(movieId: number) {
+    return this.prisma.rating.findMany({
+      where: { movieId },
+      select: { value: true },
+    });
+  }
 
-    async findManyInFav(userId: number, skip: number, movieId?: number) {
-        // console.log(movieId, userId);
-        return await this.prisma.userFavoriteMovies.findMany({
-            skip,
-            take: PAGINATION_LIMIT,
-            where: {
-                userId: userId,
-                movieId: movieId,
-            },
-        });
-    }
+  async findManyReviews(skip: number) {
+    // console.log(12345);
+    const reviews = await this.prisma.reviews.findMany({
+      skip,
+      take: PAGINATION_LIMIT,
+      orderBy: { createdAt: 'desc' },
+    });
+    const total = await this.prisma.reviews.count();
 
-    async findManyMovieIn(skip: number, movieIds: number[]) {
-        return await this.prisma.movie.findMany({
-            skip,
-            take: PAGINATION_LIMIT,
-            where: {
-                id: { in: movieIds },
-            },
-        });
+    if (!reviews) {
+      throw new NotFoundException('No reviews created yet.');
     }
 
-    async findUniqueFavMov(userId, movieId) {
-        return await this.prisma.userFavoriteMovies.findUnique({
-            where: {
-                userId_movieId: {
-                    userId,
-                    movieId,
-                },
-            },
-        });
-        // return movie;
-    }
-    async removeFromFav(movieId: number, userId: number) {
-        const favorite = await this.prisma.userFavoriteMovies.findUnique({
-            where: {
-                userId_movieId: { movieId, userId },
-            },
-        });
+    return { reviews, total };
+  }
 
-        if (!favorite) {
-            throw new NotFoundException(
-                `Movie with ID ${movieId} is not in the favorites of user ${userId}.`,
-            );
-        }
+  async findManyReviewsByMovie(id: number, page: number) {
+    const pageSize = PAGINATION_LIMIT;
+    const skip = (page - 1) * pageSize;
 
-        return await this.prisma.userFavoriteMovies.delete({
-            where: {
-                userId_movieId: { movieId, userId },
-            },
-        });
+    const reviews = await this.prisma.reviews.findMany({
+      skip,
+      take: PAGINATION_LIMIT,
+      orderBy: { createdAt: 'desc' },
+      where: {
+        movieId: id,
+      },
+    });
+    const total = await this.prisma.reviews.count();
+
+    if (!reviews) {
+      throw new NotFoundException('No reviews created yet.');
     }
 
-    async updateMovie(criteria: {
-        id: number;
-        avg?: number;
-        updateMovieDto?: UpdateMovieDto;
-    }) {
-        const { id, updateMovieDto, avg } = criteria;
-        console.log('id, updateMovieDto, avg', id, avg);
-        return await this.prisma.movie.update({
-            where: { id },
-            data: {
-                ...(updateMovieDto || {}),
-                ...(avg !== undefined ? { avgRating: avg } : {}),
-            },
-        });
+    return { reviews, total };
+  }
+
+  async findSingleReviewMovie(id: number) {
+    const review = await this.prisma.reviews.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!review) {
+      throw new NotFoundException('No review(s) created yet.');
     }
 
-    async findAllMovie(skip: number) {
-        return await this.prisma.movie.findMany({
-            skip,
-            take: PAGINATION_LIMIT,
-            orderBy: {
-                id: 'asc',
-            },
-        });
-    }
-
-    async findUniqueRating(movieId: number, userId: number) {
-        return await this.prisma.rating.findUnique({
-            where: {
-                userId_movieId: { movieId, userId },
-            },
-        });
-    }
-
-    async updateRating(id: number, value: number) {
-        return this.prisma.rating.update({
-            where: { id },
-            data: { value },
-        });
-    }
-    async createRating(movieId: number, userId: number, value: number) {
-        const movieExists = await this.prisma.movie.findUnique({
-            where: { id: movieId },
-            select: { id: true },
-        });
-
-        if (!movieExists) {
-            throw new NotFoundException(`Movie with ID ${movieId} not found.`);
-        }
-
-        return this.prisma.rating.create({
-            data: {
-                value,
-                user: { connect: { id: userId } },
-                movie: { connect: { id: movieId } },
-            },
-        });
-        // return this.prisma.rating.create({
-        //     data: {
-        //         value,
-        //         user: { connect: { id: userId } },
-        //         movie: { connect: { id: movieId } },
-        //     },
-        // });
-    }
-
-    async getAllRatingsForMovie(movieId: number) {
-        return this.prisma.rating.findMany({
-            where: { movieId },
-            select: { value: true },
-        });
-    }
+    return review;
+  }
 }

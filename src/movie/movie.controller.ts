@@ -11,6 +11,8 @@ import {
     Query,
     UseGuards,
     BadRequestException,
+    Put,
+    DefaultValuePipe,
 } from '@nestjs/common';
 import { MovieService } from './movie.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
@@ -60,6 +62,12 @@ import { RemoveMovieFavCommand } from './commands/favorite/removeMovieFavorite.c
 import { RateMovieCommand } from './commands/rateMovie.command';
 import { MovieRepository } from './repositories/movie.repository';
 import { CheckUserExistPipe } from '@/users/pipe/CheckUserExist.pipe';
+import { CreateMovieReviewDto } from './dto/create-review.dto';
+import { MovieReviewEntity } from './entities/movieReview.entity';
+import { GetReviewsQuery } from './queries/reviews/getAllReviews.query';
+import { GetAllReviewsByMovieHandler } from './handlers/reviews/getAllReviewsByMovie.handler';
+import { GetReviewsByMovieQuery } from './queries/reviews/getAllReviewsMovie.query';
+import { GetSingleReviewQuery } from './queries/reviews/getSingleReview.query';
 
 @Controller('movie')
 @ApiTags('Movie')
@@ -76,12 +84,11 @@ export class MovieController {
         private readonly movieRemoveService: MovieRemoveService,
         private readonly movieFindDraftsService: MovieFindDraftsService,
         private readonly movieRateService: MovieRateService,
+        private readonly prisma: PrismaService,
 
         private readonly movieRepository: MovieRepository,
         private readonly commandBus: CommandBus,
         private readonly queryBus: QueryBus,
-
-        private readonly prisma: PrismaService,
     ) {}
 
     @Get()
@@ -138,6 +145,29 @@ export class MovieController {
         // return movies;
         return movies.map((draft) => new MovieEntity(draft));
         // return movies.map((movie) => new MovieEntity(movie));
+    }
+    @Get('reviewsAll')
+    @ApiOperation({ summary: 'Get all reviews from site' })
+    @ApiOkResponse({ type: [MovieReviewEntity] })
+    @ApiBearerAuth('access-token')
+    async getAllReviews(@Query('page') pageString?: string) {
+        // const nameNum = Number(page);
+        const page = pageString ? parseInt(pageString, 10) : 1;
+
+        if (isNaN(page)) {
+            throw new BadRequestException('Page must be a number.');
+        }
+        if (page < 1) {
+            throw new BadRequestException('Page must be greater than 0.');
+        }
+
+        const skip = (page - 1) * PAGINATION_LIMIT;
+        const { reviews, total } = await this.queryBus.execute(
+            new GetReviewsQuery(skip),
+        );
+        return { reviews, total, page, limit: PAGINATION_LIMIT };
+        // console.log(page, skip);
+        // return await this.queryBus.execute(new GetReviewsQuery(skip));
     }
 
     @Get('drafts')
@@ -306,4 +336,83 @@ export class MovieController {
             new RateMovieCommand(movieId, user.id, rateMovieDto.rating),
         );
     }
+
+    @Get(':id/review')
+    @ApiOperation({ summary: 'Get all reviews from movie' })
+    @ApiOkResponse({ type: [MovieEntity] })
+    @ApiBearerAuth('access-token')
+    async getReviewsByMovie(
+        @Param('id', ParseIntPipe, CheckMovieExistPipe) id: number,
+        @Query('page') page: number = 1,
+    ) {
+        const { reviews, total } = await this.queryBus.execute(
+            new GetReviewsByMovieQuery(id, page),
+        );
+        return { reviews, total, page, limit: PAGINATION_LIMIT };
+    }
+
+    @Get(':id/singleReview')
+    @ApiOperation({ summary: 'Get all reviews from movie' })
+    @ApiOkResponse({ type: [MovieEntity] })
+    @ApiBearerAuth('access-token')
+    async getSingleReview(@Param('id', ParseIntPipe) id: number) {
+        const review = await this.queryBus.execute(
+            new GetSingleReviewQuery(id),
+        );
+        return review;
+    }
+
+    @Post(':id/review')
+    @UseGuards(AuthGuard)
+    @ApiOperation({ summary: 'Create review movie' })
+    @ApiOkResponse({ type: [MovieReviewEntity] })
+    @ApiBearerAuth('access-token')
+    async createReview(
+        @Param('id', ParseIntPipe, CheckMovieExistPipe) movieId: number,
+        @User('id') user: User,
+        @Body() createMovieReviewDto: CreateMovieReviewDto,
+    ): Promise<CreateMovieReviewDto | void> {
+        // const newReview = await this.movieCreateReviewService.createReview(
+        //     movieId,
+        //     user.id,
+        //     createMovieReviewDto,
+        // );
+        // return newReview;
+    }
+
+    // @Put(':id/review')
+    // @UseGuards(AuthGuard)
+    // @ApiOperation({
+    //     summary: 'Update review movie. You can edit during 15 minutes',
+    // })
+    // @ApiOkResponse({ type: [MovieReviewEntity] })
+    // @ApiBearerAuth('access-token')
+    // async updateReview(
+    //     @Param('id', ParseIntPipe) reviewId: number,
+    //     @User('id') user: User,
+    //     @Body() createMovieReviewDto: CreateMovieReviewDto,
+    // ): Promise<CreateMovieReviewDto | null> {
+    //     const newReview = await this.movieUpdateReviewService.updateReviewMovie(
+    //         reviewId,
+    //         user.id,
+    //         createMovieReviewDto,
+    //     );
+    //     return newReview;
+    // }
+
+    // @Delete(':id/review')
+    // @UseGuards(AuthGuard)
+    // @ApiOperation({ summary: 'Delete review movie' })
+    // @ApiOkResponse({ type: [MovieReviewEntity] })
+    // @ApiBearerAuth('access-token')
+    // async removeReview(
+    //     @Param('id', ParseIntPipe) reviewId: number,
+    //     @User('id') user: User,
+    // ): Promise<CreateMovieReviewDto | null> {
+    //     const newReview = await this.movieRemoveReviewService.removeReviewMovie(
+    //         reviewId,
+    //         user.id,
+    //     );
+    //     return newReview;
+    // }
 }

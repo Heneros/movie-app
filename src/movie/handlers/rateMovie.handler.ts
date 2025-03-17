@@ -30,7 +30,7 @@ export class RateMovieHandler implements ICommandHandler<RateMovieCommand> {
         const total = ratings.reduce((sum, r) => sum + r.value, 0);
         const avg = ratings.length > 0 ? total / ratings.length : 0;
 
-        console.log(movieId, avg);
+        //      console.log(movieId, avg);
         return await this.movieRepository.updateMovie({ id: movieId, avg });
         // return this.prisma.movie.update({
         //     where: { id: movieId },
