@@ -1,6 +1,7 @@
 import { CreateMovieReviewDto } from '@/movie/dto/create-review.dto';
 import { PrismaService } from '@/prisma/prisma.service';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { Reviews } from '@prisma/client';
 import { differenceInMinutes } from 'date-fns';
 
 @Injectable()
@@ -12,7 +13,7 @@ export class MovieUpdateReviewService {
         reviewId: number,
         auId: number,
         createMovieReviewDto: CreateMovieReviewDto,
-    ): Promise<CreateMovieReviewDto | null> {
+    ): Promise<Reviews | null> {
         try {
             const review = await this.prisma.reviews.findFirst({
                 where: {

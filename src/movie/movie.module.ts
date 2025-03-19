@@ -36,6 +36,8 @@ import { CreateMovieReviewHandler } from './handlers/reviews/createReview.handle
 import { GetAllReviewsHandler } from './handlers/reviews/getAllReviews.handler';
 import { GetAllReviewsByMovieHandler } from './handlers/reviews/getAllReviewsByMovie.handler';
 import { GetSingleReviewHandler } from './handlers/reviews/getSingleReview.handler';
+import { ReviewRepository } from './repositories/review.repository';
+import { UpdateReviewHandler } from './handlers/reviews/updateReview.handler';
 
 @Module({
     controllers: [MovieController],
@@ -59,6 +61,7 @@ import { GetSingleReviewHandler } from './handlers/reviews/getSingleReview.handl
         MovieResolver,
 
         MovieRepository,
+        ReviewRepository,
         AddMovieFavoriteHandler,
         RemoveMovieFavHandler,
         GetAllFavoritesHandler,
@@ -73,6 +76,8 @@ import { GetSingleReviewHandler } from './handlers/reviews/getSingleReview.handl
         GetAllReviewsHandler,
         GetAllReviewsByMovieHandler,
         GetSingleReviewHandler,
+        UpdateReviewHandler,
+
         // {
         //   provide: 'PUB_SUB',
         //   useValue: new PubSub(),

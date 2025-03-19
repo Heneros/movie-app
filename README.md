@@ -22,7 +22,7 @@
 
 ## Features app have:
 - CQRS architecture.
-- user can registration. with vallidation. after send data, user receive email from smtp. and should verify his account.  
+- user can register. with validation(class-validator). after send data, user receive email link from smtp server. link which he should verify his account.  
 - login  
 - Reset Password, user enter his email and receive valid link duration 15 minutes. in this link user enter new password and send back to site, after this user update his password in account 
 - Resend Email during 15 minutes, if user forget to validate email.
@@ -69,8 +69,8 @@
 - Nginx configure for load balancer app
 - Authorization through code. You should receive in mail box code and enter to proceed authorization
 - AES encryption 
-
 - Add field to table Users ban true or false. By default false
+- CQRS event if someone reply or 
 
 ## In future:
 

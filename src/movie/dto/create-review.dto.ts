@@ -1,13 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import {
-    IsAlpha,
-    IsBoolean,
-    IsInt,
-    IsNotEmpty,
-    IsString,
-    Length,
-} from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateMovieReviewDto {
     @IsString()

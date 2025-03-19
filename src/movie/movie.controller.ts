@@ -68,6 +68,8 @@ import { GetReviewsQuery } from './queries/reviews/getAllReviews.query';
 import { GetAllReviewsByMovieHandler } from './handlers/reviews/getAllReviewsByMovie.handler';
 import { GetReviewsByMovieQuery } from './queries/reviews/getAllReviewsMovie.query';
 import { GetSingleReviewQuery } from './queries/reviews/getSingleReview.query';
+import { UpdateReviewCommand } from './commands/reviews/updateReview.command';
+import { CreateReviewCommand } from './commands/reviews/createReview.command';
 
 @Controller('movie')
 @ApiTags('Movie')
@@ -372,33 +374,29 @@ export class MovieController {
         @User('id') user: User,
         @Body() createMovieReviewDto: CreateMovieReviewDto,
     ): Promise<CreateMovieReviewDto | void> {
-        // const newReview = await this.movieCreateReviewService.createReview(
-        //     movieId,
-        //     user.id,
-        //     createMovieReviewDto,
-        // );
-        // return newReview;
+        const newReview = await this.commandBus.execute(
+            new CreateReviewCommand(movieId, user.id, createMovieReviewDto),
+        );
+        return newReview;
     }
 
-    // @Put(':id/review')
-    // @UseGuards(AuthGuard)
-    // @ApiOperation({
-    //     summary: 'Update review movie. You can edit during 15 minutes',
-    // })
-    // @ApiOkResponse({ type: [MovieReviewEntity] })
-    // @ApiBearerAuth('access-token')
-    // async updateReview(
-    //     @Param('id', ParseIntPipe) reviewId: number,
-    //     @User('id') user: User,
-    //     @Body() createMovieReviewDto: CreateMovieReviewDto,
-    // ): Promise<CreateMovieReviewDto | null> {
-    //     const newReview = await this.movieUpdateReviewService.updateReviewMovie(
-    //         reviewId,
-    //         user.id,
-    //         createMovieReviewDto,
-    //     );
-    //     return newReview;
-    // }
+    @Put(':id/review')
+    @UseGuards(AuthGuard, ProfileOwnerGuard)
+    @ApiOperation({
+        summary: 'Update review movie. You can edit during 15 minutes',
+    })
+    @ApiOkResponse({ type: [MovieReviewEntity] })
+    @ApiBearerAuth('access-token')
+    async updateReview(
+        @Param('id', ParseIntPipe) reviewId: number,
+        @User('id') user: User,
+        @Body() createMovieReviewDto: CreateMovieReviewDto,
+    ): Promise<CreateMovieReviewDto | null> {
+        const newReview = await this.commandBus.execute(
+            new UpdateReviewCommand(reviewId, user.id, createMovieReviewDto),
+        );
+        return newReview;
+    }
 
     // @Delete(':id/review')
     // @UseGuards(AuthGuard)
