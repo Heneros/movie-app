@@ -44,5 +44,13 @@
                 "test/*"
             ]
         }
-    }
+    },
+    "include": [
+        "test/**/*",
+        "src/**/*"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist"
+    ]
 }

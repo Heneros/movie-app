@@ -1,14 +1,18 @@
 import { CreateReviewCommand } from '@/movie/commands/reviews/createReview.command';
+import { CreatedReviewEvent } from '@/movie/events/createReview.event';
 import { MovieRepository } from '@/movie/repositories/movie.repository';
 import { ReviewRepository } from '@/movie/repositories/review.repository';
 import { BadRequestException } from '@nestjs/common';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 
 @CommandHandler(CreateReviewCommand)
 export class CreateMovieReviewHandler
     implements ICommandHandler<CreateReviewCommand>
 {
-    constructor(private readonly reviewRepository: ReviewRepository) {}
+    constructor(
+        private readonly eventBus: EventBus,
+        private readonly reviewRepository: ReviewRepository,
+    ) {}
 
     async execute(command: CreateReviewCommand) {
         const { movieId, auId, createMovieReviewDto } = command;
@@ -28,8 +32,10 @@ export class CreateMovieReviewHandler
             createMovieReviewDto,
         );
 
-        return newReview;
+        this.eventBus.publish(
+            new CreatedReviewEvent(movieId, auId, createMovieReviewDto),
+        );
 
-        console.log(movieId, auId, createMovieReviewDto);
+        return newReview;
     }
 }

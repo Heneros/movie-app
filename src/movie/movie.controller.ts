@@ -13,6 +13,7 @@ import {
     BadRequestException,
     Put,
     DefaultValuePipe,
+    UseInterceptors,
 } from '@nestjs/common';
 import { MovieService } from './movie.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
@@ -61,7 +62,6 @@ import { AddMovieFavCommand } from './commands/favorite/addMovieFavorite.command
 import { RemoveMovieFavCommand } from './commands/favorite/removeMovieFavorite.command';
 import { RateMovieCommand } from './commands/rateMovie.command';
 import { MovieRepository } from './repositories/movie.repository';
-import { CheckUserExistPipe } from '@/users/pipe/CheckUserExist.pipe';
 import { CreateMovieReviewDto } from './dto/create-review.dto';
 import { MovieReviewEntity } from './entities/movieReview.entity';
 import { GetReviewsQuery } from './queries/reviews/getAllReviews.query';
@@ -70,9 +70,12 @@ import { GetReviewsByMovieQuery } from './queries/reviews/getAllReviewsMovie.que
 import { GetSingleReviewQuery } from './queries/reviews/getSingleReview.query';
 import { UpdateReviewCommand } from './commands/reviews/updateReview.command';
 import { CreateReviewCommand } from './commands/reviews/createReview.command';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
+import { RedisService } from './events/event-store.service';
 
 @Controller('movie')
 @ApiTags('Movie')
+@UseInterceptors(CacheInterceptor)
 // @UseInterceptors(TimeoutInterceptor)
 export class MovieController {
     constructor(
@@ -88,12 +91,14 @@ export class MovieController {
         private readonly movieRateService: MovieRateService,
         private readonly prisma: PrismaService,
 
+        private readonly redisService: RedisService,
         private readonly movieRepository: MovieRepository,
         private readonly commandBus: CommandBus,
         private readonly queryBus: QueryBus,
     ) {}
 
     @Get()
+    @CacheTTL(45)
     @ApiQuery({
         name: 'page',
         required: false,
@@ -113,7 +118,11 @@ export class MovieController {
         // return movies;
         return movies.allMovies.map((movie: Movie) => new MovieEntity(movie));
     }
-
+    @Get('events')
+    async getEvents() {
+        const events = await this.redisService.getEvents('movie_events');
+        return { events };
+    }
     @Get('search')
     // @Throttle({ default: { limit: 3, ttl: 60000 } })
     @ApiProperty({ description: 'Search movie by title' })
@@ -148,6 +157,7 @@ export class MovieController {
         return movies.map((draft) => new MovieEntity(draft));
         // return movies.map((movie) => new MovieEntity(movie));
     }
+
     @Get('reviewsAll')
     @ApiOperation({ summary: 'Get all reviews from site' })
     @ApiOkResponse({ type: [MovieReviewEntity] })

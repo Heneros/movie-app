@@ -38,6 +38,9 @@ import { GetAllReviewsByMovieHandler } from './handlers/reviews/getAllReviewsByM
 import { GetSingleReviewHandler } from './handlers/reviews/getSingleReview.handler';
 import { ReviewRepository } from './repositories/review.repository';
 import { UpdateReviewHandler } from './handlers/reviews/updateReview.handler';
+import { FindDraftsHandler } from './handlers/findDrafts.handler';
+import { RedisService } from './events/event-store.service';
+import { CreatedMovieReviewHandler } from './handlers/reviews/createdReview.handler';
 
 @Module({
     controllers: [MovieController],
@@ -77,7 +80,9 @@ import { UpdateReviewHandler } from './handlers/reviews/updateReview.handler';
         GetAllReviewsByMovieHandler,
         GetSingleReviewHandler,
         UpdateReviewHandler,
-
+        FindDraftsHandler,
+        CreatedMovieReviewHandler,
+        RedisService,
         // {
         //   provide: 'PUB_SUB',
         //   useValue: new PubSub(),
@@ -86,7 +91,11 @@ import { UpdateReviewHandler } from './handlers/reviews/updateReview.handler';
     imports: [
         PrismaModule,
         CqrsModule,
-        CacheModule.register(),
+
+        // CacheModule.register({
+        //     isGlobal: true,
+        // }),
+
         ThrottlerModule.forRoot([
             {
                 // name: 'long',

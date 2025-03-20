@@ -20,16 +20,14 @@ export class FindAllMovieHandler implements IQueryHandler<FindAllMovieQuery> {
         const { skip } = query;
         const cacheKey = `movies:${skip}`;
 
-        const cachedData = await this.cacheManager.get<Movie[]>(cacheKey);
+        // const cachedData = await this.cacheManager.get<Movie[]>(cacheKey);
 
-        if (cachedData && cachedData.length > 0) {
-            const ttl = await this.cacheManager.ttl(cacheKey);
-            const remainingTime = ttl > 0 ? ttl : 0;
-            console.log(
-                `Cache hit: ${cacheKey}, TTL: ${remainingTime} seconds`,
-            );
-            return cachedData;
-        }
+        // if (cachedData && cachedData.length > 0) {
+        //     const ttl = await this.cacheManager.ttl(cacheKey);
+        //     const remainingTime = ttl > 0 ? ttl : 0;
+
+        //     return cachedData;
+        // }
 
         const allMovies = await this.movieRepository.findAllMovie(skip);
 

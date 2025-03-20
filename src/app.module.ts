@@ -1,12 +1,9 @@
 import { ClassSerializerInterceptor, Module } from '@nestjs/common';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { CacheModule } from '@nestjs/cache-manager';
-import * as redisStore from 'cache-manager-redis-store';
-import * as path from 'path';
+import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
+
 import { join } from 'node:path';
 
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { MovieModule } from './movie/movie.module';
@@ -16,15 +13,16 @@ import { MailModule } from './mail/mail.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { PubSub } from 'graphql-subscriptions';
 
 import { WinstonModule } from 'nest-winston';
 import { CqrsModule } from '@nestjs/cqrs';
+import { RedisModule } from '@nestjs-modules/ioredis';
+import { RedisOptions } from './configs/redis-config';
+import { RedisService } from './movie/events/event-store.service';
 
 @Module({
     imports: [
         PrismaModule,
-
         MovieModule,
         UsersModule,
         AuthModule,
@@ -33,6 +31,7 @@ import { CqrsModule } from '@nestjs/cqrs';
             isGlobal: true,
         }),
 
+        CacheModule.registerAsync(RedisOptions),
         WinstonModule.forRoot({}),
         GraphQLModule.forRoot<ApolloDriverConfig>({
             driver: ApolloDriver,
@@ -47,6 +46,7 @@ import { CqrsModule } from '@nestjs/cqrs';
     ],
     controllers: [],
     providers: [
+        // RedisService,
         // AppService,
         //  MovieResolver,
         // MailService,
@@ -54,6 +54,10 @@ import { CqrsModule } from '@nestjs/cqrs';
         //     provide: APP_INTERCEPTOR,
         //     useClass: ClassSerializerInterceptor,
         // },
+        {
+            provide: APP_INTERCEPTOR,
+            useClass: CacheInterceptor,
+        },
         {
             provide: APP_GUARD,
             useClass: ThrottlerGuard,
