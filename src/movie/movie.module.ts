@@ -39,8 +39,8 @@ import { GetSingleReviewHandler } from './handlers/reviews/getSingleReview.handl
 import { ReviewRepository } from './repositories/review.repository';
 import { UpdateReviewHandler } from './handlers/reviews/updateReview.handler';
 import { FindDraftsHandler } from './handlers/findDrafts.handler';
-import { RedisService } from './events/event-store.service';
 import { CreatedMovieReviewHandler } from './handlers/reviews/createdReview.handler';
+import { RedisService } from '@/redis/event-store.service';
 
 @Module({
     controllers: [MovieController],

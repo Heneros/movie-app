@@ -1,6 +1,5 @@
 import { CreateReviewCommand } from '@/movie/commands/reviews/createReview.command';
 import { CreatedReviewEvent } from '@/movie/events/createReview.event';
-import { MovieRepository } from '@/movie/repositories/movie.repository';
 import { ReviewRepository } from '@/movie/repositories/review.repository';
 import { BadRequestException } from '@nestjs/common';
 import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';

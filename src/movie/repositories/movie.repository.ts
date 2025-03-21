@@ -181,4 +181,20 @@ export class MovieRepository {
             select: { value: true },
         });
     }
+
+    async searchMovie(searchText: string, skip: number) {
+        return await this.prisma.movie.findMany({
+            skip,
+            take: PAGINATION_LIMIT,
+            where: {
+                title: {
+                    contains: searchText,
+                    mode: 'insensitive',
+                },
+            },
+        });
+    }
+    async removeMovie(id: number) {
+        return await this.prisma.movie.delete({ where: { id } });
+    }
 }

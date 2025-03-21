@@ -71,7 +71,7 @@ import { GetSingleReviewQuery } from './queries/reviews/getSingleReview.query';
 import { UpdateReviewCommand } from './commands/reviews/updateReview.command';
 import { CreateReviewCommand } from './commands/reviews/createReview.command';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
-import { RedisService } from './events/event-store.service';
+import { RedisService } from '../redis/event-store.service';
 
 @Controller('movie')
 @ApiTags('Movie')
@@ -153,7 +153,7 @@ export class MovieController {
             );
         }
 
-        // return movies;
+
         return movies.map((draft) => new MovieEntity(draft));
         // return movies.map((movie) => new MovieEntity(movie));
     }

@@ -40,6 +40,9 @@
             "@/src/auth/*": [
                 "src/auth/*"
             ],
+            "@/src/redis/*": [
+                "src/redis/*"
+            ],
             "test/*": [
                 "test/*"
             ]

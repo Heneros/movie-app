@@ -80,4 +80,6 @@ animated avatar,
 show list all reviews/comments without button  "open more"
 everyday recieve letter to mail box about favorite movies, he subscribed
 
+- Review edit me, editor and admin.
+
 

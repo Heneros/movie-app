@@ -32,9 +32,6 @@ export class RateMovieHandler implements ICommandHandler<RateMovieCommand> {
 
         //      console.log(movieId, avg);
         return await this.movieRepository.updateMovie({ id: movieId, avg });
-        // return this.prisma.movie.update({
-        //     where: { id: movieId },
-        //     data: { avgRating: isNaN(avg) ? 0 : avg },
-        // });
+
     }
 }

@@ -18,7 +18,7 @@ import { WinstonModule } from 'nest-winston';
 import { CqrsModule } from '@nestjs/cqrs';
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { RedisOptions } from './configs/redis-config';
-import { RedisService } from './movie/events/event-store.service';
+import { RedisService } from './redis/event-store.service';
 
 @Module({
     imports: [
@@ -30,7 +30,6 @@ import { RedisService } from './movie/events/event-store.service';
         ConfigModule.forRoot({
             isGlobal: true,
         }),
-
         CacheModule.registerAsync(RedisOptions),
         WinstonModule.forRoot({}),
         GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -46,7 +45,6 @@ import { RedisService } from './movie/events/event-store.service';
     ],
     controllers: [],
     providers: [
-        // RedisService,
         // AppService,
         //  MovieResolver,
         // MailService,

@@ -1,7 +1,7 @@
 import { CreateReviewCommand } from '@/movie/commands/reviews/createReview.command';
 
 import { CommandHandler, EventsHandler, IEventHandler } from '@nestjs/cqrs';
-import { RedisService } from './../../events/event-store.service';
+import { RedisService } from '../../../redis/event-store.service';
 import { CreatedReviewEvent } from '@/movie/events/createReview.event';
 
 @EventsHandler(CreatedReviewEvent)
@@ -15,7 +15,7 @@ export class CreatedMovieReviewHandler
 
     async handle(event: CreatedReviewEvent) {
         // const { movieId, auId, createMovieReviewDto } = event;
-        console.log('Movie added event received:', event);
+        // console.log('Movie added event received:', event);
 
         await this.redisService.saveEvent('movie_events', {
             type: 'MovieAdded',
