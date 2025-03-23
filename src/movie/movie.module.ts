@@ -21,6 +21,7 @@ import { MovieRemoveReviewService } from './services/reviews/removeByIdReview.se
 import { ThrottlerModule } from '@nestjs/throttler';
 import { AddMovieFavoriteHandler } from './handlers/favorite/addMovieFavorite.handler';
 import { CqrsModule } from '@nestjs/cqrs';
+
 import { RemoveMovieFavHandler } from './handlers/favorite/removeMovieFavorite.handler';
 import { GetAllFavoritesHandler } from './handlers/favorite/getAllFavorite.handler';
 import { UpdateMovieHandler } from './handlers/updateMovie.handler';
@@ -96,13 +97,13 @@ import { RedisService } from '@/redis/event-store.service';
         //     isGlobal: true,
         // }),
 
-        ThrottlerModule.forRoot([
-            {
-                // name: 'long',
-                ttl: 6000,
-                limit: 10,
-            },
-        ]),
+        // ThrottlerModule.forRoot([
+        //     {
+        //         // name: 'long',
+        //         ttl: 6000,
+        //         limit: 10,
+        //     },
+        // ]),
     ],
 })
 export class MovieModule {}

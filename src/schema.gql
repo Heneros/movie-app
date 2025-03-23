@@ -28,7 +28,7 @@ scalar DateTime
 
 type Query {
   """Get All favorites """
-  getAllFavorites(id: Int!): [MovieEntity!]!
+  getAllFavorites(page: Float! = 1): [MovieEntity!]!
 
   """Get All movies"""
   getAllMovies(page: Float! = 1): [MovieEntity!]!
@@ -37,7 +37,7 @@ type Query {
   searchMovies(title: String!, pageString: String!): [MovieEntity!]!
 
   """Get Drafts movies"""
-  findDrafts(pageString: String!): [MovieEntity!]!
+  findDrafts(page: String!): [MovieEntity!]!
 
   """Find By id movie"""
   findById(id: Float!): MovieEntity!
@@ -47,7 +47,7 @@ type Mutation {
   createMovie(createMovieInput: String!): MovieEntity!
 
   """Add to favorite list"""
-  addToFavorite(movieId: Float!, userId: Float!): MovieEntity!
+  addToFavorite(movieId: Float!): MovieEntity!
 
   """Remove from favorites"""
   removeFromFavorite(input: MovieBasicInput!): MovieEntity!

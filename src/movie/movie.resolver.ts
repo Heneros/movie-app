@@ -6,11 +6,6 @@ import {
     Resolver,
     Subscription,
 } from '@nestjs/graphql';
-import { MovieEntity } from './entities/movie.entity';
-import { MovieFavorite } from './services/addMovieFavoriteList.service';
-
-import { PrismaService } from '@/prisma/prisma.service';
-import { AuthGuard } from '@/guards/auth.guard';
 import {
     Inject,
     NotFoundException,
@@ -18,6 +13,15 @@ import {
     UseGuards,
     ValidationPipe,
 } from '@nestjs/common';
+
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
+
+import { MovieEntity } from './entities/movie.entity';
+import { MovieFavorite } from './services/addMovieFavoriteList.service';
+
+import { PrismaService } from '@/prisma/prisma.service';
+import { AuthGuard } from '@/guards/auth.guard';
+
 import { MovieService } from './movie.service';
 import { ProfileOwnerGuard } from '@/guards/ProfileOwner.guard';
 import { MovieFindOneService } from './services/findOneMovie.service';
@@ -32,6 +36,11 @@ import { MovieRateService } from './services/rateMovie.service';
 import { MovieBasicInput } from './input/movie.input';
 import { PubSub } from 'graphql-subscriptions';
 // import { MovieBaseEntity } from './entities/movie-base.entity';
+import { MovieRepository } from '@/movie/repositories/movie.repository';
+import { AddMovieFavCommand } from './commands/favorite/addMovieFavorite.command';
+import { GetAllFavoritesQuery } from './queries/favorite/getAllFavorite.query';
+import { FindDraftsMovieQuery } from './queries/findDrafts.query';
+import { Roles } from '@/decorators/roles.decorator';
 
 @Resolver((of) => MovieEntity)
 export class MovieResolver {
@@ -44,9 +53,14 @@ export class MovieResolver {
         private readonly movieSearchService: MovieSearchService,
         private readonly movieFindDraftsService: MovieFindDraftsService,
 
+        private readonly movieRepository: MovieRepository,
+        private readonly commandBus: CommandBus,
+        private readonly queryBus: QueryBus,
+
         private movieRateService: MovieRateService,
         private movieFavorite: MovieFavorite,
         private prisma: PrismaService,
+
         // @Inject('PUB_SUB') private pubSub: PubSubEngine,
     ) {
         this.pubSub = new PubSub();
@@ -55,7 +69,7 @@ export class MovieResolver {
     @Subscription(() => MovieEntity, {
         name: 'movieRatingUpdated',
         resolve: (payload) => {
-            console.log('Subscription Payload:', payload);
+            // console.log('Subscription Payload:', payload);
             return payload.movieRatingUpdated;
         },
         // resolve: (payload) => console.log(payload),
@@ -81,35 +95,63 @@ export class MovieResolver {
     })
     async addToFavorite(
         @Args('movieId', CheckMovieExistPipe) movieId: number,
-        @Args('userId') userId: number,
+        // @Args('userId') userId: number,
+        @User('userId') user: User,
     ) {
-        const movie = await this.movieFindOneService.findOne(+movieId);
+        return new MovieEntity(
+            await this.commandBus.execute(
+                new AddMovieFavCommand(movieId, user.id),
+            ),
+        );
+        // const movie = await this.movieRepository.(+movieId);
 
-        if (!movie) {
-            throw new NotFoundException(
-                `movie with ${movieId} does not exist.`,
-            );
-        }
+        // if (!movie) {
+        //     throw new NotFoundException(
+        //         `movie with ${movieId} does not exist.`,
+        //     );
+        // }
 
-        await this.movieFavorite.addMovieFav(movieId, userId);
+        // await this.movieFavorite.addMovieFav(movieId, userId);
 
-        return new MovieEntity(movie);
+        // return new MovieEntity(movie);
         // console.log(movie);
     }
 
     @UseGuards(AuthGuard, ProfileOwnerGuard)
     @Query((returns) => [MovieEntity], { description: 'Get All favorites ' })
-    async getAllFavorites(@Args('id', { type: () => Int }) userId: number) {
-        const favoriteMovies = await this.movieFavorite.getAllFavorites(userId);
+    async getAllFavorites(
+        // @Args('id', { type: () => Int }) userId: number,
+        @User('userId') user: User,
+        @Args('page', { type: () => Number, defaultValue: 1 })
+        pageNum?: number,
+    ): Promise<MovieEntity[]> {
+        const page = pageNum ? Number(pageNum) : 1;
+        const skip = (page - 1) * PAGINATION_LIMIT;
 
+        const userId = user.id;
+        const favoriteMovies = await this.queryBus.execute(
+            new GetAllFavoritesQuery(userId, skip),
+        );
+
+        // return favoriteMovies;
         const movieIds = favoriteMovies.map((fav) => fav.movieId);
 
-        return this.prisma.movie
-            .findMany({
-                where: { id: { in: movieIds } },
-                include: { author: true },
-            })
-            .then((movies) => movies.map((movie) => new MovieEntity(movie)));
+        const movies = await this.movieRepository.findManyMovieIn(
+            skip,
+            movieIds,
+        );
+
+        return movies.map((movie) => new MovieEntity(movie));
+        // const favoriteMovies = await this.movieFavorite.getAllFavorites(userId);
+
+        // const movieIds = favoriteMovies.map((fav) => fav.movieId);
+
+        // return this.prisma.movie
+        //     .findMany({
+        //         where: { id: { in: movieIds } },
+        //         include: { author: true },
+        //     })
+        //     .then((movies) => movies.map((movie) => new MovieEntity(movie)));
     }
 
     @UseGuards(AuthGuard, ProfileOwnerGuard)
@@ -172,15 +214,28 @@ export class MovieResolver {
         return movies.map((movie) => new MovieEntity(movie));
     }
 
+    @UseGuards(AuthGuard)
+    @Roles('Admin', 'Editor')
     @Query(() => [MovieEntity], { description: 'Get Drafts movies' })
     async findDrafts(
-        @Args('pageString', { type: () => String }) pageString?: string,
+        @Args('page', { type: () => String }) pageString?: string,
     ) {
         const page = pageString ? parseInt(pageString, 10) : 1;
         const skip = (page - 1) * PAGINATION_LIMIT;
-        const drafts = await this.movieFindDraftsService.findDrafts(skip);
 
-        return drafts.map((draft) => new MovieEntity(draft));
+        // const drafts = (await this.movieFindDraftsService.findDrafts(
+        //     skip,
+        // )) as Movie[];
+        const movies = await this.queryBus.execute(
+            new FindDraftsMovieQuery(skip),
+        );
+
+        return movies.map((draft) => new MovieEntity(draft));
+        // const page = pageString ? parseInt(pageString, 10) : 1;
+        // const skip = (page - 1) * PAGINATION_LIMIT;
+        // const drafts = await this.movieFindDraftsService.findDrafts(skip);
+
+        // return drafts.map((draft) => new MovieEntity(draft));
     }
 
     @Query(() => MovieEntity, { description: 'Find By id movie' })

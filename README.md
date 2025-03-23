@@ -82,3 +82,5 @@ everyday recieve letter to mail box about favorite movies, he subscribed
 
 - Review edit me, editor and admin.
 - Live chat with users through ws
+- Temp link for 20 minutes and after expire deleted
+- Create spe

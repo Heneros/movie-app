@@ -52,10 +52,10 @@ import { RedisService } from './redis/event-store.service';
         //     provide: APP_INTERCEPTOR,
         //     useClass: ClassSerializerInterceptor,
         // },
-        {
-            provide: APP_INTERCEPTOR,
-            useClass: CacheInterceptor,
-        },
+        // {
+        //     provide: APP_INTERCEPTOR,
+        //     useClass: CacheInterceptor,
+        // },
         {
             provide: APP_GUARD,
             useClass: ThrottlerGuard,

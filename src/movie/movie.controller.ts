@@ -153,7 +153,6 @@ export class MovieController {
             );
         }
 
-
         return movies.map((draft) => new MovieEntity(draft));
         // return movies.map((movie) => new MovieEntity(movie));
     }
