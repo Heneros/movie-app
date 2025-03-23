@@ -28,7 +28,7 @@ scalar DateTime
 
 type Query {
   """Get All favorites """
-  getAllFavorites(page: Float! = 1): [MovieEntity!]!
+  getAllFavorites(userId: Int!, page: Float = 1): [MovieEntity!]!
 
   """Get All movies"""
   getAllMovies(page: Float! = 1): [MovieEntity!]!

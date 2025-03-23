@@ -46,7 +46,6 @@ export class AuthGuard implements CanActivate {
         } else {
             const gqlContext = GqlExecutionContext.create(context);
             request = gqlContext.getContext().req;
-   
         }
 
         const authHeader = request.headers?.authorization;
@@ -72,6 +71,7 @@ export class AuthGuard implements CanActivate {
                     token,
                     process.env.JWT_SECRET,
                 ) as JwtPayload;
+                console.log(payload);
                 const user = await this.prismaService.user.findUnique({
                     where: {
                         id: payload.id,

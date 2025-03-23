@@ -28,6 +28,8 @@ export class ProfileOwnerGuard implements CanActivate {
             const args = gqlContext.getArgs();
 
             idFromParams = +args.userId || +args.id || args.input.userId;
+
+            console.log(idFromParams);
         }
 
         const authHeader = request.headers?.authorization;
@@ -37,7 +39,7 @@ export class ProfileOwnerGuard implements CanActivate {
         }
 
         const token = authHeader?.split('Bearer ')[1];
-        // console.log(token);
+
         if (!token) {
             throw new UnauthorizedException('No token provided');
         }
@@ -49,10 +51,11 @@ export class ProfileOwnerGuard implements CanActivate {
         } catch (error) {
             throw new UnauthorizedException('Invalid token');
         }
-
+        // console.log(userIdFromToken);
+        // console.log(idFromParams);
         if (!idFromParams || userIdFromToken !== idFromParams) {
             throw new ForbiddenException(
-                'You are not authorized to update this profile',
+                'You are not authorized to have access to this profile',
             );
         }
 

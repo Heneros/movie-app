@@ -120,15 +120,19 @@ export class MovieResolver {
     @UseGuards(AuthGuard, ProfileOwnerGuard)
     @Query((returns) => [MovieEntity], { description: 'Get All favorites ' })
     async getAllFavorites(
-        // @Args('id', { type: () => Int }) userId: number,
-        @User('userId') user: User,
-        @Args('page', { type: () => Number, defaultValue: 1 })
+        @Args('userId', { type: () => Int }) userId: number,
+        // @User('userId') user: User,
+        // @Context() context: any,
+        // @User('userId') user: User,
+        @Args('page', { type: () => Number, defaultValue: 1, nullable: true })
         pageNum?: number,
     ): Promise<MovieEntity[]> {
         const page = pageNum ? Number(pageNum) : 1;
         const skip = (page - 1) * PAGINATION_LIMIT;
 
-        const userId = user.id;
+        // const userId = user.id;
+
+        // console.log(userId);
         const favoriteMovies = await this.queryBus.execute(
             new GetAllFavoritesQuery(userId, skip),
         );
