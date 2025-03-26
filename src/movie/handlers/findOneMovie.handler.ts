@@ -13,7 +13,7 @@ export class FindOneHandler implements IQueryHandler<FindOneMovieQuery> {
         // console.log('movieId, user ', id);
         try {
             const movieId = await this.movieRepository.findUniqueMovie({
-                id: id,
+                id,
             });
             if (!movieId) {
                 throw new BadRequestException('Movie dont exist');

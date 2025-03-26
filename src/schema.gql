@@ -26,21 +26,32 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+"""MovieReview"""
+type MovieReviewEntity {
+  review: String!
+  positive: Boolean!
+  createdAt: String!
+  total: Int!
+}
+
 type Query {
   """Get All favorites """
   getAllFavorites(userId: Int!, page: Float = 1): [MovieEntity!]!
 
   """Get All movies"""
-  getAllMovies(page: Float! = 1): [MovieEntity!]!
+  getAllMovies(page: Float = 1): [MovieEntity!]!
 
   """Search movies"""
-  searchMovies(title: String!, pageString: String!): [MovieEntity!]!
+  searchMovies(title: String!, pageString: Float): [MovieEntity!]!
 
   """Get Drafts movies"""
   findDrafts(page: String!): [MovieEntity!]!
 
   """Find By id movie"""
-  findById(id: Float!): MovieEntity!
+  findOne(id: Float!): MovieEntity!
+
+  """Get All Reviews from app"""
+  getAllReviews(page: String): [MovieReviewEntity!]!
 }
 
 type Mutation {

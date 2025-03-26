@@ -15,4 +15,12 @@ export class MovieReviewEntity {
     @ApiProperty()
     @Field(() => String, { nullable: false })
     createdAt: Date;
+
+    @ApiProperty()
+    @Field(() => Int, { nullable: false })
+    total: Number;
+
+    constructor({ ...data }: Partial<MovieReviewEntity>) {
+        Object.assign(this, data);
+    }
 }

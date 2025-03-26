@@ -160,7 +160,6 @@ export class MovieController {
     @Get('reviewsAll')
     @ApiOperation({ summary: 'Get all reviews from site' })
     @ApiOkResponse({ type: [MovieReviewEntity] })
-    @ApiBearerAuth('access-token')
     async getAllReviews(@Query('page') pageString?: string) {
         // const nameNum = Number(page);
         const page = pageString ? parseInt(pageString, 10) : 1;

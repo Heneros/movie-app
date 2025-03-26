@@ -38,6 +38,7 @@
 - Reviews movie. positive or negative. 
 - Edit review during 15 minutes. Latter gonna be edit without limitless for premium users. 
 - ApiLimiter  
+- ProfileOwner
 
 
 ## Features and functionality app should be:
@@ -83,4 +84,4 @@ everyday recieve letter to mail box about favorite movies, he subscribed
 - Review edit me, editor and admin.
 - Live chat with users through ws
 - Temp link for 20 minutes and after expire deleted
-- Create spe
+- Create token on 31 day to access to data, you can share with other user token

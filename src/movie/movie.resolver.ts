@@ -41,10 +41,17 @@ import { AddMovieFavCommand } from './commands/favorite/addMovieFavorite.command
 import { GetAllFavoritesQuery } from './queries/favorite/getAllFavorite.query';
 import { FindDraftsMovieQuery } from './queries/findDrafts.query';
 import { Roles } from '@/decorators/roles.decorator';
+import { RateMovieCommand } from './commands/rateMovie.command';
+import { FindOneMovieQuery } from './queries/findOneMovie.query';
+import { RemoveMovieFavCommand } from './commands/favorite/removeMovieFavorite.command';
+import { FindAllMovieQuery } from './queries/findAllMovie.query';
+import { SearchMovieQuery } from './queries/searchMovie.query';
+import { GetReviewsQuery } from './queries/reviews/getAllReviews.query';
+import { MovieReviewEntity } from './entities/movieReview.entity';
+import { GetAllReviewsHandler } from './handlers/reviews/getAllReviews.handler';
 
 @Resolver((of) => MovieEntity)
 export class MovieResolver {
-    private tests: String[] = [];
     public pubSub: PubSub;
     constructor(
         private readonly movieService: MovieService,
@@ -103,27 +110,12 @@ export class MovieResolver {
                 new AddMovieFavCommand(movieId, user.id),
             ),
         );
-        // const movie = await this.movieRepository.(+movieId);
-
-        // if (!movie) {
-        //     throw new NotFoundException(
-        //         `movie with ${movieId} does not exist.`,
-        //     );
-        // }
-
-        // await this.movieFavorite.addMovieFav(movieId, userId);
-
-        // return new MovieEntity(movie);
-        // console.log(movie);
     }
 
     @UseGuards(AuthGuard, ProfileOwnerGuard)
     @Query((returns) => [MovieEntity], { description: 'Get All favorites ' })
     async getAllFavorites(
         @Args('userId', { type: () => Int }) userId: number,
-        // @User('userId') user: User,
-        // @Context() context: any,
-        // @User('userId') user: User,
         @Args('page', { type: () => Number, defaultValue: 1, nullable: true })
         pageNum?: number,
     ): Promise<MovieEntity[]> {
@@ -146,16 +138,6 @@ export class MovieResolver {
         );
 
         return movies.map((movie) => new MovieEntity(movie));
-        // const favoriteMovies = await this.movieFavorite.getAllFavorites(userId);
-
-        // const movieIds = favoriteMovies.map((fav) => fav.movieId);
-
-        // return this.prisma.movie
-        //     .findMany({
-        //         where: { id: { in: movieIds } },
-        //         include: { author: true },
-        //     })
-        //     .then((movies) => movies.map((movie) => new MovieEntity(movie)));
     }
 
     @UseGuards(AuthGuard, ProfileOwnerGuard)
@@ -172,8 +154,10 @@ export class MovieResolver {
             );
         }
         // console.log(12231312);
-
-        const movie = await this.movieFindOneService.findOne(movieId);
+        const movie = await this.queryBus.execute(
+            new FindOneMovieQuery(movieId),
+        );
+        // const movie = await this.movieFindOneService.findOne(movieId);
 
         if (!movie) {
             throw new NotFoundException(
@@ -181,21 +165,25 @@ export class MovieResolver {
             );
         }
 
-        await this.movieFavorite.removeMovieFav(movieId, userId);
+        await this.commandBus.execute(
+            new RemoveMovieFavCommand(movieId, userId),
+        );
+        // await this.movieFavorite.removeMovieFav(movieId, userId);
         return new MovieEntity(movie);
     }
 
     @Query(() => [MovieEntity], { description: 'Get All movies' })
     async getAllMovies(
-        @Args('page', { type: () => Number, defaultValue: 1, nullable: false })
+        @Args('page', { type: () => Number, defaultValue: 1, nullable: true })
         page: number,
     ): Promise<MovieEntity[]> {
         const currentPage = page ?? 1;
         const skip = (currentPage - 1) * PAGINATION_LIMIT;
 
-        const movies = (await this.movieFindAllService.findAll(
-            skip,
-        )) as Movie[];
+        // const movies = (await this.movieFindAllService.findAll(
+        //     skip,
+        // )) as Movie[];
+        const movies = await this.queryBus.execute(new FindAllMovieQuery(skip));
 
         return movies.map((movie) => new MovieEntity(movie));
     }
@@ -203,11 +191,16 @@ export class MovieResolver {
     @Query(() => [MovieEntity], { description: 'Search movies' })
     async searchMovies(
         @Args('title', { type: () => String }) title: string,
-        @Args('pageString', { type: () => String }) pageString?: string,
+        @Args('pageString', { type: () => Number, nullable: true })
+        pageString?: string,
     ) {
         const page = pageString ? parseInt(pageString, 10) : 1;
         const skip = (page - 1) * PAGINATION_LIMIT;
-        const movies = await this.movieSearchService.searchByTitle(title, skip);
+
+        // const movies = await this.movieSearchService.searchByTitle(title, skip);
+        const movies = await this.queryBus.execute(
+            new SearchMovieQuery(title, skip),
+        );
 
         if (!movies || movies.length === 0) {
             throw new NotFoundException(
@@ -243,7 +236,7 @@ export class MovieResolver {
     }
 
     @Query(() => MovieEntity, { description: 'Find By id movie' })
-    async findById(
+    async findOne(
         @Args(
             'id',
             { type: () => Number, nullable: false },
@@ -251,7 +244,9 @@ export class MovieResolver {
         )
         id: number,
     ) {
-        return await this.movieFindOneService.findOne(+id);
+        const movie = await this.queryBus.execute(new FindOneMovieQuery(id));
+
+        return new MovieEntity(movie);
     }
 
     @UseGuards(AuthGuard)
@@ -264,10 +259,8 @@ export class MovieResolver {
         @User('id')
         user: User,
     ) {
-        const movie = await this.movieRateService.rateMovie(
-            movieId,
-            user.id,
-            value,
+        const movie = await this.commandBus.execute(
+            new RateMovieCommand(movieId, user.id, value),
         );
 
         this.pubSub.publish('MOVIE_RATING_UPDATED', {
@@ -275,5 +268,26 @@ export class MovieResolver {
         });
         // console.log(movie, 123);
         return movie;
+    }
+
+    @Query(() => [MovieReviewEntity], {
+        description: 'Get All Reviews from app',
+    })
+    async getAllReviews(
+        @Args('page', { type: () => String, nullable: true })
+        pageString: string,
+    ) {
+        const page = pageString ? parseInt(pageString, 10) : 1;
+        const skip = (page - 1) * PAGINATION_LIMIT;
+
+        const { reviews, total } = await this.queryBus.execute(
+            new GetReviewsQuery(skip),
+        );
+        // if (!reviews || reviews.length === 0) {
+        //     throw new NotFoundException(`Not Exist`);
+        // }
+
+        return { reviews, total };
+        // return { reviews, total, page, limit: PAGINATION_LIMIT };
     }
 }

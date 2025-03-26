@@ -1,5 +1,4 @@
 import { GetReviewsQuery } from '@/movie/queries/reviews/getAllReviews.query';
-import { MovieRepository } from '@/movie/repositories/movie.repository';
 import { ReviewRepository } from '@/movie/repositories/review.repository';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
@@ -11,6 +10,7 @@ export class GetAllReviewsHandler implements IQueryHandler<GetReviewsQuery> {
     async execute(command: GetReviewsQuery) {
         const { skip } = command;
         const reviews = await this.reviewRepository.findManyReviews(skip);
+        // console.log(reviews);
         return reviews;
     }
 }

@@ -17,21 +17,18 @@ export class MovieRepository {
         });
     }
 
-    async findUniqueMovie(criteria: {
-        id?: number;
-        title?: string;
-    }): Promise<boolean> {
+    async findUniqueMovie(criteria: { id?: number; title?: string }) {
         const { id, title } = criteria;
         const movie = await this.prisma.movie.findUnique({
             where: {
                 ...(id && { id }),
                 ...(title && { title }),
             },
-            include: {
-                author: true,
-            },
+            // include: {
+            //     author: true,
+            // },
         });
-        return !!movie;
+        return movie;
     }
 
     async findMovieUniqueWithAuthor(userId: number, movieId?: number) {
