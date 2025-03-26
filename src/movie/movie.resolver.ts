@@ -26,7 +26,6 @@ import { MovieService } from './movie.service';
 import { ProfileOwnerGuard } from '@/guards/ProfileOwner.guard';
 import { MovieFindOneService } from './services/findOneMovie.service';
 import { PAGINATION_LIMIT } from '@/data/defaultData';
-import { Movie } from '@prisma/client';
 import { MovieFindAllService } from './services/findAllMovie.service';
 import { MovieSearchService } from './services/searchMovie.service';
 import { CheckMovieExistPipe } from './guard/checkIfMovieExist.guard';
@@ -47,8 +46,12 @@ import { RemoveMovieFavCommand } from './commands/favorite/removeMovieFavorite.c
 import { FindAllMovieQuery } from './queries/findAllMovie.query';
 import { SearchMovieQuery } from './queries/searchMovie.query';
 import { GetReviewsQuery } from './queries/reviews/getAllReviews.query';
+import { ReviewPaginationEntity } from './entities/reviewPaginationEntity.entity';
+import { GetReviewsByMovieQuery } from './queries/reviews/getAllReviewsMovie.query';
+import { GetSingleReviewQuery } from './queries/reviews/getSingleReview.query';
 import { MovieReviewEntity } from './entities/movieReview.entity';
-import { GetAllReviewsHandler } from './handlers/reviews/getAllReviews.handler';
+import { CreateReviewCommand } from './commands/reviews/createReview.command';
+import { CreateMovieReviewDto } from './dto/create-review.dto';
 
 @Resolver((of) => MovieEntity)
 export class MovieResolver {
@@ -270,7 +273,7 @@ export class MovieResolver {
         return movie;
     }
 
-    @Query(() => [MovieReviewEntity], {
+    @Query(() => ReviewPaginationEntity, {
         description: 'Get All Reviews from app',
     })
     async getAllReviews(
@@ -283,11 +286,58 @@ export class MovieResolver {
         const { reviews, total } = await this.queryBus.execute(
             new GetReviewsQuery(skip),
         );
-        // if (!reviews || reviews.length === 0) {
-        //     throw new NotFoundException(`Not Exist`);
-        // }
+        if (!reviews || reviews.length === 0) {
+            throw new NotFoundException(`Not Exist`);
+        }
 
-        return { reviews, total };
+        return { reviews, total, limit: PAGINATION_LIMIT };
         // return { reviews, total, page, limit: PAGINATION_LIMIT };
+    }
+
+    @Query(() => ReviewPaginationEntity, {
+        description: 'Get All Reviews from movie',
+    })
+    async getReviewsByMovie(
+        @Args('id', { type: () => Number, nullable: false })
+        id: number,
+        @Args('page', { type: () => Number, nullable: false })
+        page: number,
+    ) {
+        const { reviews, total } = await this.queryBus.execute(
+            new GetReviewsByMovieQuery(id, page),
+        );
+
+        return { reviews, total, limit: PAGINATION_LIMIT };
+        // return { reviews, total, page, limit: PAGINATION_LIMIT };
+    }
+
+    @Query(() => MovieReviewEntity, {
+        description: 'Get single review from movie',
+    })
+    async getReviewSingleByMovie(
+        @Args('id', { type: () => Number, nullable: false })
+        id: number,
+    ) {
+        const review = await this.queryBus.execute(
+            new GetSingleReviewQuery(id),
+        );
+
+        return review;
+    }
+
+    @UseGuards(AuthGuard)
+    @Mutation(() => MovieReviewEntity, {
+        description: 'Create a review for a movie',
+    })
+    async createReview(
+        @Args('movieId', { type: () => Number, nullable: false })
+        movieId: number,
+        @Args('userId') userId: number,
+        @Args('input') createMovieReviewDto: CreateMovieReviewDto,
+    ) {
+        const newReview = await this.commandBus.execute(
+            new CreateReviewCommand(movieId, userId, createMovieReviewDto),
+        );
+        return newReview;
     }
 }

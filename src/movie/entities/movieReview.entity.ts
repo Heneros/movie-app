@@ -6,6 +6,10 @@ import { Field, Int, ObjectType } from '@nestjs/graphql';
 export class MovieReviewEntity {
     @ApiProperty()
     @Field(() => String, { nullable: false })
+    id: string;
+
+    @ApiProperty()
+    @Field(() => String, { nullable: false })
     review: string;
 
     @ApiProperty()

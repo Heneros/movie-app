@@ -39,14 +39,7 @@ export class ReviewRepository {
             this.prisma.reviews.count(),
         ]);
 
-        // const total = await this.prisma.reviews.count();
-
-        // if (!reviews) {
-        //     throw new NotFoundException('No reviews created yet.');
-        // }
-        //  console.log(reviews, total);
-
-        return reviews;
+        return { reviews, total };
     }
 
     async findManyReviewsByMovie(id: number, page: number) {

@@ -28,10 +28,17 @@ scalar DateTime
 
 """MovieReview"""
 type MovieReviewEntity {
+  id: String!
   review: String!
   positive: Boolean!
   createdAt: String!
   total: Int!
+}
+
+type ReviewPaginationEntity {
+  reviews: [MovieReviewEntity!]!
+  total: Int!
+  limit: Int!
 }
 
 type Query {
@@ -51,7 +58,13 @@ type Query {
   findOne(id: Float!): MovieEntity!
 
   """Get All Reviews from app"""
-  getAllReviews(page: String): [MovieReviewEntity!]!
+  getAllReviews(page: String): ReviewPaginationEntity!
+
+  """Get All Reviews from movie"""
+  getReviewsByMovie(id: Float!, page: Float!): ReviewPaginationEntity!
+
+  """Get single review from movie"""
+  getReviewSingleByMovie(id: Float!): MovieReviewEntity!
 }
 
 type Mutation {
@@ -65,6 +78,9 @@ type Mutation {
 
   """Rate movie"""
   rateMovie(id: Float!, rating: Float!): MovieEntity!
+
+  """Create a review for a movie"""
+  createReview(movieId: Float!, userId: Float!, input: CreateMovieReviewDto!): MovieReviewEntity!
 }
 
 input MovieBasicInput {
@@ -73,6 +89,14 @@ input MovieBasicInput {
 
   """Id user"""
   userId: Int!
+}
+
+input CreateMovieReviewDto {
+  """Review movie"""
+  review: String!
+
+  """Positive or negative"""
+  positive: Boolean! = true
 }
 
 type Subscription {

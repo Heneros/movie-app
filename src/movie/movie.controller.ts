@@ -362,9 +362,8 @@ export class MovieController {
     }
 
     @Get(':id/singleReview')
-    @ApiOperation({ summary: 'Get all reviews from movie' })
+    @ApiOperation({ summary: 'Get single review from movie' })
     @ApiOkResponse({ type: [MovieEntity] })
-    @ApiBearerAuth('access-token')
     async getSingleReview(@Param('id', ParseIntPipe) id: number) {
         const review = await this.queryBus.execute(
             new GetSingleReviewQuery(id),
