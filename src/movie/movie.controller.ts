@@ -72,6 +72,7 @@ import { UpdateReviewCommand } from './commands/reviews/updateReview.command';
 import { CreateReviewCommand } from './commands/reviews/createReview.command';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { RedisService } from '../redis/event-store.service';
+import { RemoveReviewCommand } from './commands/reviews/removeReview.command';
 
 @Controller('movie')
 @ApiTags('Movie')
@@ -405,19 +406,18 @@ export class MovieController {
         return newReview;
     }
 
-    // @Delete(':id/review')
-    // @UseGuards(AuthGuard)
-    // @ApiOperation({ summary: 'Delete review movie' })
-    // @ApiOkResponse({ type: [MovieReviewEntity] })
-    // @ApiBearerAuth('access-token')
-    // async removeReview(
-    //     @Param('id', ParseIntPipe) reviewId: number,
-    //     @User('id') user: User,
-    // ): Promise<CreateMovieReviewDto | null> {
-    //     const newReview = await this.movieRemoveReviewService.removeReviewMovie(
-    //         reviewId,
-    //         user.id,
-    //     );
-    //     return newReview;
-    // }
+    @Delete(':id/review')
+    @UseGuards(AuthGuard, ProfileOwnerGuard)
+    @ApiOperation({ summary: 'Delete review movie' })
+    @ApiOkResponse({ type: [MovieReviewEntity] })
+    @ApiBearerAuth('access-token')
+    async removeReview(
+        @Param('id', ParseIntPipe) reviewId: number,
+        @User('id') user: User,
+    ): Promise<CreateMovieReviewDto | null> {
+        const newReview = await this.commandBus.execute(
+            new RemoveReviewCommand(reviewId, user.id),
+        );
+        return newReview;
+    }
 }

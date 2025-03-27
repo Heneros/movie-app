@@ -108,7 +108,7 @@ export class MovieRepository {
         updateMovieDto?: UpdateMovieDto;
     }) {
         const { id, updateMovieDto, avg } = criteria;
-        console.log('id, updateMovieDto, avg', id, avg);
+        // console.log('id, updateMovieDto, avg', id, avg);
         return await this.prisma.movie.update({
             where: { id },
             data: {
@@ -192,6 +192,11 @@ export class MovieRepository {
         });
     }
     async removeMovie(id: number) {
-        return await this.prisma.movie.delete({ where: { id } });
+        const movie = Promise.all([
+            this.prisma.reviews.deleteMany({ where: { movieId: id } }),
+            this.prisma.rating.deleteMany({ where: { movieId: id } }),
+            this.prisma.movie.delete({ where: { id } }),
+        ]);
+        return movie;
     }
 }

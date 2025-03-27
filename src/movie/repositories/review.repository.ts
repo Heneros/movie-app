@@ -91,4 +91,14 @@ export class ReviewRepository {
             },
         });
     }
+
+    async removeReview(reviewId: number, auId: number) {
+        const review = await this.prisma.reviews.delete({
+            where: {
+                id: reviewId,
+                auId: auId,
+            },
+        });
+        return review;
+    }
 }

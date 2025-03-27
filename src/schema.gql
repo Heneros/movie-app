@@ -68,7 +68,11 @@ type Query {
 }
 
 type Mutation {
-  createMovie(createMovieInput: String!): MovieEntity!
+  """Create Movie"""
+  createMovie(input: CreateMovieDto!): MovieEntity!
+
+  """Update Movie"""
+  updateMovie(id: Float!, input: CreateMovieDto!): MovieEntity!
 
   """Add to favorite list"""
   addToFavorite(movieId: Float!): MovieEntity!
@@ -81,6 +85,38 @@ type Mutation {
 
   """Create a review for a movie"""
   createReview(movieId: Float!, userId: Float!, input: CreateMovieReviewDto!): MovieReviewEntity!
+
+  """Update review movie. You can edit during 15 minutes"""
+  updateReview(reviewId: Float!, userId: Float!, input: CreateMovieReviewDto!): MovieReviewEntity!
+
+  """"""
+  removeMovie(movieId: Float!): MovieEntity!
+
+  """Delete review movie"""
+  removeReview(reviewId: Float!, userId: Float!): MovieReviewEntity!
+}
+
+input CreateMovieDto {
+  """Title movie"""
+  title: String!
+
+  """Description about movie"""
+  description: String!
+
+  """Preview movie"""
+  preview: String!
+
+  """Movie category"""
+  category: String!
+
+  """Author ID"""
+  authorId: Int
+
+  """List of actors"""
+  actorsList: [String!]!
+
+  """Published status"""
+  published: Boolean = false
 }
 
 input MovieBasicInput {

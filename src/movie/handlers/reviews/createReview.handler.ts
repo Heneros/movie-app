@@ -21,9 +21,9 @@ export class CreateMovieReviewHandler
             auId,
         );
 
-        if (review) {
-            throw new BadRequestException('You already reviewed this movie.');
-        }
+        // if (review) {
+        //     throw new BadRequestException('You already reviewed this movie.');
+        // }
 
         const newReview = await this.reviewRepository.createReview(
             movieId,

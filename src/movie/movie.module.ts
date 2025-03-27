@@ -42,6 +42,7 @@ import { UpdateReviewHandler } from './handlers/reviews/updateReview.handler';
 import { FindDraftsHandler } from './handlers/findDrafts.handler';
 import { CreatedMovieReviewHandler } from './handlers/reviews/createdReview.handler';
 import { RedisService } from '@/redis/event-store.service';
+import { RemoveMReviewHandler } from './handlers/reviews/removeReview.handler';
 
 @Module({
     controllers: [MovieController],
@@ -84,6 +85,7 @@ import { RedisService } from '@/redis/event-store.service';
         FindDraftsHandler,
         CreatedMovieReviewHandler,
         RedisService,
+        RemoveMReviewHandler,
         // {
         //   provide: 'PUB_SUB',
         //   useValue: new PubSub(),

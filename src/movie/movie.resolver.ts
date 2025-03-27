@@ -52,6 +52,13 @@ import { GetSingleReviewQuery } from './queries/reviews/getSingleReview.query';
 import { MovieReviewEntity } from './entities/movieReview.entity';
 import { CreateReviewCommand } from './commands/reviews/createReview.command';
 import { CreateMovieReviewDto } from './dto/create-review.dto';
+import { UpdateReviewCommand } from './commands/reviews/updateReview.command';
+import { RemoveReviewCommand } from './commands/reviews/removeReview.command';
+import { RemoveMovieCommand } from './commands/removeMovie.command';
+import { CreateMovieDto } from './dto/create-movie.dto';
+import { CreateMovieCommand } from './commands/createMovie.command';
+import { UpdateMovieCommand } from './commands/updateMovie.command';
+import { UpdateMovieDto } from './dto/update-movie.dto';
 
 @Resolver((of) => MovieEntity)
 export class MovieResolver {
@@ -90,13 +97,36 @@ export class MovieResolver {
         return this.pubSub.asyncIterableIterator('MOVIE_RATING_UPDATED');
     }
 
-    @Mutation(() => MovieEntity)
-    async createMovie(@Args('createMovieInput') createMovieInput: string) {
+    @UseGuards(AuthGuard)
+    @Mutation(() => MovieEntity, {
+        description: 'Create Movie',
+    })
+    async createMovie(
+        @User('id') user: User,
+        @Args('input') createMovieDto: CreateMovieDto,
+    ) {
         await this.pubSub.publish('NEW_MESSAGE', {
-            newMessage: createMovieInput,
+            newMessage: createMovieDto,
         });
-        return true;
-        // return this.movieService.create(createMovieInput);
+        createMovieDto.authorId = user.id;
+
+        const movie = await this.commandBus.execute(
+            new CreateMovieCommand(createMovieDto),
+        );
+        return new MovieEntity(movie);
+    }
+
+    @UseGuards(AuthGuard)
+    @Mutation(() => MovieEntity, {
+        description: 'Update Movie',
+    })
+    async updateMovie(
+        @Args('id') id: number,
+        @Args('input') updateMovieDto: CreateMovieDto,
+    ) {
+        return await this.commandBus.execute(
+            new UpdateMovieCommand(id, updateMovieDto),
+        );
     }
 
     @UseGuards(AuthGuard, ProfileOwnerGuard)
@@ -124,9 +154,7 @@ export class MovieResolver {
     ): Promise<MovieEntity[]> {
         const page = pageNum ? Number(pageNum) : 1;
         const skip = (page - 1) * PAGINATION_LIMIT;
-
         // const userId = user.id;
-
         // console.log(userId);
         const favoriteMovies = await this.queryBus.execute(
             new GetAllFavoritesQuery(userId, skip),
@@ -188,7 +216,7 @@ export class MovieResolver {
         // )) as Movie[];
         const movies = await this.queryBus.execute(new FindAllMovieQuery(skip));
 
-        return movies.map((movie) => new MovieEntity(movie));
+        return movies.allMovies.map((movie) => new MovieEntity(movie));
     }
 
     @Query(() => [MovieEntity], { description: 'Search movies' })
@@ -231,11 +259,6 @@ export class MovieResolver {
         );
 
         return movies.map((draft) => new MovieEntity(draft));
-        // const page = pageString ? parseInt(pageString, 10) : 1;
-        // const skip = (page - 1) * PAGINATION_LIMIT;
-        // const drafts = await this.movieFindDraftsService.findDrafts(skip);
-
-        // return drafts.map((draft) => new MovieEntity(draft));
     }
 
     @Query(() => MovieEntity, { description: 'Find By id movie' })
@@ -337,6 +360,63 @@ export class MovieResolver {
     ) {
         const newReview = await this.commandBus.execute(
             new CreateReviewCommand(movieId, userId, createMovieReviewDto),
+        );
+        return newReview;
+    }
+
+    @UseGuards(AuthGuard, ProfileOwnerGuard)
+    @Mutation(() => MovieReviewEntity, {
+        description: 'Update review movie. You can edit during 15 minutes',
+    })
+    async updateReview(
+        @Args('reviewId', { type: () => Number, nullable: false })
+        reviewId: number,
+        @Args('userId') userId: number,
+        @Args('input') createMovieReviewDto: CreateMovieReviewDto,
+    ): Promise<CreateMovieReviewDto> {
+        const newReview = await this.commandBus.execute(
+            new UpdateReviewCommand(reviewId, userId, createMovieReviewDto),
+        );
+        return newReview;
+    }
+
+    @Roles('Admin', 'Editor')
+    @UseGuards(AuthGuard)
+    @Mutation(() => MovieEntity, {
+        description: '',
+    })
+    async removeMovie(
+        @Args(
+            'movieId',
+            {
+                type: () => Number,
+                nullable: false,
+            },
+            CheckMovieExistPipe,
+        )
+        id: number,
+    ): Promise<MovieEntity> {
+        const movie = await this.queryBus.execute(new FindOneMovieQuery(id));
+        if (!movie) {
+            throw new NotFoundException(`movie with ${id} does not exist.`);
+        }
+
+        await this.commandBus.execute(new RemoveMovieCommand(id));
+
+        return new MovieEntity(movie);
+    }
+
+    @UseGuards(AuthGuard, ProfileOwnerGuard)
+    @Mutation(() => MovieReviewEntity, {
+        description: 'Delete review movie',
+    })
+    async removeReview(
+        @Args('reviewId', { type: () => Number, nullable: false })
+        reviewId: number,
+        @Args('userId') userId: number,
+    ): Promise<CreateMovieReviewDto> {
+        const newReview = await this.commandBus.execute(
+            new RemoveReviewCommand(reviewId, userId),
         );
         return newReview;
     }

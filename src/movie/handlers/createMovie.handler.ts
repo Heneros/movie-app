@@ -9,7 +9,7 @@ export class CreateMovieHandler implements ICommandHandler<CreateMovieCommand> {
 
     async execute(command: CreateMovieCommand) {
         const { createMovieDto } = command;
- 
+
         const movieTitle = await this.movieRepository.findUniqueMovie({
             title: createMovieDto.title,
         });
