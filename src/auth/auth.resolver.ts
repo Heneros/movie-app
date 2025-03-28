@@ -1,4 +1,7 @@
 import { Resolver } from '@nestjs/graphql';
+import { AuthEntity } from './entity/auth.entity';
 
-@Resolver()
-export class AuthResolver {}
+@Resolver(() => AuthEntity)
+export class AuthResolver {
+    
+}

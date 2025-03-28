@@ -80,18 +80,6 @@ import { RemoveReviewCommand } from './commands/reviews/removeReview.command';
 // @UseInterceptors(TimeoutInterceptor)
 export class MovieController {
     constructor(
-        private readonly movieService: MovieService,
-        private readonly movieFavorite: MovieFavorite,
-        private readonly movieSearchService: MovieSearchService,
-        private readonly movieCreateService: MovieCreateService,
-        private readonly movieFindAllService: MovieFindAllService,
-        private readonly movieFindOneService: MovieFindOneService,
-        private readonly movieUpdateService: MovieUpdateService,
-        private readonly movieRemoveService: MovieRemoveService,
-        private readonly movieFindDraftsService: MovieFindDraftsService,
-        private readonly movieRateService: MovieRateService,
-        private readonly prisma: PrismaService,
-
         private readonly redisService: RedisService,
         private readonly movieRepository: MovieRepository,
         private readonly commandBus: CommandBus,

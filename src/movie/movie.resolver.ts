@@ -64,19 +64,9 @@ import { UpdateMovieDto } from './dto/update-movie.dto';
 export class MovieResolver {
     public pubSub: PubSub;
     constructor(
-        private readonly movieService: MovieService,
-        private readonly movieFindOneService: MovieFindOneService,
-        private readonly movieFindAllService: MovieFindAllService,
-        private readonly movieSearchService: MovieSearchService,
-        private readonly movieFindDraftsService: MovieFindDraftsService,
-
         private readonly movieRepository: MovieRepository,
         private readonly commandBus: CommandBus,
         private readonly queryBus: QueryBus,
-
-        private movieRateService: MovieRateService,
-        private movieFavorite: MovieFavorite,
-        private prisma: PrismaService,
 
         // @Inject('PUB_SUB') private pubSub: PubSubEngine,
     ) {

@@ -17,18 +17,12 @@ import { ResetPasswordService } from './services/resetPassword.service';
 import { LogoutAuthService } from './services/logout.service';
 import { RequestResetPasswordService } from './services/requestResetPassword.service';
 import { AuthResolver } from './auth.resolver';
+import { MovieRepository } from '@/movie/repositories/movie.repository';
+import { LoginUserHandler } from './handlers/Login.handler';
+import { CqrsModule } from '@nestjs/cqrs';
+import { AuthRepository } from './repositories/auth.repository';
 
 @Module({
-    imports: [
-        PrismaModule,
-        PassportModule,
-        JwtModule.register({
-            global: true,
-            secret: jwtConstants.secret,
-            signOptions: { expiresIn: '31d' },
-        }),
-        UsersModule,
-    ],
     controllers: [AuthController],
     exports: [AuthModule],
     providers: [
@@ -42,6 +36,20 @@ import { AuthResolver } from './auth.resolver';
         RequestResetPasswordService,
         LogoutAuthService,
         AuthResolver,
+
+        AuthRepository,
+        LoginUserHandler,
+    ],
+    imports: [
+        PrismaModule,
+        CqrsModule,
+        PassportModule,
+        JwtModule.register({
+            global: true,
+            secret: jwtConstants.secret,
+            signOptions: { expiresIn: '31d' },
+        }),
+        UsersModule,
     ],
 })
 export class AuthModule {}

@@ -9,7 +9,7 @@ import {
     Res,
     UseInterceptors,
 } from '@nestjs/common';
-import express, { Response, Request } from 'express';
+import { Request, Response } from 'express';
 
 import { AuthService } from './auth.service';
 import {
@@ -38,6 +38,9 @@ import { ResendEmailService } from './services/resendEmailValidation.service';
 import { ResetPasswordService } from './services/resetPassword.service';
 import { LogoutAuthService } from './services/logout.service';
 import { RequestResetPasswordService } from './services/requestResetPassword.service';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { AuthRepository } from './repositories/auth.repository';
+import { LoginUserCommand } from './commands/loginUser.command';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -51,11 +54,13 @@ export class AuthController {
         private readonly resendEmailService: ResendEmailService,
         private readonly resetPasswordService: ResetPasswordService,
         private readonly logoutAuthService: LogoutAuthService,
-
         private readonly requestResetPasswordService: RequestResetPasswordService,
+
+        private readonly commandBus: CommandBus,
+        private readonly queryBus: QueryBus,
+        private readonly authRepository: AuthRepository,
     ) {}
 
-    @Public()
     @Post('register')
     @ApiOperation({ summary: 'Create user' })
     @ApiCreatedResponse({
@@ -63,8 +68,8 @@ export class AuthController {
             'The user has been successfully created. Check out your email to verify account',
         type: AuthEntity,
     })
-    async create(@Body() createUserDto: CreateUserDto, @Res() res: Response) {
-        return await this.createUserService.create(res, createUserDto);
+    async create(@Body() createUserDto: CreateUserDto) {
+        return await this.createUserService.create(createUserDto);
     }
 
     @Get('verify/:emailToken/:userId')
@@ -92,19 +97,19 @@ export class AuthController {
         // }
     }
 
-    // @Public()
     @Post('login')
     @ApiOperation({ summary: 'Log in. Only for verified accounts' })
     @ApiCreatedResponse({
         description: 'User successfully authorize',
         type: AuthRegister,
     })
-    login(
-        @Body(EmailValidationPipe) logInDto: LogInDto,
+    async login(
         @Req() req: Request,
-        @Res() res: Response,
+        @Body(EmailValidationPipe) logInDto: LogInDto,
     ) {
-        return this.loginAuthService.login(logInDto, req, res);
+        return await this.commandBus.execute(
+            new LoginUserCommand(logInDto, req),
+        );
     }
 
     @Post('/resend_email_token')
