@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '@/prisma/prisma.service';
-import { LogInDto } from '../dto/login.dto';
+import { LogInDto } from '../dto/Login.dto';
 import * as bcrypt from 'bcrypt';
 import { isDevelopment, tempLoginDate } from '@/data/defaultData';
 // import { isDevelopment, tempLoginDate } from '@/data/defaultData';
@@ -56,8 +56,6 @@ export class LoginAuthService {
 
         user.refreshToken = [...newRefreshTokenArray, newRefreshToken];
 
-        // const tokens = await this.generateToken(payload);
-        // await this.saveRefreshToken(user.id, tokens.refreshToken);
 
         const refreshToken = this.jwtService.sign(payload, {
             expiresIn: '7d',
@@ -80,22 +78,11 @@ export class LoginAuthService {
             data: { refreshToken: [...newRefreshTokenArray, newRefreshToken] },
         });
 
-        // if (!req.session) {
-        //   throw new UnauthorizedException('Session is not initialized');
-        // }
-
-        // req.session.user = payload;
-
         res.cookie('jwtMovie', newRefreshToken, {
             httpOnly: isDevelopment ? false : true,
             strict: isDevelopment ? 'none' : 'strict',
             maxAge: 31 * 24 * 60 * 60 * 1000,
             secure: isDevelopment ? false : true,
         });
-
-        // res.status(200).json({
-        //   message: 'Login successful',
-        //   newRefreshToken,
-        // });
     }
 }

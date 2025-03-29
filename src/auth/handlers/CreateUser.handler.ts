@@ -1,39 +1,34 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateUserDto } from '../dto/Create-user.dto';
-import { randomBytes } from 'crypto';
-import { PrismaService } from '@/prisma/prisma.service';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import * as bcrypt from 'bcrypt';
-import { roundsOfHashing, tempRegisterDate } from '@/data/defaultData';
+import { randomBytes } from 'crypto';
+import { CreateUserCommand } from '../commands/CreateUser.command';
 import { MailService } from '@/mail/mail.service';
-import { Response } from 'express';
+import { AuthRepository } from '../repositories/Auth.repository';
+import { BadRequestException } from '@nestjs/common';
+import { roundsOfHashing, tempRegisterDate } from '@/data/defaultData';
 
-@Injectable()
-export class CreateUserService {
+@CommandHandler(CreateUserCommand)
+export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
     constructor(
-        private readonly prisma: PrismaService,
+        private readonly authRepository: AuthRepository,
         private readonly mailService: MailService,
     ) {}
 
-    async create(createUserDto: CreateUserDto) {
+    async execute(command: CreateUserCommand) {
+        const { createUserDto } = command;
+
         if (createUserDto.password !== createUserDto.passwordConfirm) {
-            throw new BadRequestException('Confirm password.', {
-                cause: new Error(),
-                description: 'Check the passwords you provided.',
-            });
+            throw new BadRequestException('Confirm password');
         }
 
         const hashedPassword = await bcrypt.hash(
             createUserDto.password,
             roundsOfHashing,
         );
-
         const tokenVerification = randomBytes(32).toString('hex');
-
         createUserDto.password = hashedPassword;
 
-        const userEmail = await this.prisma.user.findUnique({
-            where: { email: createUserDto.email },
-        });
+        const userEmail = await this.authRepository.findUser(createUserDto);
 
         if (userEmail) {
             throw new BadRequestException(
@@ -51,18 +46,13 @@ export class CreateUserService {
             password: hashedPassword,
         };
 
-        const createdUser = await this.prisma.user.create({
-            data: userData,
-        });
+        const createdUser = await this.authRepository.createUser(userData);
 
-        const emailVerificationToken =
-            await this.prisma.verifyResetToken.create({
-                data: {
-                    userId: createdUser.id,
-                    token: tokenVerification,
-                    expiresAt: tempRegisterDate,
-                },
-            });
+        const emailVerificationToken = await this.authRepository.createToken(
+            createdUser,
+            tokenVerification,
+            tempRegisterDate,
+        );
 
         await this.mailService.sendEmail(
             true,
@@ -74,10 +64,6 @@ export class CreateUserService {
             './confirmation',
             emailVerificationToken,
         );
-
-        // res
-        //   .status(201)
-        //   .json({ message: 'Welcome to Movie App! Confirm your Email ' });
 
         return { email: createUserDto.email, emailVerificationToken };
     }

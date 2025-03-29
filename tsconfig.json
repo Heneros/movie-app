@@ -9,7 +9,7 @@
         "target": "ES2017",
         "sourceMap": true,
         "typeRoots": [
-            "./types",
+            "types",
             "./node_modules/@types"
         ],
         "outDir": "./dist/",
@@ -43,14 +43,19 @@
             "@/src/redis/*": [
                 "src/redis/*"
             ],
+                "@types/*": [
+                "src/types/*"
+            ],
             "test/*": [
                 "test/*"
             ]
+        
         }
     },
     "include": [
         "test/**/*",
-        "src/**/*"
+        "src/**/*",
+        "types"
     ],
     "exclude": [
         "node_modules",

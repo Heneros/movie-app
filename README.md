@@ -1,20 +1,27 @@
 # Movies API
+App analogue imdb/kinopoisk about movies. 
 
-
-## Technologies should be
+## Technologies implemented:
 - Prisma 
 - PostgreSQL
-- Graphql(code first)
+- Graphql(code first) and Graphql-ws
 - Mongodb
 - Redis
 - Nginx 
 - Passport(Google, Github, Outlook)
+- Socket io
+- Nodemailer
+- Github Actions
+- Jest (e2e)
+- Docker-Compose
+
+
+## Technologies should be
 - Elasticsearch 
 - Socket io
 - Cypress
 - RabbitMQ
 - Prometheus
-- Nodemailer
 - TensorFlow.js
 - Github Actions
 
@@ -38,7 +45,7 @@
 - Reviews movie. positive or negative. 
 - Edit review during 15 minutes. Latter gonna be edit without limitless for premium users. 
 - ApiLimiter  
-- ProfileOwner
+- ProfileOwner, restricted content to only owners can perform
 
 
 ## Features and functionality app should be:
@@ -83,5 +90,5 @@ everyday recieve letter to mail box about favorite movies, he subscribed
 
 - Review edit me, editor and admin.
 - Live chat with users through ws
-- Temp link for 20 minutes and after expire deleted
-- Create token on 31 day to access to data, you can share with other user token
+- Temp link for 20 minutes and after expire link deleted himself
+- Create token on  only 31 day to access to data, you can share with other user token(only 3 times) after this token gonna be invalid

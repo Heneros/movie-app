@@ -1,19 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class AuthEntity {
-  @ApiProperty()
-  accessToken: string;
+    @ApiProperty()
+    accessToken: string;
 
-  @ApiProperty()
-  name: string;
+    @ApiProperty()
+    name: string;
 
-  @ApiProperty()
-  email: string;
- 
-  
-  
+    @ApiProperty()
+    email: string;
 
-  constructor(partial: Partial<AuthEntity>) {
-    Object.assign(this, partial);
-  }
+    constructor(partial: Partial<AuthEntity>) {
+        Object.assign(this, partial);
+    }
 }

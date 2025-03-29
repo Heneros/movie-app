@@ -21,14 +21,13 @@ import {
     ApiTags,
 } from '@nestjs/swagger';
 import { AuthEntity } from './entity/auth.entity';
-import { LogInDto } from './dto/login.dto';
-import { Public } from '@/decorators/public.decorator';
+import { LogInDto } from './dto/Login.dto';
 import { TimeoutInterceptor } from '@/interceptor/timeout.interceptor';
 import { UserEntity } from '@/users/entities/user.entity';
-import { CreateUserDto } from './dto/create-user.dto';
-import { VerifyEmailDto } from './dto/verify-email.dto';
-import { ResendEmailDto } from './dto/resend-email.dto';
-import { ResetPasswordDto } from './dto/reset-password.dto';
+import { CreateUserDto } from './dto/Create-user.dto';
+import { VerifyEmailDto } from './dto/Verify-email.dto';
+import { ResendEmailDto } from './dto/Resend-email.dto';
+import { ResetPasswordDto } from './dto/Reset-password.dto';
 import { AuthRegister } from './entity/register.entity';
 import { EmailValidationPipe } from './pipe/EmailValidation.pipe';
 import { CreateUserService } from './services/createUser.service';
@@ -39,10 +38,14 @@ import { ResetPasswordService } from './services/resetPassword.service';
 import { LogoutAuthService } from './services/logout.service';
 import { RequestResetPasswordService } from './services/requestResetPassword.service';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { AuthRepository } from './repositories/auth.repository';
-import { LoginUserCommand } from './commands/loginUser.command';
+import { AuthRepository } from './repositories/Auth.repository';
+import { CreateUserCommand, LoginUserCommand } from './commands/index';
 
-@Controller('auth')
+import { CustomRequest } from '@/types/cus-request';
+import { AUTH_CONTROLLER, AUTH_ROUTES } from '@/sites/site.constants';
+import { VerifyEmailQuery } from './queries';
+
+@Controller(AUTH_CONTROLLER)
 @ApiTags('Auth')
 @UseInterceptors(TimeoutInterceptor)
 export class AuthController {
@@ -61,7 +64,7 @@ export class AuthController {
         private readonly authRepository: AuthRepository,
     ) {}
 
-    @Post('register')
+    @Post(AUTH_ROUTES.REGISTER)
     @ApiOperation({ summary: 'Create user' })
     @ApiCreatedResponse({
         description:
@@ -69,10 +72,12 @@ export class AuthController {
         type: AuthEntity,
     })
     async create(@Body() createUserDto: CreateUserDto) {
-        return await this.createUserService.create(createUserDto);
+        return await this.commandBus.execute(
+            new CreateUserCommand(createUserDto),
+        );
     }
 
-    @Get('verify/:emailToken/:userId')
+    @Get(AUTH_ROUTES.VERIFY)
     @ApiOperation({ summary: 'Verify email. Enter id user and token' })
     @ApiCreatedResponse({
         description: 'The user has been successfully verified email.',
@@ -82,37 +87,32 @@ export class AuthController {
         description: 'Invalid or expired token.',
     })
     async verifyEmail(
-        @Param() verifyEmailDto: VerifyEmailDto,
+        @Param() userId: number,
+        @Body() verifyEmailDto: VerifyEmailDto,
         @Res() res: Response,
     ) {
-        await this.verifyEmailService.verifyEmail(res, verifyEmailDto);
-        // try {
-        //
-        //   return res.status(200).send({ message: 'Email successfully verified!' });
-        // } catch (error) {
-        //   if (error instanceof NotFoundException || BadRequestException) {
-        //     return res.status(404).send({ message: error.message });
-        //   }
-        //   return res.status(500).send({ message: 'An unexpected error occurred' });
-        // }
+        return await this.commandBus.execute(
+            new VerifyEmailQuery(res, userId, verifyEmailDto),
+        );
     }
 
-    @Post('login')
+    @Post(AUTH_ROUTES.LOGIN)
     @ApiOperation({ summary: 'Log in. Only for verified accounts' })
     @ApiCreatedResponse({
         description: 'User successfully authorize',
         type: AuthRegister,
     })
     async login(
-        @Req() req: Request,
+        @Req() req: CustomRequest,
+        @Res() res: Response,
         @Body(EmailValidationPipe) logInDto: LogInDto,
     ) {
-        return await this.commandBus.execute(
-            new LoginUserCommand(logInDto, req),
+        return this.commandBus.execute(
+            new LoginUserCommand(req, res, logInDto),
         );
     }
 
-    @Post('/resend_email_token')
+    @Post(AUTH_ROUTES.VERIFY)
     @ApiOperation({ summary: 'Action to resend email and receive token' })
     @ApiCreatedResponse({
         description: 'Email was successfully sent to user.',
@@ -163,7 +163,7 @@ export class AuthController {
         return this.resetPasswordService.resetPassword(res, resetPasswordDto);
     }
 
-    @Post('logout')
+    @Post(AUTH_ROUTES.LOGOUT)
     @ApiOperation({
         summary: 'Log out for application ',
     })

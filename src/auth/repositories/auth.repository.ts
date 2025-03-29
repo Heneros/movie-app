@@ -1,18 +1,27 @@
 import { PrismaService } from '@/prisma/prisma.service';
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateUserDto } from '../dto/create-user.dto';
+import { CreateUserDto } from '../dto/Create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
 import { roundsOfHashing } from '@/data/defaultData';
-import { LogInDto } from '../dto/login.dto';
+import { LogInDto } from '../dto/Login.dto';
 
 @Injectable()
 export class AuthRepository {
     constructor(private prisma: PrismaService) {}
 
-    async findUser(logInDto: LogInDto) {
+    async findUser(criteria: { userId?: number; logInDto?: LogInDto }) {
+        const { userId, logInDto } = criteria;
+        if (!userId && !logInDto) {
+            throw new BadRequestException(
+                'Either userId or email must be provided',
+            );
+        }
         const userEmail = await this.prisma.user.findUnique({
-            where: { email: logInDto.email },
+            where: {
+                ...(logInDto.email && { email: logInDto.email }),
+                ...(userId && { id: userId }),
+            },
         });
         return userEmail;
     }
@@ -25,15 +34,21 @@ export class AuthRepository {
     }
 
     async createToken(createdUser, tokenVerification, tempRegisterDate) {
-        const emailVerificationToken =
-            await this.prisma.verifyResetToken.create({
-                data: {
-                    userId: createdUser.id,
-                    token: tokenVerification,
-                    expiresAt: tempRegisterDate,
-                },
-            });
-        return emailVerificationToken;
+        //   const emailVerificationToken =
+        return await this.prisma.verifyResetToken.create({
+            data: {
+                userId: createdUser.id,
+                token: tokenVerification,
+                expiresAt: tempRegisterDate,
+            },
+        });
+        // return emailVerificationToken;
+    }
+
+    async deleteToken(user) {
+        return await this.prisma.verifyResetToken.deleteMany({
+            where: { userId: user.id },
+        });
     }
 
     async findFirstUser(user, refreshToken) {

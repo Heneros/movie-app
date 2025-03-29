@@ -17,10 +17,14 @@ import { ResetPasswordService } from './services/resetPassword.service';
 import { LogoutAuthService } from './services/logout.service';
 import { RequestResetPasswordService } from './services/requestResetPassword.service';
 import { AuthResolver } from './auth.resolver';
-import { MovieRepository } from '@/movie/repositories/movie.repository';
-import { LoginUserHandler } from './handlers/Login.handler';
+
+import {
+    CreateUserHandler,
+    LoginUserHandler,
+    VerifyEmailHandler,
+} from './handlers/index';
 import { CqrsModule } from '@nestjs/cqrs';
-import { AuthRepository } from './repositories/auth.repository';
+import { AuthRepository } from './repositories/Auth.repository';
 
 @Module({
     controllers: [AuthController],
@@ -39,6 +43,8 @@ import { AuthRepository } from './repositories/auth.repository';
 
         AuthRepository,
         LoginUserHandler,
+        CreateUserHandler,
+        VerifyEmailHandler,
     ],
     imports: [
         PrismaModule,
