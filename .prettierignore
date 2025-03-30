@@ -1,6 +1,4 @@
 node_modules
 dist
-.eslintrc.js
-eslint.config.mjs
 build
 coverage

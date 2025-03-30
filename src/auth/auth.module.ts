@@ -21,6 +21,8 @@ import { AuthResolver } from './auth.resolver';
 import {
     CreateUserHandler,
     LoginUserHandler,
+    ResendEmailHandler,
+    ResetPasswordRequestHandler,
     VerifyEmailHandler,
 } from './handlers/index';
 import { CqrsModule } from '@nestjs/cqrs';
@@ -45,6 +47,8 @@ import { AuthRepository } from './repositories/Auth.repository';
         LoginUserHandler,
         CreateUserHandler,
         VerifyEmailHandler,
+        ResendEmailHandler,
+        ResetPasswordRequestHandler,
     ],
     imports: [
         PrismaModule,

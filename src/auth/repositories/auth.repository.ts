@@ -1,8 +1,6 @@
 import { PrismaService } from '@/prisma/prisma.service';
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateUserDto } from '../dto/Create-user.dto';
-import * as bcrypt from 'bcrypt';
-import { randomBytes } from 'crypto';
+
 import { roundsOfHashing, tempLoginDate } from '@/data/defaultData';
 import { LogInDto } from '../dto/Login.dto';
 
@@ -25,7 +23,7 @@ export class AuthRepository {
         const userEmail = await this.prisma.user.findUnique({
             where: {
                 ...(logInDto && logInDto.email && { email: logInDto.email }),
-                ...(email && { email: email }),
+                ...(email && { email }),
                 ...(userId && { id: userId }),
                 ...(token ? { refreshToken: { has: token } } : []),
             },
@@ -40,13 +38,16 @@ export class AuthRepository {
         return createdUser;
     }
 
-    async createToken(createdUser, tokenVerification, tempRegisterDate) {
+    async createToken(criteria: { userId?; token?; tempDate? }) {
+        const { userId, token, tempDate } = criteria;
+        console.log(userId, token);
         //   const emailVerificationToken =
         return await this.prisma.verifyResetToken.create({
             data: {
-                userId: createdUser.id,
-                token: tokenVerification,
-                expiresAt: tempRegisterDate,
+                userId: userId,
+                token: token,
+                createdAt: new Date().toISOString(),
+                expiresAt: tempDate,
             },
         });
         // return emailVerificationToken;
@@ -54,13 +55,14 @@ export class AuthRepository {
 
     async findToken(criteria: { userId?: number; token?: string }) {
         const { userId, token } = criteria;
+
         if (!userId && !token) {
             throw new BadRequestException('Either userId must be provided');
         }
         const userEmail = await this.prisma.verifyResetToken.findUnique({
             where: {
                 userId,
-                token: token,
+                token,
             },
         });
         return userEmail;

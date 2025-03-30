@@ -25,7 +25,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
             createUserDto.password,
             roundsOfHashing,
         );
-        const tokenVerification = randomBytes(32).toString('hex');
+        const token = randomBytes(32).toString('hex');
         createUserDto.password = hashedPassword;
         let email = createUserDto.email;
 
@@ -53,11 +53,12 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
 
         const createdUser = await this.authRepository.createUser(userData);
 
-        const emailVerificationToken = await this.authRepository.createToken(
-            createdUser,
-            tokenVerification,
-            tempRegisterDate,
-        );
+        const userId = createdUser.id;
+        const emailVerificationToken = await this.authRepository.createToken({
+            userId,
+            token,
+            tempDate: tempRegisterDate,
+        });
 
         await this.mailService.sendEmail(
             true,

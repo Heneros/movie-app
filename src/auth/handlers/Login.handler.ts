@@ -55,12 +55,12 @@ export class LoginUserHandler implements ICommandHandler<LoginUserCommand> {
         });
 
         await this.authRepository.deleteToken(user);
-
-        await this.authRepository.createToken(
-            user,
-            refreshToken,
-            tempLoginDate,
-        );
+        const userId = user.id;
+        await this.authRepository.createToken({
+            userId,
+            token: refreshToken,
+            tempDate: tempLoginDate,
+        });
 
         await this.authRepository.updateUser(
             user,

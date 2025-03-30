@@ -21,7 +21,7 @@ export class ResetPasswordService {
         const verificationToken = await this.prisma.verifyResetToken.findUnique(
             {
                 where: {
-                    userId: resetPasswordDto.userId,
+                    userId: 1, ///resetPasswordDto.userId,
                 },
             },
         );

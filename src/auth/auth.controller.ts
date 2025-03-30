@@ -3,6 +3,7 @@ import {
     Controller,
     Get,
     Param,
+    ParseIntPipe,
     Patch,
     Post,
     Query,
@@ -39,7 +40,11 @@ import { LogoutAuthService } from './services/logout.service';
 import { RequestResetPasswordService } from './services/requestResetPassword.service';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { AuthRepository } from './repositories/Auth.repository';
-import { CreateUserCommand, LoginUserCommand } from './commands/index';
+import {
+    CreateUserCommand,
+    LoginUserCommand,
+    ResendEmailCommand,
+} from './commands/index';
 
 import { CustomRequest } from '@/types/cus-request';
 import { AUTH_CONTROLLER, AUTH_ROUTES } from '@/sites/site.constants';
@@ -113,26 +118,26 @@ export class AuthController {
         );
     }
 
-    // @Post(AUTH_ROUTES.VERIFY)
-    // @ApiOperation({ summary: 'Action to resend email and receive token' })
-    // @ApiCreatedResponse({
-    //     description: 'Email was successfully sent to user.',
-    //     type: UserEntity,
-    // })
-    // @ApiOkResponse({ type: AuthEntity })
-    // async resendEmailValidation(
-    //     @Param()
-    //     userId: number,
-    //     @Body()
-    //     email: ,
-    //     @Res() res: Response,
-    // ) {
-    //     return await this.queryBus.execute(
-    //         new VerifyEmailQuery(userId, email, res),
-    //     );
-    // }
+    @Post(AUTH_ROUTES.RESEND_EMAIL)
+    @ApiOperation({ summary: 'Action to resend email to receive token' })
+    @ApiCreatedResponse({
+        description: 'Email was successfully sent to user.',
+        type: UserEntity,
+    })
+    @ApiOkResponse({ type: AuthEntity })
+    async resendEmailValidation(
+        @Param('userId')
+        userId: number,
+        @Body()
+        email: EmailDto,
+        @Res() res: Response,
+    ) {
+        return await this.commandBus.execute(
+            new ResendEmailCommand(userId, email, res),
+        );
+    }
 
-    @Post('/reset_password_request')
+    @Post(AUTH_ROUTES.RESET_PASSWORD_REQUEST)
     @ApiOperation({
         summary:
             'Request for users who wants receive in email to change password',
@@ -152,7 +157,7 @@ export class AuthController {
         );
     }
 
-    @Post('/reset_password')
+    @Post(AUTH_ROUTES.RESET_PASSWORD)
     @ApiOperation({
         summary: 'For users, who receive link in email. And know user id.',
     })
@@ -166,6 +171,7 @@ export class AuthController {
         description: 'Actions specify new password and user id',
     })
     async resetPassword(
+        @Param('userId', ParseIntPipe) userId: number,
         @Body(EmailValidationPipe) resetPasswordDto: ResetPasswordDto,
         @Res() res: Response,
     ) {

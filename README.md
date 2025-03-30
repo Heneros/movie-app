@@ -24,7 +24,7 @@ App analogue imdb/kinopoisk about movies.
 - Prometheus
 - TensorFlow.js
 - Github Actions
-
+- Kubernetes
 
 
 ## Features app have:
@@ -45,7 +45,7 @@ App analogue imdb/kinopoisk about movies.
 - Reviews movie. positive or negative. 
 - Edit review during 15 minutes. Latter gonna be edit without limitless for premium users. 
 - ApiLimiter  
-- ProfileOwner, restricted content to only owners can perform
+- ProfileOwner, restricted content to only owners can perform actions
 
 
 ## Features and functionality app should be:
