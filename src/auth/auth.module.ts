@@ -22,6 +22,7 @@ import {
     CreateUserHandler,
     LoginUserHandler,
     ResendEmailHandler,
+    ResetPasswordHandler,
     ResetPasswordRequestHandler,
     VerifyEmailHandler,
 } from './handlers/index';
@@ -49,6 +50,7 @@ import { AuthRepository } from './repositories/Auth.repository';
         VerifyEmailHandler,
         ResendEmailHandler,
         ResetPasswordRequestHandler,
+        ResetPasswordHandler,
     ],
     imports: [
         PrismaModule,

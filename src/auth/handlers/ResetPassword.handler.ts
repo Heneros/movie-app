@@ -38,6 +38,26 @@ export class ResetPasswordHandler
                 resetPasswordDto.password,
                 roundsOfHashing,
             );
+
+            const user = await this.authRepository.updateUser({
+                userId,
+                password: newPass,
+            });
+            const payload = {
+                name: user.name,
+                link: null,
+            };
+
+            await this.mailService.resendEmail(
+                user,
+                'Your password was reset successfully!',
+                './resetPassword',
+                payload,
+            );
+
+            res.status(200).json({
+                message: 'Your password was reset successfully!',
+            });
         }
     }
 }

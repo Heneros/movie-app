@@ -44,6 +44,8 @@ import {
     CreateUserCommand,
     LoginUserCommand,
     ResendEmailCommand,
+    ResetPasswordCommand,
+    ResetPasswordRequestCommand,
 } from './commands/index';
 
 import { CustomRequest } from '@/types/cus-request';
@@ -147,13 +149,13 @@ export class AuthController {
         type: UserEntity,
     })
     @ApiOkResponse({ type: AuthEntity })
-    requestResetPassword(
+    async requestResetPassword(
+        @Param('userId') userId: number,
         @Body(EmailValidationPipe) email: EmailDto,
         @Res() res: Response,
     ) {
-        return this.requestResetPasswordService.requestResetPassword(
-            res,
-            email,
+        return await this.commandBus.execute(
+            new ResetPasswordRequestCommand(userId, email, res),
         );
     }
 
@@ -171,11 +173,13 @@ export class AuthController {
         description: 'Actions specify new password and user id',
     })
     async resetPassword(
-        @Param('userId', ParseIntPipe) userId: number,
-        @Body(EmailValidationPipe) resetPasswordDto: ResetPasswordDto,
+        @Query('userId', ParseIntPipe) userId: number,
+        @Body() resetPasswordDto: ResetPasswordDto,
         @Res() res: Response,
     ) {
-        return this.resetPasswordService.resetPassword(res, resetPasswordDto);
+        return await this.commandBus.execute(
+            new ResetPasswordCommand(userId, resetPasswordDto, res),
+        );
     }
 
     @Post(AUTH_ROUTES.LOGOUT)
