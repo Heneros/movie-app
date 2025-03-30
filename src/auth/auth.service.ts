@@ -13,7 +13,7 @@ import { MailService } from '@/mail/mail.service';
 import { CreateUserDto } from './dto/Create-user.dto';
 import { domain, isDevelopment, roundsOfHashing } from '@/data/defaultData';
 import { randomBytes } from 'crypto';
-import { ResendEmailDto } from './dto/Resend-email.dto';
+
 import { Request, Response } from 'express';
 import { add } from 'date-fns';
 

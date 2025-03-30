@@ -5,6 +5,7 @@ import {
     Param,
     Patch,
     Post,
+    Query,
     Req,
     Res,
     UseInterceptors,
@@ -26,7 +27,6 @@ import { TimeoutInterceptor } from '@/interceptor/timeout.interceptor';
 import { UserEntity } from '@/users/entities/user.entity';
 import { CreateUserDto } from './dto/Create-user.dto';
 import { VerifyEmailDto } from './dto/Verify-email.dto';
-import { ResendEmailDto } from './dto/Resend-email.dto';
 import { ResetPasswordDto } from './dto/Reset-password.dto';
 import { AuthRegister } from './entity/register.entity';
 import { EmailValidationPipe } from './pipe/EmailValidation.pipe';
@@ -44,6 +44,7 @@ import { CreateUserCommand, LoginUserCommand } from './commands/index';
 import { CustomRequest } from '@/types/cus-request';
 import { AUTH_CONTROLLER, AUTH_ROUTES } from '@/sites/site.constants';
 import { VerifyEmailQuery } from './queries';
+import { EmailDto } from './dto/Resend-email.dto';
 
 @Controller(AUTH_CONTROLLER)
 @ApiTags('Auth')
@@ -87,12 +88,12 @@ export class AuthController {
         description: 'Invalid or expired token.',
     })
     async verifyEmail(
-        @Param() userId: number,
-        @Body() verifyEmailDto: VerifyEmailDto,
+        @Param('emailToken') token: string,
+        @Param('userId') userId: number,
         @Res() res: Response,
     ) {
-        return await this.commandBus.execute(
-            new VerifyEmailQuery(res, userId, verifyEmailDto),
+        return await this.queryBus.execute(
+            new VerifyEmailQuery(token, userId, res),
         );
     }
 
@@ -112,16 +113,24 @@ export class AuthController {
         );
     }
 
-    @Post(AUTH_ROUTES.VERIFY)
-    @ApiOperation({ summary: 'Action to resend email and receive token' })
-    @ApiCreatedResponse({
-        description: 'Email was successfully sent to user.',
-        type: UserEntity,
-    })
-    @ApiOkResponse({ type: AuthEntity })
-    resendEmailValidation(@Body() email: ResendEmailDto, @Res() res: Response) {
-        return this.resendEmailService.resendEmailValidation(res, email);
-    }
+    // @Post(AUTH_ROUTES.VERIFY)
+    // @ApiOperation({ summary: 'Action to resend email and receive token' })
+    // @ApiCreatedResponse({
+    //     description: 'Email was successfully sent to user.',
+    //     type: UserEntity,
+    // })
+    // @ApiOkResponse({ type: AuthEntity })
+    // async resendEmailValidation(
+    //     @Param()
+    //     userId: number,
+    //     @Body()
+    //     email: ,
+    //     @Res() res: Response,
+    // ) {
+    //     return await this.queryBus.execute(
+    //         new VerifyEmailQuery(userId, email, res),
+    //     );
+    // }
 
     @Post('/reset_password_request')
     @ApiOperation({
@@ -134,7 +143,7 @@ export class AuthController {
     })
     @ApiOkResponse({ type: AuthEntity })
     requestResetPassword(
-        @Body(EmailValidationPipe) email: ResendEmailDto,
+        @Body(EmailValidationPipe) email: EmailDto,
         @Res() res: Response,
     ) {
         return this.requestResetPasswordService.requestResetPassword(

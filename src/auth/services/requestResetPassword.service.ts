@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/prisma/prisma.service';
-import { ResendEmailDto } from '../dto/Resend-email.dto';
+
 import { MailService } from '@/mail/mail.service';
 import { randomBytes } from 'crypto';
 import { domain, tempRequestPassDate } from '@/data/defaultData';
 import { Response } from 'express';
+import { VerifyEmailDto } from '../dto/Verify-email.dto';
+import { EmailDto } from '../dto/Resend-email.dto';
 
 @Injectable()
 export class RequestResetPasswordService {
@@ -13,7 +15,7 @@ export class RequestResetPasswordService {
         private mailService: MailService,
     ) {}
 
-    async requestResetPassword(res: Response, resendEmailDto: ResendEmailDto) {
+    async requestResetPassword(res: Response, resendEmailDto: EmailDto) {
         const user = await this.prisma.user.findUnique({
             where: { email: resendEmailDto.email },
         });

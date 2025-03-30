@@ -5,4 +5,7 @@ export interface CustomRequest extends Request {
     user?: any;
 }
 
-export interface CustomResponse extends Response {}
+// export interface CustomResponse extends Response {
+//     userId?: number;
+//     verifyEmailDto: any;
+// }

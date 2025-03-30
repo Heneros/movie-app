@@ -27,8 +27,13 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
         );
         const tokenVerification = randomBytes(32).toString('hex');
         createUserDto.password = hashedPassword;
+        let email = createUserDto.email;
 
-        const userEmail = await this.authRepository.findUser(createUserDto);
+        console.log(email);
+
+        const userEmail = await this.authRepository.findUser({
+            email: email,
+        });
 
         if (userEmail) {
             throw new BadRequestException(

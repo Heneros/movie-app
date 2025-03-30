@@ -3,24 +3,31 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from '../dto/Create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
-import { roundsOfHashing } from '@/data/defaultData';
+import { roundsOfHashing, tempLoginDate } from '@/data/defaultData';
 import { LogInDto } from '../dto/Login.dto';
 
 @Injectable()
 export class AuthRepository {
     constructor(private prisma: PrismaService) {}
 
-    async findUser(criteria: { userId?: number; logInDto?: LogInDto }) {
-        const { userId, logInDto } = criteria;
-        if (!userId && !logInDto) {
+    async findUser(criteria: {
+        userId?: number;
+        logInDto?: LogInDto;
+        email?: string;
+        token?: string;
+    }) {
+        const { userId, email, logInDto, token } = criteria;
+        if (!userId && !email && !logInDto && !token) {
             throw new BadRequestException(
                 'Either userId or email must be provided',
             );
         }
         const userEmail = await this.prisma.user.findUnique({
             where: {
-                ...(logInDto.email && { email: logInDto.email }),
+                ...(logInDto && logInDto.email && { email: logInDto.email }),
+                ...(email && { email: email }),
                 ...(userId && { id: userId }),
+                ...(token ? { refreshToken: { has: token } } : []),
             },
         });
         return userEmail;
@@ -45,6 +52,20 @@ export class AuthRepository {
         // return emailVerificationToken;
     }
 
+    async findToken(criteria: { userId?: number; token?: string }) {
+        const { userId, token } = criteria;
+        if (!userId && !token) {
+            throw new BadRequestException('Either userId must be provided');
+        }
+        const userEmail = await this.prisma.verifyResetToken.findUnique({
+            where: {
+                userId,
+                token: token,
+            },
+        });
+        return userEmail;
+    }
+
     async deleteToken(user) {
         return await this.prisma.verifyResetToken.deleteMany({
             where: { userId: user.id },
@@ -65,9 +86,34 @@ export class AuthRepository {
     async updateUser(user, newRefreshTokenArray, newRefreshToken) {
         const existingRefreshToken = await this.prisma.user.update({
             where: { id: user.id },
-            data: { refreshToken: [...newRefreshTokenArray, newRefreshToken] },
+            data: {
+                refreshToken: [...newRefreshTokenArray, newRefreshToken],
+            },
         });
 
         return existingRefreshToken;
+    }
+    async verifyUser(userId: number) {
+        const updatedUser = await this.prisma.user.update({
+            where: { id: userId },
+            data: {
+                isEmailVerified: true,
+            },
+        });
+
+        return updatedUser;
+    }
+    async updatedToken(userId: number, emailToken: string) {
+        const updatedUser = await this.prisma.verifyResetToken.update({
+            where: {
+                userId,
+                token: emailToken,
+            },
+            data: {
+                expiresAt: tempLoginDate,
+            },
+        });
+
+        return updatedUser;
     }
 }

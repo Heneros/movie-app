@@ -4,7 +4,7 @@ import {
     NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '@/prisma/prisma.service';
-import { ResendEmailDto } from '../dto/Resend-email.dto';
+import { EmailDto } from '../dto/Resend-email.dto';
 import { MailService } from '@/mail/mail.service';
 import { domain, tempRegisterDate } from '@/data/defaultData';
 import { randomBytes } from 'crypto';
@@ -17,7 +17,7 @@ export class ResendEmailService {
         private mailService: MailService,
     ) {}
 
-    async resendEmailValidation(res: Response, resendEmailDto: ResendEmailDto) {
+    async resendEmailValidation(res: Response, resendEmailDto: EmailDto) {
         const user = await this.prisma.user.findUnique({
             where: { email: resendEmailDto.email },
         });
