@@ -73,10 +73,12 @@ import { CreateReviewCommand } from './commands/reviews/createReview.command';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { RedisService } from '../redis/event-store.service';
 import { RemoveReviewCommand } from './commands/reviews/removeReview.command';
+import { GqlThrottlerGuard } from '../guards/gql-throttler.guard';
 
 @Controller('movie')
 @ApiTags('Movie')
 @UseInterceptors(CacheInterceptor)
+@UseGuards(GqlThrottlerGuard)
 // @UseInterceptors(TimeoutInterceptor)
 export class MovieController {
     constructor(
@@ -190,6 +192,7 @@ export class MovieController {
 
     // @Public()
     @Get(':id')
+    @Throttle({ default: { limit: 3, ttl: 60000 } })
     @ApiOkResponse({ type: MovieEntity })
     async findOne(@Param('id', ParseIntPipe, CheckMovieExistPipe) id: number) {
         // const movie = await this.movieFindOneService.findOne(+id);

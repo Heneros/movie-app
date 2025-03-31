@@ -19,6 +19,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { RedisOptions } from './configs/redis-config';
 import { RedisService } from './redis/event-store.service';
+import { GqlThrottlerGuard } from './guards/gql-throttler.guard';
 
 @Module({
     imports: [
@@ -36,7 +37,7 @@ import { RedisService } from './redis/event-store.service';
             throttlers: [
                 {
                     ttl: 60000,
-                    limit: 5,
+                    limit: 20,
                 },
             ],
         }),
@@ -44,7 +45,12 @@ import { RedisService } from './redis/event-store.service';
             driver: ApolloDriver,
             autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
             installSubscriptionHandlers: true,
-            context: ({ req }: { req: Request }) => ({ req }),
+            context: ({ req, res }: { req: Request; res: Response }) => ({
+                req,
+                res,
+            }),
+
+            // context: ({ req }: { req: Request }) => ({ req }),
             subscriptions: {
                 'graphql-ws': true,
             },
@@ -67,7 +73,7 @@ import { RedisService } from './redis/event-store.service';
         // },
         {
             provide: APP_GUARD,
-            useClass: ThrottlerGuard,
+            useClass: GqlThrottlerGuard,
         },
     ],
 })

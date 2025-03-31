@@ -74,6 +74,7 @@ export class AuthController {
         private readonly authRepository: AuthRepository,
     ) {}
 
+    @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Post(AUTH_ROUTES.REGISTER)
     @ApiOperation({ summary: 'Create user' })
     @ApiCreatedResponse({
@@ -87,6 +88,7 @@ export class AuthController {
         );
     }
 
+    @Throttle({ default: { limit: 15, ttl: 60000 } })
     @Get(AUTH_ROUTES.VERIFY)
     @ApiOperation({ summary: 'Verify email. Enter id user and token' })
     @ApiCreatedResponse({
@@ -106,6 +108,7 @@ export class AuthController {
         );
     }
 
+    @Throttle({ default: { limit: 15, ttl: 60000 } })
     @Post(AUTH_ROUTES.LOGIN)
     @ApiOperation({ summary: 'Log in. Only for verified accounts' })
     @ApiCreatedResponse({
@@ -122,6 +125,7 @@ export class AuthController {
         );
     }
 
+    @Throttle({ default: { limit: 15, ttl: 60000 } })
     @Post(AUTH_ROUTES.RESEND_EMAIL)
     @ApiOperation({ summary: 'Action to resend email to receive token' })
     @ApiCreatedResponse({
@@ -141,7 +145,7 @@ export class AuthController {
         );
     }
 
-    // @Throttle({ default: { limit: 3, ttl: 60000 } })
+    @Throttle({ default: { limit: 15, ttl: 60000 } })
     @Post(AUTH_ROUTES.RESET_PASSWORD_REQUEST)
     @ApiOperation({
         summary:
@@ -162,6 +166,7 @@ export class AuthController {
         );
     }
 
+    @Throttle({ default: { limit: 10, ttl: 60000 } })
     @Post(AUTH_ROUTES.RESET_PASSWORD)
     @ApiOperation({
         summary: 'For users, who receive link in email. And know user id.',

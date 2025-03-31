@@ -29,7 +29,7 @@ export class ProfileOwnerGuard implements CanActivate {
 
             idFromParams = +args.userId || +args.id || args.input.userId;
 
-            console.log(idFromParams);
+            // console.log(idFromParams);
         }
 
         const authHeader = request.headers?.authorization;
