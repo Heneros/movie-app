@@ -1,5 +1,5 @@
 # Movies API
-App analogue imdb/kinopoisk about movies. 
+App analogue imdb/kinopoisk about movies. Site separated on 4 modules: auth(login, registration etc), users(for actions for admin and user), movie()
 
 ## Technologies implemented:
 - Prisma 
@@ -92,3 +92,4 @@ everyday recieve letter to mail box about favorite movies, he subscribed
 - Live chat with users through ws
 - Temp link for 20 minutes and after expire link deleted himself
 - Create token on  only 31 day to access to data, you can share with other user token(only 3 times) after this token gonna be invalid
+- You can't change password on same. check prev password before update on new

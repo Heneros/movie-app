@@ -193,7 +193,7 @@ export class MovieController {
     @ApiOkResponse({ type: MovieEntity })
     async findOne(@Param('id', ParseIntPipe, CheckMovieExistPipe) id: number) {
         // const movie = await this.movieFindOneService.findOne(+id);
-        const movie = await this.queryBus.execute(new FindOneMovieQuery(id));
+        const movie = await this.queryBus.execute(new FindOneMovieQuery(+id));
         // if (!movie) {
         //     throw new NotFoundException(`movie with ${id} does not exist.`);
         // }

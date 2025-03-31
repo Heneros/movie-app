@@ -5,6 +5,7 @@ import { MailService } from '@/mail/mail.service';
 import { AuthRepository } from '../repositories/Auth.repository';
 import { domain, roundsOfHashing, tempRegisterDate } from '@/data/defaultData';
 import { ResetPasswordRequestCommand } from '../commands';
+import { BadRequestException } from '@nestjs/common';
 
 @CommandHandler(ResetPasswordRequestCommand)
 export class ResetPasswordRequestHandler
@@ -25,6 +26,11 @@ export class ResetPasswordRequestHandler
         const verificationToken = await this.authRepository.findToken({
             userId,
         });
+
+        // console.log(user, verificationToken);
+        if (!user) {
+            throw new BadRequestException('No user exist');
+        }
 
         if (verificationToken) {
             await this.authRepository.deleteToken({

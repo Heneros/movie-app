@@ -8,6 +8,9 @@
         "allowSyntheticDefaultImports": true,
         "target": "ES2017",
         "sourceMap": true,
+        "types": [
+            "express"
+        ],
         "typeRoots": [
             "types",
             "./node_modules/@types"
@@ -43,13 +46,12 @@
             "@/src/redis/*": [
                 "src/redis/*"
             ],
-                "@types/*": [
+            "@types/*": [
                 "src/types/*"
             ],
             "test/*": [
                 "test/*"
             ]
-        
         }
     },
     "include": [

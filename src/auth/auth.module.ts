@@ -21,6 +21,7 @@ import { AuthResolver } from './auth.resolver';
 import {
     CreateUserHandler,
     LoginUserHandler,
+    LogoutHandler,
     ResendEmailHandler,
     ResetPasswordHandler,
     ResetPasswordRequestHandler,
@@ -51,6 +52,7 @@ import { AuthRepository } from './repositories/Auth.repository';
         ResendEmailHandler,
         ResetPasswordRequestHandler,
         ResetPasswordHandler,
+        LogoutHandler,
     ],
     imports: [
         PrismaModule,

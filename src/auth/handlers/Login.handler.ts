@@ -62,10 +62,9 @@ export class LoginUserHandler implements ICommandHandler<LoginUserCommand> {
             tempDate: tempLoginDate,
         });
 
-        await this.authRepository.updateUser(
-            user,
+        await this.authRepository.updateRefreshToken(
+            user.id,
             newRefreshTokenArray,
-            newRefreshToken,
         );
 
         res.cookie('jwtMovie', newRefreshToken, {

@@ -43,6 +43,7 @@ import { AuthRepository } from './repositories/Auth.repository';
 import {
     CreateUserCommand,
     LoginUserCommand,
+    LogoutCommand,
     ResendEmailCommand,
     ResetPasswordCommand,
     ResetPasswordRequestCommand,
@@ -52,6 +53,7 @@ import { CustomRequest } from '@/types/cus-request';
 import { AUTH_CONTROLLER, AUTH_ROUTES } from '@/sites/site.constants';
 import { VerifyEmailQuery } from './queries';
 import { EmailDto } from './dto/Resend-email.dto';
+import { Throttle } from '@nestjs/throttler';
 
 @Controller(AUTH_CONTROLLER)
 @ApiTags('Auth')
@@ -139,6 +141,7 @@ export class AuthController {
         );
     }
 
+    // @Throttle({ default: { limit: 3, ttl: 60000 } })
     @Post(AUTH_ROUTES.RESET_PASSWORD_REQUEST)
     @ApiOperation({
         summary:
@@ -174,11 +177,12 @@ export class AuthController {
     })
     async resetPassword(
         @Query('userId', ParseIntPipe) userId: number,
+        @Query('emailToken') emailToken: string,
         @Body() resetPasswordDto: ResetPasswordDto,
         @Res() res: Response,
     ) {
         return await this.commandBus.execute(
-            new ResetPasswordCommand(userId, resetPasswordDto, res),
+            new ResetPasswordCommand(userId, emailToken, resetPasswordDto, res),
         );
     }
 
@@ -186,7 +190,7 @@ export class AuthController {
     @ApiOperation({
         summary: 'Log out for application ',
     })
-    logout(@Req() req: Request, @Res() res: Response) {
-        return this.logoutAuthService.logout(req, res);
+    async logout(@Req() req: CustomRequest, @Res() res: Response) {
+        return await this.commandBus.execute(new LogoutCommand(req, res));
     }
 }

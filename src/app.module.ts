@@ -32,15 +32,24 @@ import { RedisService } from './redis/event-store.service';
         }),
         CacheModule.registerAsync(RedisOptions),
         WinstonModule.forRoot({}),
+        ThrottlerModule.forRoot({
+            throttlers: [
+                {
+                    ttl: 60000,
+                    limit: 5,
+                },
+            ],
+        }),
         GraphQLModule.forRoot<ApolloDriverConfig>({
             driver: ApolloDriver,
             autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
             installSubscriptionHandlers: true,
+            context: ({ req }: { req: Request }) => ({ req }),
             subscriptions: {
                 'graphql-ws': true,
             },
         }),
-        ThrottlerModule.forRoot([]),
+
         CqrsModule.forRoot(),
     ],
     controllers: [],

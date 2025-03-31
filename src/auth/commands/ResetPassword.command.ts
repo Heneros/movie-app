@@ -6,6 +6,8 @@ import { ResetPasswordDto } from '../dto/Reset-password.dto';
 export class ResetPasswordCommand implements ICommand {
     constructor(
         public readonly userId: number,
+        public readonly emailToken: string,
+
         public readonly resetPasswordDto: ResetPasswordDto,
         public readonly res: Response,
     ) {}

@@ -85,26 +85,31 @@ export class AuthRepository {
         return existingRefreshToken;
     }
 
-    async updateUser(
-        user?: { id: number },
-        newRefreshTokenArray: string[] = [],
-        newRefreshToken?: string,
-        password?: string,
-        userId?: number,
-    ) {
-        const refreshTokens = newRefreshToken
-            ? [...newRefreshTokenArray, newRefreshToken]
-            : newRefreshTokenArray;
-
-        const existingRefreshToken = await this.prisma.user.update({
-            where: { id: user.id ?? userId },
-            data: {
-                refreshToken: refreshTokens,
-                ...(password && { password }),
-            },
+    async updatePassword(userId: number, newPassword: string) {
+        return this.prisma.user.update({
+            where: { id: userId },
+            data: { password: newPassword },
         });
+    }
 
-        return existingRefreshToken;
+    async updateRefreshToken(userId: number, newRefreshTokens: string[]) {
+        return this.prisma.user.update({
+            where: { id: userId },
+            data: { refreshToken: newRefreshTokens },
+        });
+    }
+    async updateProfile(
+        userId: number,
+        updates: {
+            name?: string;
+            email?: string;
+            profilePic?: string;
+        },
+    ) {
+        return this.prisma.user.update({
+            where: { id: userId },
+            data: { ...updates },
+        });
     }
 
     async verifyUser(userId: number) {
