@@ -13,7 +13,6 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 
-import { AuthService } from './auth.service';
 import {
     ApiBody,
     ApiCreatedResponse,
@@ -27,17 +26,9 @@ import { LogInDto } from './dto/Login.dto';
 import { TimeoutInterceptor } from '@/interceptor/timeout.interceptor';
 import { UserEntity } from '@/users/entities/user.entity';
 import { CreateUserDto } from './dto/Create-user.dto';
-import { VerifyEmailDto } from './dto/Verify-email.dto';
 import { ResetPasswordDto } from './dto/Reset-password.dto';
 import { AuthRegister } from './entity/register.entity';
 import { EmailValidationPipe } from './pipe/EmailValidation.pipe';
-import { CreateUserService } from './services/createUser.service';
-import { LoginAuthService } from './services/login.service';
-import { VerifyEmailService } from './services/verifyEmail.service';
-import { ResendEmailService } from './services/resendEmailValidation.service';
-import { ResetPasswordService } from './services/resetPassword.service';
-import { LogoutAuthService } from './services/logout.service';
-import { RequestResetPasswordService } from './services/requestResetPassword.service';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { AuthRepository } from './repositories/Auth.repository';
 import {
@@ -54,21 +45,13 @@ import { AUTH_CONTROLLER, AUTH_ROUTES } from '@/sites/site.constants';
 import { VerifyEmailQuery } from './queries';
 import { EmailDto } from './dto/Resend-email.dto';
 import { Throttle } from '@nestjs/throttler';
+import { isDevelopment } from '@/data/defaultData';
 
 @Controller(AUTH_CONTROLLER)
 @ApiTags('Auth')
 @UseInterceptors(TimeoutInterceptor)
 export class AuthController {
     constructor(
-        private readonly authService: AuthService,
-        private readonly createUserService: CreateUserService,
-        private readonly loginAuthService: LoginAuthService,
-        private readonly verifyEmailService: VerifyEmailService,
-        private readonly resendEmailService: ResendEmailService,
-        private readonly resetPasswordService: ResetPasswordService,
-        private readonly logoutAuthService: LogoutAuthService,
-        private readonly requestResetPasswordService: RequestResetPasswordService,
-
         private readonly commandBus: CommandBus,
         private readonly queryBus: QueryBus,
         private readonly authRepository: AuthRepository,
@@ -103,12 +86,11 @@ export class AuthController {
         @Param('userId') userId: number,
         @Res() res: Response,
     ) {
-        return await this.queryBus.execute(
-            new VerifyEmailQuery(token, userId, res),
-        );
+        await this.queryBus.execute(new VerifyEmailQuery(token, userId));
+
+        return res.status(200).json({ message: 'Your email is verified!' });
     }
 
-    @Throttle({ default: { limit: 15, ttl: 60000 } })
     @Post(AUTH_ROUTES.LOGIN)
     @ApiOperation({ summary: 'Log in. Only for verified accounts' })
     @ApiCreatedResponse({
@@ -117,12 +99,28 @@ export class AuthController {
     })
     async login(
         @Req() req: CustomRequest,
-        @Res() res: Response,
+        @Res({ passthrough: true }) res: Response,
         @Body(EmailValidationPipe) logInDto: LogInDto,
     ) {
-        return this.commandBus.execute(
-            new LoginUserCommand(req, res, logInDto),
+        // return this.commandBus.execute(new LoginUserCommand(logInDto));
+        const result = await this.commandBus.execute(
+            new LoginUserCommand(logInDto),
         );
+
+        res.cookie('jwtMovie', result.refreshToken, {
+            httpOnly: !isDevelopment,
+            sameSite: isDevelopment ? 'none' : 'strict',
+            maxAge: 31 * 24 * 60 * 60 * 1000,
+            secure: !isDevelopment,
+        });
+        // console.log(result);
+        return new AuthEntity({
+            message: 'Login successful',
+            accessToken: result.accessToken,
+            name: result.user.name,
+            id: result.user.id,
+            email: result.user.email,
+        });
     }
 
     @Throttle({ default: { limit: 15, ttl: 60000 } })

@@ -1,11 +1,8 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import express, { Response } from 'express';
-import * as bcrypt from 'bcrypt';
+
 import { AuthRepository } from '../repositories/Auth.repository';
-import { BadRequestException } from '@nestjs/common';
-import { isDevelopment, tempLoginDate } from '@/data/defaultData';
+
 import { LogoutCommand } from '../commands';
-import { CustomRequest } from '@/types/cus-request';
 
 @CommandHandler(LogoutCommand)
 export class LogoutHandler implements ICommandHandler<LogoutCommand> {

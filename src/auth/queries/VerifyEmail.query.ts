@@ -8,6 +8,6 @@ export class VerifyEmailQuery implements IQuery {
         public readonly token: string,
         public readonly userId: number,
 
-        public readonly res: Response,
+        // public readonly res: Response,
     ) {}
 }

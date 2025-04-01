@@ -35,7 +35,7 @@ import { AuthRepository } from './repositories/Auth.repository';
     exports: [AuthModule],
     providers: [
         AuthService,
-        MailService,
+
         CreateUserService,
         LoginAuthService,
         VerifyEmailService,
@@ -43,8 +43,9 @@ import { AuthRepository } from './repositories/Auth.repository';
         ResetPasswordService,
         RequestResetPasswordService,
         LogoutAuthService,
-        AuthResolver,
 
+        
+        MailService,
         AuthRepository,
         LoginUserHandler,
         CreateUserHandler,
@@ -53,6 +54,7 @@ import { AuthRepository } from './repositories/Auth.repository';
         ResetPasswordRequestHandler,
         ResetPasswordHandler,
         LogoutHandler,
+        AuthResolver,
     ],
     imports: [
         PrismaModule,

@@ -17,24 +17,14 @@ import {
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
 import { MovieEntity } from './entities/movie.entity';
-import { MovieFavorite } from './services/addMovieFavoriteList.service';
-
-import { PrismaService } from '@/prisma/prisma.service';
 import { AuthGuard } from '@/guards/auth.guard';
 
-import { MovieService } from './movie.service';
 import { ProfileOwnerGuard } from '@/guards/ProfileOwner.guard';
-import { MovieFindOneService } from './services/findOneMovie.service';
 import { PAGINATION_LIMIT } from '@/data/defaultData';
-import { MovieFindAllService } from './services/findAllMovie.service';
-import { MovieSearchService } from './services/searchMovie.service';
 import { CheckMovieExistPipe } from './guard/checkIfMovieExist.guard';
-import { MovieFindDraftsService } from './services/findDraftsMovie.service';
 import { User } from '@/decorators/user.decorator';
-import { MovieRateService } from './services/rateMovie.service';
 import { MovieBasicInput } from './input/movie.input';
 import { PubSub } from 'graphql-subscriptions';
-// import { MovieBaseEntity } from './entities/movie-base.entity';
 import { MovieRepository } from '@/movie/repositories/movie.repository';
 import { AddMovieFavCommand } from './commands/favorite/addMovieFavorite.command';
 import { GetAllFavoritesQuery } from './queries/favorite/getAllFavorite.query';

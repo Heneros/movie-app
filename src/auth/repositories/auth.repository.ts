@@ -40,7 +40,7 @@ export class AuthRepository {
 
     async createToken(criteria: { userId?; token?; tempDate? }) {
         const { userId, token, tempDate } = criteria;
-        console.log(userId, token);
+        // console.log(userId, token);
         //   const emailVerificationToken =
         return await this.prisma.verifyResetToken.create({
             data: {
@@ -92,12 +92,26 @@ export class AuthRepository {
         });
     }
 
+    async findTokenByUserId(userId: number) {
+        return this.prisma.verifyResetToken.findUnique({
+            where: { userId },
+        });
+    }
+
     async updateRefreshToken(userId: number, newRefreshTokens: string[]) {
         return this.prisma.user.update({
             where: { id: userId },
             data: { refreshToken: newRefreshTokens },
         });
     }
+
+    async createOrUpdateToken(userId: number, token: string) {
+        return this.prisma.verifyResetToken.update({
+            where: { userId },
+            data: { token },
+        });
+    }
+
     async updateProfile(
         userId: number,
         updates: {
@@ -122,17 +136,19 @@ export class AuthRepository {
 
         return updatedUser;
     }
-    async updatedToken(userId: number, emailToken: string) {
-        const updatedUser = await this.prisma.verifyResetToken.update({
-            where: {
+    async updateToken(userId: number, emailToken: string) {
+        return this.prisma.verifyResetToken.upsert({
+            where: { userId },
+            update: {
+                userId: userId,
+                token: emailToken,
+                expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+            },
+            create: {
                 userId,
                 token: emailToken,
-            },
-            data: {
-                expiresAt: tempLoginDate,
+                expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
             },
         });
-
-        return updatedUser;
     }
 }

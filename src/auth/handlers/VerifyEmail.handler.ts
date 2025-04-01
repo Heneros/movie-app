@@ -13,7 +13,7 @@ export class VerifyEmailHandler implements IQueryHandler<VerifyEmailQuery> {
     ) {}
 
     async execute(query: VerifyEmailQuery) {
-        const { res, userId, token } = query;
+        const { userId, token } = query;
 
         const user = await this.authRepository.findUser({ userId });
 
@@ -42,7 +42,7 @@ export class VerifyEmailHandler implements IQueryHandler<VerifyEmailQuery> {
 
         await this.authRepository.verifyUser(emailVerificationToken.userId);
 
-        await this.authRepository.updatedToken(
+        await this.authRepository.updateToken(
             emailVerificationToken.userId,
             emailVerificationToken.token,
         );
@@ -55,7 +55,8 @@ export class VerifyEmailHandler implements IQueryHandler<VerifyEmailQuery> {
             emailVerificationToken,
         );
 
-        res.status(200).json({ message: 'Your email is verified!' });
-        // return emailVerificationToken;
+        // res.status(200).json({ message: 'Your email is verified!' });
+
+        
     }
 }

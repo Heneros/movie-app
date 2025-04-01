@@ -41,6 +41,16 @@ type ReviewPaginationEntity {
   limit: Int!
 }
 
+"""Auth"""
+type AuthEntity {
+  message: String!
+  id: Int
+  accessToken: String!
+  refreshToken: String!
+  name: String!
+  email: String
+}
+
 type Query {
   """Get All favorites """
   getAllFavorites(userId: Int!, page: Float = 1): [MovieEntity!]!
@@ -94,6 +104,9 @@ type Mutation {
 
   """Delete review movie"""
   removeReview(reviewId: Float!, userId: Float!): MovieReviewEntity!
+
+  """Login in"""
+  login(input: LogInDto!): AuthEntity!
 }
 
 input CreateMovieDto {
@@ -133,6 +146,14 @@ input CreateMovieReviewDto {
 
   """Positive or negative"""
   positive: Boolean! = true
+}
+
+input LogInDto {
+  """Email"""
+  email: String!
+
+  """Password minimum 6 symbols"""
+  password: String!
 }
 
 type Subscription {

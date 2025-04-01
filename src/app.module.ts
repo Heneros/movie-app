@@ -33,13 +33,21 @@ import { GqlThrottlerGuard } from './guards/gql-throttler.guard';
         }),
         CacheModule.registerAsync(RedisOptions),
         WinstonModule.forRoot({}),
-        ThrottlerModule.forRoot({
-            throttlers: [
+        ThrottlerModule.forRootAsync({
+            imports: [ConfigModule],
+            inject: [ConfigService],
+            useFactory: (config: ConfigService) => [
                 {
-                    ttl: 60000,
-                    limit: 20,
+                    ttl: config.get('THROTTLE_TTL'),
+                    limit: config.get('THROTTLE_LIMIT'),
                 },
             ],
+            // throttlers: [
+            //     {
+            //         ttl: 60000,
+            //         limit: 20,
+            //     },
+            // ],
         }),
         GraphQLModule.forRoot<ApolloDriverConfig>({
             driver: ApolloDriver,
@@ -50,7 +58,6 @@ import { GqlThrottlerGuard } from './guards/gql-throttler.guard';
                 res,
             }),
 
-            // context: ({ req }: { req: Request }) => ({ req }),
             subscriptions: {
                 'graphql-ws': true,
             },
