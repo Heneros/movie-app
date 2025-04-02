@@ -53,14 +53,13 @@ import { GqlThrottlerGuard } from './guards/gql-throttler.guard';
             driver: ApolloDriver,
             autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
             installSubscriptionHandlers: true,
+            subscriptions: {
+                'graphql-ws': true,
+            },
             context: ({ req, res }: { req: Request; res: Response }) => ({
                 req,
                 res,
             }),
-
-            subscriptions: {
-                'graphql-ws': true,
-            },
         }),
 
         CqrsModule.forRoot(),

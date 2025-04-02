@@ -29,6 +29,7 @@ import {
 } from './handlers/index';
 import { CqrsModule } from '@nestjs/cqrs';
 import { AuthRepository } from './repositories/Auth.repository';
+import { PubSub } from 'graphql-subscriptions';
 
 @Module({
     controllers: [AuthController],
@@ -44,7 +45,6 @@ import { AuthRepository } from './repositories/Auth.repository';
         RequestResetPasswordService,
         LogoutAuthService,
 
-        
         MailService,
         AuthRepository,
         LoginUserHandler,
@@ -55,6 +55,10 @@ import { AuthRepository } from './repositories/Auth.repository';
         ResetPasswordHandler,
         LogoutHandler,
         AuthResolver,
+        // {
+        //     provide: 'PUB_SUB',
+        //     useValue: new PubSub(),
+        // },
     ],
     imports: [
         PrismaModule,

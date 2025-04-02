@@ -168,7 +168,6 @@ export class MovieResolver {
         const movie = await this.queryBus.execute(
             new FindOneMovieQuery(movieId),
         );
-        // const movie = await this.movieFindOneService.findOne(movieId);
 
         if (!movie) {
             throw new NotFoundException(

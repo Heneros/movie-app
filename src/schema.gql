@@ -158,4 +158,5 @@ input LogInDto {
 
 type Subscription {
   movieRatingUpdated: MovieEntity!
+  userLogInSubscribe: AuthEntity!
 }
