@@ -49,6 +49,7 @@ type AuthEntity {
   refreshToken: String!
   name: String!
   email: String
+  status: Int
 }
 
 type Query {
@@ -75,6 +76,9 @@ type Query {
 
   """Get single review from movie"""
   getReviewSingleByMovie(id: Float!): MovieReviewEntity!
+
+  """Verify email. Enter token user and id"""
+  verifyEmail(emailToken: String!, userId: Float!): AuthEntity!
 }
 
 type Mutation {
@@ -107,6 +111,15 @@ type Mutation {
 
   """Login in"""
   login(input: LogInDto!): AuthEntity!
+
+  """Registration user"""
+  createUser(input: CreateUserDto!): AuthEntity!
+
+  """Resend Email"""
+  resendEmail(userId: Float!, email: EmailDto!): AuthEntity!
+
+  """Request for users who wants receive in email to change password"""
+  resetPasswordRequest(userId: Float!, email: EmailDto!): AuthEntity!
 }
 
 input CreateMovieDto {
@@ -154,6 +167,25 @@ input LogInDto {
 
   """Password minimum 6 symbols"""
   password: String!
+}
+
+input CreateUserDto {
+  """Name of user"""
+  name: String!
+
+  """Email of user"""
+  email: String!
+
+  """Password"""
+  password: String!
+
+  """Confirm password"""
+  passwordConfirm: String!
+}
+
+input EmailDto {
+  """Email user"""
+  email: String!
 }
 
 type Subscription {

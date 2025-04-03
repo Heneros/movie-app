@@ -42,12 +42,6 @@ import { GqlThrottlerGuard } from './guards/gql-throttler.guard';
                     limit: config.get('THROTTLE_LIMIT'),
                 },
             ],
-            // throttlers: [
-            //     {
-            //         ttl: 60000,
-            //         limit: 20,
-            //     },
-            // ],
         }),
         GraphQLModule.forRoot<ApolloDriverConfig>({
             driver: ApolloDriver,

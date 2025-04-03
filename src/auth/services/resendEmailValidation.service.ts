@@ -25,6 +25,8 @@ export class ResendEmailService {
             throw new NotFoundException('User not found');
         }
 
+
+        console.log('test123')
         if (user.isEmailVerified) {
             throw new BadRequestException('User already verified');
         }
@@ -67,6 +69,10 @@ export class ResendEmailService {
             './confirmation',
             payload,
         );
+
         res.status(200).json({ message: 'Email was successfully sent' });
+        return {
+            message: 'Email was successfully sent',
+        };
     }
 }

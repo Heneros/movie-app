@@ -21,6 +21,7 @@ export class ResetPasswordRequestHandler
 
         const user = await this.authRepository.findUser({
             email: resendEmailDto.email,
+            userId,
         });
 
         const verificationToken = await this.authRepository.findToken({
@@ -40,7 +41,7 @@ export class ResetPasswordRequestHandler
         const resentToken = randomBytes(32).toString('hex');
 
         const emailToken = await this.authRepository.createToken({
-            userId,
+            userId: user.id,
             token: resentToken,
             tempDate: tempRegisterDate,
         });

@@ -22,6 +22,7 @@ export class ResendEmailHandler implements ICommandHandler<ResendEmailCommand> {
             throw new NotFoundException('User not found');
         }
 
+        console.log(user);
         if (user.isEmailVerified) {
             throw new BadRequestException('User already verified');
         }
@@ -55,6 +56,11 @@ export class ResendEmailHandler implements ICommandHandler<ResendEmailCommand> {
             './confirmation',
             payload,
         );
-        res.status(200).json({ message: 'Email was successfully sent' });
+        //   res.status(200).json({ message: 'Email was successfully sent' });
+
+        return {
+            message: 'Email was successfully sent',
+            status: 200,
+        };
     }
 }

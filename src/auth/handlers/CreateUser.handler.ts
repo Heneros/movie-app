@@ -29,7 +29,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
         createUserDto.password = hashedPassword;
         let email = createUserDto.email;
 
-        console.log(email);
+        // console.log(email);
 
         const userEmail = await this.authRepository.findUser({
             email: email,
@@ -71,6 +71,11 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
             emailVerificationToken,
         );
 
-        return { email: createUserDto.email, emailVerificationToken };
+        return {
+            id: userId,
+            email: createUserDto.email,
+            name: createUserDto.name,
+            accessToken: emailVerificationToken.token,
+        };
     }
 }

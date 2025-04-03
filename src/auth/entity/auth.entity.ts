@@ -4,7 +4,7 @@ import { ApiProperty } from '@nestjs/swagger';
 @ObjectType({ description: 'Auth' })
 export class AuthEntity {
     @Field()
-    message: string;
+    message?: string;
 
     @ApiProperty()
     @Field(() => Int, { nullable: true })
@@ -12,7 +12,7 @@ export class AuthEntity {
 
     @ApiProperty()
     @Field(() => String, { nullable: false })
-    accessToken: string;
+    accessToken: [string];
 
     @ApiProperty()
     @Field(() => String, { nullable: false })
@@ -25,6 +25,10 @@ export class AuthEntity {
     @ApiProperty()
     @Field(() => String, { nullable: true })
     email?: string;
+
+    @ApiProperty()
+    @Field(() => Int, { nullable: true })
+    status?: number;
 
     constructor(partial: Partial<AuthEntity>) {
         Object.assign(this, partial);

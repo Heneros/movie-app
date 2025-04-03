@@ -58,6 +58,10 @@ export class ResetPasswordHandler
             res.status(200).json({
                 message: 'Your password was reset successfully!',
             });
+
+            return {
+                message: 'Your password was reset successfully!',
+            };
         }
     }
 }

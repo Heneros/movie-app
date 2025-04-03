@@ -1,11 +1,11 @@
 version: '3.8'
 
 services:
- postgres_master:
+ postgres-master:
     restart: always
     image: postgres:17.4
     env_file: ./.env
-    container_name: postgres_master
+    container_name: postgres-master
     build:
       context: ./docker/dev/postgresql_master
     environment:
@@ -15,7 +15,7 @@ services:
     volumes:
        - master_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      -  '5434:5432'
     command: ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
@@ -25,41 +25,38 @@ services:
     networks:
       app_movie:
 
-#  pg_slave:
-#     image: postgres:17.4
-#     container_name: pg_slave
-#     restart: always
-#     env_file: ./.env
-#     build:
-#      context: ./docker/dev/postgresql_slave
-#     environment: 
-#      POSTGRES_USER: postgres
-#      POSTGRES_PASSWORD: postgres
-#      POSTGRES_DB: moviedb
-#      PGDATA: /var/lib/postgresql/data
-#     command: >
-#       bash -c "
-#         until pg_isready -h postgres_master -U ${POSTGRES_USER}; do
-#           echo 'Waiting for master...';
-#           sleep 2;
-#         done;
-#         rm -rf /var/lib/postgresql/data/* &&
-#         pg_basebackup -h postgres_master -D /var/lib/postgresql/data -U ${POSTGRES_USER} -Fp -Xs -P -R &&
-#         echo \"primary_conninfo = 'host=postgres_master port=5432 user=${POSTGRES_USER} password=${POSTGRES_PASSWORD}'\" >> /var/lib/postgresql/data/postgresql.auto.conf &&
-#         chmod 700 /var/lib/postgresql/data &&
-#         postgres
-#       "
-#     ports:
-#       - "5433:5432"
-#     volumes: 
-#       - postgres-slave-data:/var/lib/postgresql/data
-#       - ./init-slave.sh:/docker-entrypoint-initdb.d/init-slave.sh
-#     depends_on:
-#       - postgres_master
-#     networks:
-#       app_movie:
+ postgres-slave:
+    image: postgres:17.4
+    container_name: postgres-slave
+    restart: always
+    env_file: ./.env
+    environment: 
+      POSTGRES_USER:  ${POSTGRES_USER}
+      POSTGRES_PASSWORD:  ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      PGDATA: /var/lib/postgresql/data
+    command: >
+      bash -c '
+      chown -R 999:999 /var/lib/postgresql/data;
+      chmod -R 750 /var/lib/postgresql/data;
+      until pg_isready -h postgres-master -p 5432; do sleep 1; done;
+      rm -rf /var/lib/postgresql/data/*;
+      PGPASSWORD=${POSTGRES_PASSWORD} pg_basebackup -h postgres-master -U ${POSTGRES_USER} -D /var/lib/postgresql/data -Fp -Xs -R -P;
+      echo "primary_conninfo = '\''host=postgres-master port=5432 user=${POSTGRES_USER} password=${POSTGRES_PASSWORD}'\''" >> /var/lib/postgresql/data/postgresql.auto.conf;
+      touch /var/lib/postgresql/data/standby.signal;
+      chown -R 999:999 /var/lib/postgresql/data;
+      exec postgres'
+    user: "999:999"
+    ports:
+      - "5433:5432"
+    volumes: 
+      - slave_data:/var/lib/postgresql/data
+    depends_on:
+      - postgres-master
+    networks:
+      - app_movie
 
-     
+
  pgadmin:
    container_name: pgadmi_nest
    image: dpage/pgadmin4:8
@@ -70,7 +67,7 @@ services:
    ports: 
      - "5050:80"
    depends_on:  
-    - postgres_master
+    - postgres-master
    volumes:
       - pgadmin-data:/var/lib/pgadmin
    networks:
@@ -129,6 +126,7 @@ volumes:
   pgadmin-data:
   master_data:
   mongodb-data:
+  slave_data:
 
 networks:
   app_movie:

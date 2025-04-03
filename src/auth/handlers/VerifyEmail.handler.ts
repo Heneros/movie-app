@@ -54,9 +54,11 @@ export class VerifyEmailHandler implements IQueryHandler<VerifyEmailQuery> {
             './welcome',
             emailVerificationToken,
         );
+        return {
+            id: user.id,
+            message: 'Your email is verified!',
+        };
 
         // res.status(200).json({ message: 'Your email is verified!' });
-
-        
     }
 }

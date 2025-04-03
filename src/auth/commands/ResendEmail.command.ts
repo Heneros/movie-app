@@ -7,6 +7,6 @@ export class ResendEmailCommand implements ICommand {
     constructor(
         public readonly userId: number,
         public readonly email: EmailDto,
-        public readonly res: Response,
+        public readonly res?: Response,
     ) {}
 }
