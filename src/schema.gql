@@ -118,8 +118,14 @@ type Mutation {
   """Resend Email"""
   resendEmail(userId: Float!, email: EmailDto!): AuthEntity!
 
-  """Request for users who wants receive in email to change password"""
-  resetPasswordRequest(userId: Float!, email: EmailDto!): AuthEntity!
+  """For users, who receive link in email. And know user id."""
+  requestResetPassword(userId: Float!, email: EmailDto!): AuthEntity!
+
+  """For users, who receive link in email. And know user id."""
+  resetPassword(userId: Float!, emailToken: String!, input: ResetPasswordDto!): AuthEntity!
+
+  """Log out for application"""
+  logout: String!
 }
 
 input CreateMovieDto {
@@ -186,6 +192,14 @@ input CreateUserDto {
 input EmailDto {
   """Email user"""
   email: String!
+}
+
+input ResetPasswordDto {
+  """ password must be at least 8 characters long"""
+  password: String!
+
+  """A confirm password field is required"""
+  passwordConfirm: String!
 }
 
 type Subscription {

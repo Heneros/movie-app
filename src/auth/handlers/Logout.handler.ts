@@ -15,16 +15,31 @@ export class LogoutHandler implements ICommandHandler<LogoutCommand> {
             return res.status(400).json({ message: 'Session not found' });
         }
 
-        req.session.destroy((err) => {
-            if (err) {
-                return res
-                    .status(500)
-                    .json({ message: 'Failed to destroy session' });
-            }
+        // req.session.destroy((err) => {
+        //     if (err) {
+        //         return res
+        //             .status(500)
+        //             .json({ message: 'Failed to destroy session' });
+        //     }
 
-            res.clearCookie('jwtMovie');
-            res.clearCookie('connect.sid');
-            return res.status(200).json({ message: 'Logged out successfully' });
+        //     res.clearCookie('jwtMovie');
+        //     res.clearCookie('connect.sid');
+        //     return res.status(200).json({ message: 'Logged out successfully' });
+        // });
+
+        await new Promise<void>((resolve, reject) => {
+            req.session.destroy((err) => {
+                if (err) {
+                    reject(new Error('Failed to destroy session'));
+                } else {
+                    resolve();
+                }
+            });
         });
+
+        res.clearCookie('jwtMovie');
+        res.clearCookie('connect.sid');
+
+        return 'Logged out successfully';
     }
 }

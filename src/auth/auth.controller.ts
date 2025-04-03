@@ -193,7 +193,18 @@ export class AuthController {
     @ApiOperation({
         summary: 'Log out for application ',
     })
-    async logout(@Req() req: CustomRequest, @Res() res: Response) {
-        return await this.commandBus.execute(new LogoutCommand(req, res));
+    async logout(@Req() req: Request, @Res() res: Response) {
+        // return new AuthEntity(
+        //     await this.commandBus.execute(new LogoutCommand(req, res)),
+        // );
+        // const message = await this.commandBus.execute(
+        //     new LogoutCommand(context.req, context.res),
+        // );
+
+        // return new AuthEntity({ message });
+        const message = await this.commandBus.execute(
+            new LogoutCommand(req, res),
+        );
+        res.status(200).json({ message });
     }
 }

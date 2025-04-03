@@ -12,7 +12,9 @@ import { LogInDto } from './dto/Login.dto';
 import {
     CreateUserCommand,
     LoginUserCommand,
+    LogoutCommand,
     ResendEmailCommand,
+    ResetPasswordCommand,
     ResetPasswordRequestCommand,
 } from './commands';
 import { Request, Response } from 'express';
@@ -25,6 +27,8 @@ import { CreateUserDto } from './dto/Create-user.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { VerifyEmailQuery } from './queries';
 import { EmailDto } from './dto/Resend-email.dto';
+import { ResetPasswordDto } from './dto/Reset-password.dto';
+import { BadRequestException, ParseIntPipe } from '@nestjs/common';
 
 @ApiTags('Auth')
 @Resolver((of) => AuthEntity)
@@ -55,6 +59,9 @@ export class AuthResolver {
             new LoginUserCommand(loginInput),
         );
 
+        if (!result) {
+            throw new BadRequestException('No user found');
+        }
         res.cookie('jwtMovie', result.refreshToken, {
             httpOnly: !isDevelopment,
             sameSite: isDevelopment ? 'none' : 'strict',
@@ -69,7 +76,6 @@ export class AuthResolver {
         return new AuthEntity({
             message: 'Login successful',
             accessToken: result.accessToken,
-            refreshToken: result.refreshToken,
             name: result.user.name,
             id: result.user.id,
             email: result.user.email,
@@ -116,19 +122,41 @@ export class AuthResolver {
             ),
         );
     }
-
     @Mutation(() => AuthEntity, {
-        description:
-            'Request for users who wants receive in email to change password',
+        description: 'For users, who receive link in email. And know user id.',
     })
-    async resetPasswordRequest(
-        @Args('userId') userId: number,
-        @Args('email') emailDto: EmailDto,
+    async requestResetPassword(
+        @Args('userId', ParseIntPipe) userId: number,
+        @Args('email') email: EmailDto,
         @Context() context: { res: Response },
     ) {
         const { res } = context;
         return await this.commandBus.execute(
-            new ResetPasswordRequestCommand(userId, emailDto, res),
+            new ResetPasswordRequestCommand(userId, email, res),
+        );
+    }
+
+    @Mutation(() => AuthEntity, {
+        description: 'For users, who receive link in email. And know user id.',
+    })
+    async resetPassword(
+        @Args('userId', ParseIntPipe) userId: number,
+        @Args('emailToken') emailToken: string,
+        @Args('input') resetPasswordDto: ResetPasswordDto,
+        @Context() context: { res: Response },
+    ) {
+        const { res } = context;
+        return await this.commandBus.execute(
+            new ResetPasswordCommand(userId, emailToken, resetPasswordDto, res),
+        );
+    }
+
+    @Mutation(() => String, {
+        description: 'Log out for application',
+    })
+    async logout(@Context() context: { res: Response; req: Request }) {
+        return await this.commandBus.execute(
+            new LogoutCommand(context.req, context.res),
         );
     }
 }

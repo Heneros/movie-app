@@ -42,7 +42,7 @@ export class AuthRepository {
         const { userId, token, tempDate } = criteria;
         // console.log(userId, token);
         //   const emailVerificationToken =
-        
+
         return await this.prisma.verifyResetToken.create({
             data: {
                 userId: userId,

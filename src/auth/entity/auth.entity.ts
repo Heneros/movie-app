@@ -16,7 +16,7 @@ export class AuthEntity {
 
     @ApiProperty()
     @Field(() => String, { nullable: false })
-    refreshToken: string;
+    refreshToken?: string;
 
     @ApiProperty()
     @Field(() => String, { nullable: false })

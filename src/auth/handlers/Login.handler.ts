@@ -18,6 +18,10 @@ export class LoginUserHandler implements ICommandHandler<LoginUserCommand> {
 
             const user = await this.authRepository.findUser({ logInDto });
 
+            if (!user) {
+                throw new BadRequestException('User not found');
+            }
+
             const isPasswordValid = await bcrypt.compare(
                 logInDto.password,
                 user.password,
@@ -37,11 +41,14 @@ export class LoginUserHandler implements ICommandHandler<LoginUserCommand> {
                 expiresIn: '7d',
             });
 
+            await this.authRepository.deleteToken({
+                where: { userId: user.id },
+            });
             await this.authRepository.updateToken(user.id, refreshToken);
 
             return {
                 accessToken,
-                refreshToken,
+                // refreshToken,
                 // user,
                 user: {
                     id: user.id,
