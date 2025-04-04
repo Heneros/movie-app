@@ -1,4 +1,6 @@
 import {
+    BadGatewayException,
+    BadRequestException,
     Body,
     Controller,
     Get,
@@ -103,24 +105,34 @@ export class AuthController {
         @Body(EmailValidationPipe) logInDto: LogInDto,
     ) {
         // return this.commandBus.execute(new LoginUserCommand(logInDto));
-        const result = await this.commandBus.execute(
-            new LoginUserCommand(logInDto),
-        );
+        try {
+            const result = await this.commandBus.execute(
+                new LoginUserCommand(logInDto),
+            );
 
-        res.cookie('jwtMovie', result.refreshToken, {
-            httpOnly: !isDevelopment,
-            sameSite: isDevelopment ? 'none' : 'strict',
-            maxAge: 31 * 24 * 60 * 60 * 1000,
-            secure: !isDevelopment,
-        });
-        // console.log(result);
-        return new AuthEntity({
-            message: 'Login successful',
-            accessToken: result.accessToken,
-            name: result.user.name,
-            id: result.user.id,
-            email: result.user.email,
-        });
+            res.cookie('jwtMovie', result.refreshToken, {
+                httpOnly: !isDevelopment,
+                sameSite: isDevelopment ? 'none' : 'strict',
+                maxAge: 31 * 24 * 60 * 60 * 1000,
+                secure: !isDevelopment,
+            });
+
+            return new AuthEntity({
+                message: 'Login successful',
+                accessToken: result.accessToken,
+                name: result.user.name,
+                id: result.user.id,
+                email: result.user.email,
+            });
+        } catch (error) {
+            if (error instanceof BadRequestException) {
+                throw error;
+            }
+
+            throw new BadGatewayException(
+                error.message || 'Authentication failed',
+            );
+        }
     }
 
     @Throttle({ default: { limit: 15, ttl: 60000 } })

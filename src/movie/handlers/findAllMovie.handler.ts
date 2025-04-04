@@ -2,9 +2,7 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { FindAllMovieQuery } from '../queries/findAllMovie.query';
 import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { PAGINATION_LIMIT } from '@/data/defaultData';
-import { Movie } from '@prisma/client';
-import { PrismaService } from '@/prisma/prisma.service';
+
 import { Inject, NotFoundException } from '@nestjs/common';
 import { MovieRepository } from './../repositories/movie.repository';
 

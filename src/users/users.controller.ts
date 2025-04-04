@@ -1,31 +1,31 @@
 import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  ParseIntPipe,
-  UseGuards,
-  Query,
-  Res,
-  UsePipes,
-  Put,
-  Req,
+    Controller,
+    Get,
+    Post,
+    Body,
+    Patch,
+    Param,
+    Delete,
+    ParseIntPipe,
+    UseGuards,
+    Query,
+    Res,
+    UsePipes,
+    Put,
+    Req,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 
 import { UpdateUserDto } from './dto/update-user.dto';
 import {
-  ApiBearerAuth,
-  ApiCookieAuth,
-  ApiCreatedResponse,
-  ApiOkResponse,
-  ApiOperation,
-  ApiParam,
-  ApiQuery,
-  ApiTags,
+    ApiBearerAuth,
+    ApiCookieAuth,
+    ApiCreatedResponse,
+    ApiOkResponse,
+    ApiOperation,
+    ApiParam,
+    ApiQuery,
+    ApiTags,
 } from '@nestjs/swagger';
 import { UserEntity } from './entities/user.entity';
 import { AuthGuard } from '@/guards/auth.guard';
@@ -47,116 +47,116 @@ import { DeactivateUserService } from './services/deactivateUser.service';
 @Controller('users')
 @ApiTags('Users')
 export class UsersController {
-  constructor(
-    private readonly usersService: UsersService,
-    private readonly getAllUsersService: GetAllUsersService,
-    private readonly updateUserService: UpdateUserService,
-    private readonly getIdUsersService: GetIdUsersService,
-    private readonly removeUserAccountService: RemoveUserAccountService,
-    private readonly removeMyAccountService: RemoveMyAccountService,
-    private readonly changeRoleService: ChangeRoleService,
-    private readonly deactivateUserService: DeactivateUserService,
-  ) {}
+    constructor(
+        private readonly usersService: UsersService,
+        private readonly getAllUsersService: GetAllUsersService,
+        private readonly updateUserService: UpdateUserService,
+        private readonly getIdUsersService: GetIdUsersService,
+        private readonly removeUserAccountService: RemoveUserAccountService,
+        private readonly removeMyAccountService: RemoveMyAccountService,
+        private readonly changeRoleService: ChangeRoleService,
+        private readonly deactivateUserService: DeactivateUserService,
+    ) {}
 
-  @Get()
-  @UseGuards(AuthGuard)
-  @Roles('Admin', 'Editor')
-  @ApiBearerAuth('access-token')
-  @ApiCookieAuth('cookie-auth')
-  @ApiOkResponse({ type: UserEntity, isArray: true })
-  @ApiOperation({ summary: 'For admin. Get All User' })
-  @ApiQuery({
-    name: 'page',
-    required: false,
-    description: 'Page number for pagination',
-    type: Number,
-  })
-  async findAll(@Query('page') pageString: number) {
-    // console.log('123');
-    const page = pageString ? Number(pageString) : 1;
-    const skip = (page - 1) * PAGINATION_LIMIT;
+    @Get()
+    @UseGuards(AuthGuard)
+    @Roles('Admin', 'Editor')
+    @ApiBearerAuth('access-token')
+    @ApiCookieAuth('cookie-auth')
+    @ApiOkResponse({ type: UserEntity, isArray: true })
+    @ApiOperation({ summary: 'For admin. Get All User' })
+    @ApiQuery({
+        name: 'page',
+        required: false,
+        description: 'Page number for pagination',
+        type: Number,
+    })
+    async findAll(@Query('page') pageString: number) {
+        // console.log('123');
+        const page = pageString ? Number(pageString) : 1;
+        const skip = (page - 1) * PAGINATION_LIMIT;
 
-    const users = await this.getAllUsersService.findAll(skip);
-    return users.map((user) => new UserEntity(user));
-  }
+        const users = await this.getAllUsersService.findAll(skip);
+        return users.map((user) => new UserEntity(user));
+    }
 
-  @Get(':id')
-  @UseGuards(AuthGuard)
-  @ApiOperation({ summary: 'For all register. Get id user' })
-  @ApiBearerAuth('access-token')
-  @ApiCookieAuth('cookie-auth')
-  @ApiParam({
-    name: 'id',
-    required: true,
-    description: 'Id for user',
-    type: Number,
-  })
-  @UsePipes(CheckUserExistPipe)
-  @ApiOkResponse({ type: UserEntity })
-  async findOne(@Param('id', ParseIntPipe) id: number) {
-    return new UserEntity(await this.getIdUsersService.findOne(id));
-  }
+    @Get(':id')
+    @UseGuards(AuthGuard)
+    @ApiOperation({ summary: 'For all register. Get id user' })
+    @ApiBearerAuth('access-token')
+    @ApiCookieAuth('cookie-auth')
+    @ApiParam({
+        name: 'id',
+        required: true,
+        description: 'Id for user',
+        type: Number,
+    })
+    @UsePipes(CheckUserExistPipe)
+    @ApiOkResponse({ type: UserEntity })
+    async findOne(@Param('id', ParseIntPipe) id: number) {
+        return new UserEntity(await this.getIdUsersService.findOne(id));
+    }
 
-  @Put(':id')
-  @UseGuards(AuthGuard, ProfileOwnerGuard)
-  @ApiOperation({ summary: 'Update my profile. Only for authorized user' })
-  @ApiBearerAuth('access-token')
-  // @UsePipes(CheckUserExistPipe)
-  @ApiCreatedResponse({ type: UserEntity })
-  async update(
-    @Param('id', CheckUserExistPipe) id: number,
-    @Body() updateUserDto: UpdateUserDto,
-  ) {
-    return new UserEntity(
-      await this.updateUserService.update(id, updateUserDto),
-    );
-  }
+    @Put(':id')
+    @UseGuards(AuthGuard, ProfileOwnerGuard)
+    @ApiOperation({ summary: 'Update my profile. Only for authorized user' })
+    @ApiBearerAuth('access-token')
+    // @UsePipes(CheckUserExistPipe)
+    @ApiCreatedResponse({ type: UserEntity })
+    async update(
+        @Param('id', CheckUserExistPipe) id: number,
+        @Body() updateUserDto: UpdateUserDto,
+    ) {
+        return new UserEntity(
+            await this.updateUserService.update(id, updateUserDto),
+        );
+    }
 
-  @Delete(':id')
-  @Roles('Admin')
-  @UseGuards(AuthGuard)
-  @ApiOperation({ summary: 'Delete user profile. Only for admin' })
-  @ApiBearerAuth('access-token')
-  @ApiOkResponse({ type: UserEntity })
-  async remove(@Param('id', ParseIntPipe) id: number) {
-    return new UserEntity(await this.removeUserAccountService.remove(id));
-  }
+    @Delete(':id')
+    @Roles('Admin')
+    @UseGuards(AuthGuard)
+    @ApiOperation({ summary: 'Delete user profile. Only for admin' })
+    @ApiBearerAuth('access-token')
+    @ApiOkResponse({ type: UserEntity })
+    async remove(@Param('id', ParseIntPipe) id: number) {
+        return new UserEntity(await this.removeUserAccountService.remove(id));
+    }
 
-  @Put(':id/role')
-  @Roles('Admin')
-  @UseGuards(AuthGuard)
-  @ApiOperation({ summary: 'Change role for users. Only for admin user' })
-  @ApiBearerAuth('access-token')
-  // @UsePipes(CheckUserExistPipe)
-  @ApiCreatedResponse({ type: UserUpdatedProfileEntity })
-  async changeRole(
-    @Param('id', CheckUserExistPipe) id: number,
-    @Body() updateUserRole: UpdateUserRole,
-    @Req() req: Request,
-  ) {
-    // console.log(updateUserRole);
-    return new UserUpdatedProfileEntity(
-      await this.changeRoleService.changeRole(req, id, updateUserRole),
-    );
-  }
+    @Put(':id/role')
+    @Roles('Admin')
+    @UseGuards(AuthGuard)
+    @ApiOperation({ summary: 'Change role for users. Only for admin user' })
+    @ApiBearerAuth('access-token')
+    // @UsePipes(CheckUserExistPipe)
+    @ApiCreatedResponse({ type: UserUpdatedProfileEntity })
+    async changeRole(
+        @Param('id', CheckUserExistPipe) id: number,
+        @Body() updateUserRole: UpdateUserRole,
+        @Req() req: Request,
+    ) {
+        // console.log(updateUserRole);
+        return new UserUpdatedProfileEntity(
+            await this.changeRoleService.changeRole(req, id, updateUserRole),
+        );
+    }
 
-  @Delete(':id/myaccount')
-  @UseGuards(AuthGuard, ProfileOwnerGuard)
-  @ApiOperation({ summary: 'Delete my account. Only for User' })
-  @ApiBearerAuth('access-token')
-  @ApiOkResponse({ type: UserEntity })
-  async removeMyAccount(@Param('id', ParseIntPipe) id: number) {
-    return await this.removeMyAccountService.remove(id);
-  }
+    @Delete(':id/myaccount')
+    @UseGuards(AuthGuard, ProfileOwnerGuard)
+    @ApiOperation({ summary: 'Delete my account. Only for User' })
+    @ApiBearerAuth('access-token')
+    @ApiOkResponse({ type: UserEntity })
+    async removeMyAccount(@Param('id', ParseIntPipe) id: number) {
+        return await this.removeMyAccountService.remove(id);
+    }
 
-  @Put(':id/deactivate')
-  @Roles('Admin')
-  @UseGuards(AuthGuard)
-  @ApiOperation({ summary: 'Change role for users. Only for admin user' })
-  @ApiBearerAuth('access-token')
-  // @UsePipes(CheckUserExistPipe)
-  @ApiCreatedResponse({ type: UserEntity })
-  async deactivate(@Param('id', CheckUserExistPipe) id: number) {
-    return new UserEntity(await this.deactivateUserService.deactivate(id));
-  }
+    @Put(':id/deactivate')
+    @UseGuards(AuthGuard)
+    @Roles('Admin')
+    @ApiOperation({ summary: 'Change role for users. Only for admin user' })
+    @ApiBearerAuth('access-token')
+    // @UsePipes(CheckUserExistPipe)
+    @ApiCreatedResponse({ type: UserEntity })
+    async deactivate(@Param('id', CheckUserExistPipe) id: number) {
+        return new UserEntity(await this.deactivateUserService.deactivate(id));
+    }
 }

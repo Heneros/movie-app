@@ -10,6 +10,7 @@ import { RemoveUserAccountService } from './services/removeUser.service';
 import { RemoveMyAccountService } from './services/removeMyAccount.services';
 import { ChangeRoleService } from './services/changeRoleUser.service';
 import { DeactivateUserService } from './services/deactivateUser.service';
+import { UsersRepository } from './repositories/users.repository';
 
 @Module({
     controllers: [UsersController],
@@ -22,6 +23,8 @@ import { DeactivateUserService } from './services/deactivateUser.service';
         RemoveMyAccountService,
         ChangeRoleService,
         DeactivateUserService,
+
+        UsersRepository,
     ],
     imports: [PrismaModule, MailModule],
     exports: [UsersService],
