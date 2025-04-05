@@ -13,6 +13,7 @@ import {
     UsePipes,
     Put,
     Req,
+    DefaultValuePipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 
@@ -43,8 +44,12 @@ import { ChangeRoleService } from './services/changeRoleUser.service';
 import { UpdateUserRole } from './dto/update-user-role.dto';
 import { UserUpdatedProfileEntity } from './entities/updated-profile.entity';
 import { DeactivateUserService } from './services/deactivateUser.service';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { FindAllUsersQuery, GetIdUserQuery } from './queries';
+import { plainToInstance } from 'class-transformer';
+import { USERS_CONTROLLER, USERS_ROUTES } from '@/sites/site.constants';
 
-@Controller('users')
+@Controller(USERS_CONTROLLER)
 @ApiTags('Users')
 export class UsersController {
     constructor(
@@ -56,9 +61,12 @@ export class UsersController {
         private readonly removeMyAccountService: RemoveMyAccountService,
         private readonly changeRoleService: ChangeRoleService,
         private readonly deactivateUserService: DeactivateUserService,
+
+        private readonly commandBus: CommandBus,
+        private readonly queryBus: QueryBus,
     ) {}
 
-    @Get()
+    @Get(USERS_ROUTES.GET_ALL)
     @UseGuards(AuthGuard)
     @Roles('Admin', 'Editor')
     @ApiBearerAuth('access-token')
@@ -71,16 +79,16 @@ export class UsersController {
         description: 'Page number for pagination',
         type: Number,
     })
-    async findAll(@Query('page') pageString: number) {
-        // console.log('123');
-        const page = pageString ? Number(pageString) : 1;
-        const skip = (page - 1) * PAGINATION_LIMIT;
-
-        const users = await this.getAllUsersService.findAll(skip);
-        return users.map((user) => new UserEntity(user));
+    async findAll(
+        @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    ) {
+        const newUsers = await this.queryBus.execute(
+            new FindAllUsersQuery(page),
+        );
+        return plainToInstance(UserEntity, newUsers);
     }
 
-    @Get(':id')
+    @Get(USERS_ROUTES.GET_ID_USER)
     @UseGuards(AuthGuard)
     @ApiOperation({ summary: 'For all register. Get id user' })
     @ApiBearerAuth('access-token')
@@ -94,10 +102,13 @@ export class UsersController {
     @UsePipes(CheckUserExistPipe)
     @ApiOkResponse({ type: UserEntity })
     async findOne(@Param('id', ParseIntPipe) id: number) {
-        return new UserEntity(await this.getIdUsersService.findOne(id));
+        const user = await this.queryBus.execute(new GetIdUserQuery(id));
+        // return user;
+        // const newUsers = awa
+        return plainToInstance(UserEntity, user);
     }
 
-    @Put(':id')
+    @Put(USERS_ROUTES.UPDATE_USER)
     @UseGuards(AuthGuard, ProfileOwnerGuard)
     @ApiOperation({ summary: 'Update my profile. Only for authorized user' })
     @ApiBearerAuth('access-token')
@@ -112,7 +123,7 @@ export class UsersController {
         );
     }
 
-    @Delete(':id')
+    @Delete(USERS_ROUTES.DELETE_USER)
     @Roles('Admin')
     @UseGuards(AuthGuard)
     @ApiOperation({ summary: 'Delete user profile. Only for admin' })
@@ -122,7 +133,7 @@ export class UsersController {
         return new UserEntity(await this.removeUserAccountService.remove(id));
     }
 
-    @Put(':id/role')
+    @Put(USERS_ROUTES.CHANGE_ROLE)
     @Roles('Admin')
     @UseGuards(AuthGuard)
     @ApiOperation({ summary: 'Change role for users. Only for admin user' })
@@ -140,7 +151,7 @@ export class UsersController {
         );
     }
 
-    @Delete(':id/myaccount')
+    @Delete(USERS_ROUTES.DELETE_MY_ACCOUNT)
     @UseGuards(AuthGuard, ProfileOwnerGuard)
     @ApiOperation({ summary: 'Delete my account. Only for User' })
     @ApiBearerAuth('access-token')
@@ -149,7 +160,7 @@ export class UsersController {
         return await this.removeMyAccountService.remove(id);
     }
 
-    @Put(':id/deactivate')
+    @Put(USERS_ROUTES.UPDATE_USER)
     @UseGuards(AuthGuard)
     @Roles('Admin')
     @ApiOperation({ summary: 'Change role for users. Only for admin user' })

@@ -12,4 +12,8 @@ export class UsersRepository {
             take: PAGINATION_LIMIT,
         });
     }
+
+    async findIdUser(id: number) {
+        return await this.prisma.user.findUnique({ where: { id } });
+    }
 }

@@ -5,10 +5,6 @@ import { Exclude } from 'class-transformer';
 
 @ObjectType()
 export class UserEntity implements User {
-    constructor(partial: Partial<UserEntity>) {
-        Object.assign(this, partial);
-    }
-
     @ApiProperty()
     @Field(() => ID, { nullable: false })
     id: number;
@@ -37,10 +33,18 @@ export class UserEntity implements User {
     @Field(() => Boolean, { nullable: false })
     isEmailVerified: boolean;
 
+    @ApiProperty()
+    @Field(() => String, { nullable: false })
+    preview: string;
+
     @Exclude()
     @Field((type) => [String], { nullable: true })
     roles: string[];
 
     @Exclude()
     password: string;
+
+    constructor(partial: Partial<UserEntity>) {
+        Object.assign(this, partial);
+    }
 }

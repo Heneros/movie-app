@@ -109,9 +109,8 @@ model User{
   refreshToken String[]
 
   ratings Rating[]
-        
-
-}
+  avatar String
+ }
 
 
 model Rating{
