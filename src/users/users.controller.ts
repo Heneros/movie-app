@@ -48,6 +48,7 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { FindAllUsersQuery, GetIdUserQuery } from './queries';
 import { plainToInstance } from 'class-transformer';
 import { USERS_CONTROLLER, USERS_ROUTES } from '@/sites/site.constants';
+import { DeleteUserCommand, UpdateUserCommand } from './commands';
 
 @Controller(USERS_CONTROLLER)
 @ApiTags('Users')
@@ -112,15 +113,17 @@ export class UsersController {
     @UseGuards(AuthGuard, ProfileOwnerGuard)
     @ApiOperation({ summary: 'Update my profile. Only for authorized user' })
     @ApiBearerAuth('access-token')
-    // @UsePipes(CheckUserExistPipe)
     @ApiCreatedResponse({ type: UserEntity })
     async update(
         @Param('id', CheckUserExistPipe) id: number,
         @Body() updateUserDto: UpdateUserDto,
     ) {
-        return new UserEntity(
-            await this.updateUserService.update(id, updateUserDto),
+        const result = await this.commandBus.execute(
+            new UpdateUserCommand(id, updateUserDto),
         );
+
+        return plainToInstance(UserEntity, result);
+        // return new UserEntity(result);
     }
 
     @Delete(USERS_ROUTES.DELETE_USER)
@@ -130,7 +133,9 @@ export class UsersController {
     @ApiBearerAuth('access-token')
     @ApiOkResponse({ type: UserEntity })
     async remove(@Param('id', ParseIntPipe) id: number) {
-        return new UserEntity(await this.removeUserAccountService.remove(id));
+        const result = await this.commandBus.execute(new DeleteUserCommand(id));
+        return result;
+        // return new UserEntity(await this.removeUserAccountService.remove(id));
     }
 
     @Put(USERS_ROUTES.CHANGE_ROLE)

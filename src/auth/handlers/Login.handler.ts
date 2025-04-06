@@ -36,9 +36,11 @@ export class LoginUserHandler implements ICommandHandler<LoginUserCommand> {
                 roles: user.roles,
             };
 
-            const accessToken = await this.jwtService.signAsync(payload);
-            const refreshToken = await this.jwtService.signAsync(payload, {
+            const accessToken = await this.jwtService.signAsync(payload, {
                 expiresIn: '7d',
+            });
+            const refreshToken = await this.jwtService.signAsync(payload, {
+                expiresIn: '31d',
             });
 
             await this.authRepository.deleteToken({
@@ -46,9 +48,12 @@ export class LoginUserHandler implements ICommandHandler<LoginUserCommand> {
             });
             await this.authRepository.updateToken(user.id, refreshToken);
 
+            await this.authRepository.updateProfile(user.id, {
+                refreshToken: [refreshToken],
+            });
             return {
                 accessToken,
-                // refreshToken,
+                refreshToken,
                 // user,
                 user: {
                     id: user.id,

@@ -1,6 +1,7 @@
 import { PAGINATION_LIMIT } from '@/data/defaultData';
 import { PrismaService } from '@/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
+import { UpdateUserDto } from '../dto/update-user.dto';
 
 @Injectable()
 export class UsersRepository {
@@ -15,5 +16,28 @@ export class UsersRepository {
 
     async findIdUser(id: number) {
         return await this.prisma.user.findUnique({ where: { id } });
+    }
+
+    async updateUser(id: number, updateUserDto: UpdateUserDto) {
+        return await this.prisma.user.update({
+            where: {
+                id,
+            },
+            data: {
+                ...updateUserDto,
+            },
+        });
+    }
+
+    async deleteUserAccount(id: number) {
+        return this.prisma.$transaction(async (tx) => {
+            await tx.verifyResetToken.deleteMany({
+                where: { userId: id },
+            });
+
+            await tx.user.delete({
+                where: { id },
+            });
+        });
     }
 }

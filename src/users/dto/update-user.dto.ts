@@ -2,7 +2,19 @@ import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
 import { CreateUserDto } from '@/auth/dto/Create-user.dto';
 import { Field, ID, InputType } from '@nestjs/graphql';
-import { IsNotEmpty, IsString } from 'class-validator';
+import {
+    ArrayMinSize,
+    IsArray,
+    IsEnum,
+    IsNotEmpty,
+    IsString,
+} from 'class-validator';
+
+export enum UserRole {
+    Admin = 'Admin',
+    Editor = 'Editor',
+    User = 'User',
+}
 
 @InputType()
 export class UpdateUserDto extends PartialType(CreateUserDto) {
@@ -16,6 +28,17 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
 
     // @ApiProperty()
     // updatedAt: Date;
+
+    @ApiProperty({
+        example: ['Admin'],
+        description: 'User role',
+        isArray: true,
+    })
+    @IsArray()
+    @ArrayMinSize(1)
+    @IsEnum(UserRole, { each: true })
+    @IsNotEmpty()
+    roles: string[];
 
     @ApiProperty()
     @Field(() => String, { nullable: true })

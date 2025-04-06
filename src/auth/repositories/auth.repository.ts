@@ -116,6 +116,7 @@ export class AuthRepository {
     async updateProfile(
         userId: number,
         updates: {
+            refreshToken?: string[];
             name?: string;
             email?: string;
             profilePic?: string;
