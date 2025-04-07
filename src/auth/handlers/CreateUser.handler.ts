@@ -31,9 +31,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
 
         // console.log(email);
 
-        const userEmail = await this.authRepository.findUser({
-            email: email,
-        });
+        const userEmail = await this.authRepository.findUser({ email });
 
         if (userEmail) {
             throw new BadRequestException(

@@ -12,11 +12,13 @@ import { ChangeRoleService } from './services/changeRoleUser.service';
 import { DeactivateUserService } from './services/deactivateUser.service';
 import { UsersRepository } from './repositories/users.repository';
 import {
+    ChangeRoleHandler,
+    DeleteMyAccountHandler,
+    DeleteUserHandler,
     FindAllUsersHandler,
     GetIdUserHandler,
     UpdateUserHandler,
 } from './handlers';
-import { DeleteUserHandler } from './handlers/DeleteUser.handler';
 
 @Module({
     controllers: [UsersController],
@@ -35,6 +37,8 @@ import { DeleteUserHandler } from './handlers/DeleteUser.handler';
         GetIdUserHandler,
         UpdateUserHandler,
         DeleteUserHandler,
+        ChangeRoleHandler,
+        DeleteMyAccountHandler,
     ],
     imports: [PrismaModule, MailModule],
     exports: [UsersService],

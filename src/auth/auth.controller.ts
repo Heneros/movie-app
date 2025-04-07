@@ -147,12 +147,23 @@ export class AuthController {
         @Param('userId')
         userId: number,
         @Body()
-        email: EmailDto,
-        @Res() res: Response,
+        emailDto: EmailDto,
+        // @Res() res: Response,
     ) {
-        return await this.commandBus.execute(
-            new ResendEmailCommand(userId, email, res),
-        );
+        // return await this.commandBus.execute(
+        //     new ResendEmailCommand(userId, emailDto.email, res),
+        // );
+        try {
+            const result = await this.commandBus.execute(
+                new ResendEmailCommand(userId, emailDto.email),
+            );
+            return new AuthEntity(result);
+        } catch (error) {
+            console.error(error);
+            // res.status(400).json({
+            //     message: error.message || 'Something went wrong!',
+            // });
+        }
     }
 
     @Throttle({ default: { limit: 15, ttl: 60000 } })
@@ -168,11 +179,11 @@ export class AuthController {
     @ApiOkResponse({ type: AuthEntity })
     async requestResetPassword(
         @Param('userId') userId: number,
-        @Body(EmailValidationPipe) email: EmailDto,
+        @Body(EmailValidationPipe) emailDto: EmailDto,
         @Res() res: Response,
     ) {
         return await this.commandBus.execute(
-            new ResetPasswordRequestCommand(userId, email, res),
+            new ResetPasswordRequestCommand(userId, emailDto.email, res),
         );
     }
 

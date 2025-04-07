@@ -3,6 +3,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { roundsOfHashing, tempLoginDate } from '@/data/defaultData';
 import { LogInDto } from '../dto/Login.dto';
+import { EmailDto } from '../dto/Resend-email.dto';
 
 @Injectable()
 export class AuthRepository {
@@ -15,20 +16,22 @@ export class AuthRepository {
         token?: string;
     }) {
         const { userId, email, logInDto, token } = criteria;
-        if (!userId && !email && !logInDto && !token) {
+        const searchEmail = email || logInDto?.email;
+        // console.log(userId, email, logInDto, token);
+        if (!userId && !searchEmail && !token) {
             throw new BadRequestException(
-                'Either userId or email must be provided',
+                'Either userId, email or token must be provided',
             );
         }
-        const userEmail = await this.prisma.user.findUnique({
+        return await this.prisma.user.findFirst({
             where: {
-                ...(logInDto && logInDto.email && { email: logInDto.email }),
-                ...(email && { email }),
-                ...(userId && { id: userId }),
-                ...(token ? { refreshToken: { has: token } } : []),
+                OR: [
+                    ...(userId ? [{ id: userId }] : []),
+                    ...(searchEmail ? [{ email: searchEmail }] : []),
+                    ...(token ? [{ refreshToken: { has: token } }] : []),
+                ],
             },
         });
-        return userEmail;
     }
 
     async createUser(userData) {

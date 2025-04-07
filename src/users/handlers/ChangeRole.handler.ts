@@ -7,9 +7,8 @@ import { ChangeRoleCommand } from '../commands';
 export class ChangeRoleHandler implements ICommandHandler<ChangeRoleCommand> {
     constructor(private readonly usersRepository: UsersRepository) {}
 
-
     async execute(command: ChangeRoleCommand) {
-        const { id, updateUserDto } = command;
+        const { id, updateUserRoleDto } = command;
 
         const user = await this.usersRepository.findIdUser(id);
         if (!user) {
@@ -20,10 +19,15 @@ export class ChangeRoleHandler implements ICommandHandler<ChangeRoleCommand> {
             throw new ForbiddenException('Admin cannot change their own role');
         }
 
+        // user.roles = updateUserRoleDto.roles;
         // const updatedRoles = Array.from(
         //     new Set([...user.roles, ...updateUserDto.roles]),
         // );
+        // const updatedRoles = Array.from(new Set([...updateUserRoleDto.roles]));
 
-        await this.usersRepository.updateUser(id, updateUserDto);
+        return await this.usersRepository.updateUserRole(
+            id,
+            updateUserRoleDto.roles,
+        );
     }
 }

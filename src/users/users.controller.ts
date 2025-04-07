@@ -48,7 +48,12 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { FindAllUsersQuery, GetIdUserQuery } from './queries';
 import { plainToInstance } from 'class-transformer';
 import { USERS_CONTROLLER, USERS_ROUTES } from '@/sites/site.constants';
-import { DeleteUserCommand, UpdateUserCommand } from './commands';
+import {
+    ChangeRoleCommand,
+    DeleteMyAccountCommand,
+    DeleteUserCommand,
+    UpdateUserCommand,
+} from './commands';
 import { CacheTTL } from '@nestjs/cache-manager';
 
 @Controller(USERS_CONTROLLER)
@@ -144,12 +149,16 @@ export class UsersController {
     async changeRole(
         @Param('id', CheckUserExistPipe) id: number,
         @Body() updateUserRole: UpdateUserRole,
-        @Req() req: Request,
     ) {
         // console.log(updateUserRole);
         return new UserUpdatedProfileEntity(
-            await this.changeRoleService.changeRole(req, id, updateUserRole),
+            await this.commandBus.execute(
+                new ChangeRoleCommand(id, updateUserRole),
+            ),
         );
+        // return new UserUpdatedProfileEntity(
+        //     await this.changeRoleService.changeRole(req, id, updateUserRole),
+        // );
     }
 
     @Delete(USERS_ROUTES.DELETE_MY_ACCOUNT)
@@ -158,7 +167,8 @@ export class UsersController {
     @ApiBearerAuth('access-token')
     @ApiOkResponse({ type: UserEntity })
     async removeMyAccount(@Param('id', ParseIntPipe) id: number) {
-        return await this.removeMyAccountService.remove(id);
+        return await this.commandBus.execute(new DeleteMyAccountCommand(id));
+        // return await this.removeMyAccountService.remove(id);
     }
 
     @Put(USERS_ROUTES.UPDATE_USER)
@@ -169,6 +179,7 @@ export class UsersController {
     // @UsePipes(CheckUserExistPipe)
     @ApiCreatedResponse({ type: UserEntity })
     async deactivate(@Param('id', CheckUserExistPipe) id: number) {
+        
         return new UserEntity(await this.deactivateUserService.deactivate(id));
     }
 }

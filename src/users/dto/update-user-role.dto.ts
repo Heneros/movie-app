@@ -24,5 +24,5 @@ export class UpdateUserRole {
     @ArrayMinSize(1)
     @IsEnum(UserRole, { each: true })
     @IsNotEmpty()
-    roles?: string[];
+    roles: string[];
 }

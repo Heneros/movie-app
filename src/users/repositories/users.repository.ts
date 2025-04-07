@@ -19,16 +19,24 @@ export class UsersRepository {
         return await this.prisma.user.findUnique({ where: { id } });
     }
 
-    async updateUser(
-        id: number,
-        updateUserDto: UpdateUserDto | UpdateUserRole,
-    ) {
+    async updateUser(id: number, updateUserDto: UpdateUserDto | string[]) {
         return await this.prisma.user.update({
             where: {
                 id,
             },
             data: {
                 ...updateUserDto,
+            },
+        });
+    }
+
+    async updateUserRole(id: number, updateUserDto: string[]) {
+        return await this.prisma.user.update({
+            where: {
+                id,
+            },
+            data: {
+                roles: updateUserDto,
             },
         });
     }

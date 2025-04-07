@@ -1,6 +1,8 @@
 # Movies API
 App analogue imdb/kinopoisk about movies. Site separated on 4 modules: auth(login, registration etc), users(for actions for admin and user), movie()
 
+
+
 ## Technologies implemented:
 - Prisma 
 - PostgreSQL
@@ -75,7 +77,6 @@ App analogue imdb/kinopoisk about movies. Site separated on 4 modules: auth(logi
 - HttpModule NestJS for request to API 
 - Weekly newsletter with movie recommendations.
 - Nginx configure for load balancer app
-- Authorization through code. You should receive in mail box code and enter to proceed authorization
 - AES encryption 
 - Add field to table Users ban true or false. By default false
 - CQRS event if someone reply or 
@@ -92,4 +93,6 @@ everyday recieve letter to mail box about favorite movies, he subscribed
 - Live chat with users through ws
 - Temp link for 20 minutes and after expire link deleted himself
 - Create token on  only 31 day to access to data, you can share with other user token(only 3 times) after this token gonna be invalid
+- If you admin or editor, authorization through code. You should receive in mail box code and enter to proceed authorization
 - You can't change password on same. check prev password before update on new
+- WS online user or not. add functionality

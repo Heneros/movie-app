@@ -15,7 +15,7 @@ export class VerifyEmailHandler implements IQueryHandler<VerifyEmailQuery> {
     async execute(query: VerifyEmailQuery) {
         const { userId, token } = query;
 
-        const user = await this.authRepository.findUser({ userId });
+        const user = await this.authRepository.findUser({ userId: userId });
 
         if (!user) {
             throw new NotFoundException('User not found ');

@@ -16,7 +16,9 @@ export class LoginUserHandler implements ICommandHandler<LoginUserCommand> {
         try {
             const { logInDto } = command;
 
-            const user = await this.authRepository.findUser({ logInDto });
+            const user = await this.authRepository.findUser({
+                email: logInDto.email,
+            });
 
             if (!user) {
                 throw new BadRequestException('User not found');

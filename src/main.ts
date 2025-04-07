@@ -18,7 +18,7 @@ import { LoggerFactory } from './Logger';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule, {
-        logger: LoggerFactory('MovieApp'),
+        // logger: LoggerFactory('MovieApp'),
     });
 
     // const httpServer = createServer(app.getHttpAdapter().getInstance());

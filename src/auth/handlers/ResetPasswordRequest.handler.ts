@@ -20,7 +20,7 @@ export class ResetPasswordRequestHandler
         const { userId, resendEmailDto, res } = command;
 
         const user = await this.authRepository.findUser({
-            email: resendEmailDto.email,
+            email: resendEmailDto,
             userId,
         });
 

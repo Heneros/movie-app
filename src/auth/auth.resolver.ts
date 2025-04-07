@@ -113,12 +113,12 @@ export class AuthResolver {
     async resendEmail(
         @Args('userId') userId: number,
         @Args('email') emailDto: EmailDto,
-        @Context() context: { res: Response },
+        // @Context() context: { res: Response },
     ) {
-        const { res } = context;
+        // const { res } = context;
         return new AuthEntity(
             await this.commandBus.execute(
-                new ResendEmailCommand(userId, emailDto, res),
+                new ResendEmailCommand(userId, emailDto.email),
             ),
         );
     }
@@ -127,12 +127,12 @@ export class AuthResolver {
     })
     async requestResetPassword(
         @Args('userId', ParseIntPipe) userId: number,
-        @Args('email') email: EmailDto,
+        @Args('email') emailDto: EmailDto,
         @Context() context: { res: Response },
     ) {
         const { res } = context;
         return await this.commandBus.execute(
-            new ResetPasswordRequestCommand(userId, email, res),
+            new ResetPasswordRequestCommand(userId, emailDto.email, res),
         );
     }
 
