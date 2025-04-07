@@ -5,6 +5,6 @@ import { UpdateUserDto } from '../dto/update-user.dto';
 export class ChangeRoleCommand implements ICommand {
     constructor(
         public id: number,
-        public updateUserDto: UpdateUserDto,
+        public updateUserDto: UpdateUserRole,
     ) {}
 }

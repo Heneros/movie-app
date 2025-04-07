@@ -1,11 +1,16 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Inject, NotFoundException } from '@nestjs/common';
 import { UsersRepository } from './../repositories/users.repository';
 import { DeleteUserCommand } from '../commands';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
+import { deleteCache } from './FindAllUsers.handler';
 
 @CommandHandler(DeleteUserCommand)
 export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand> {
-    constructor(private readonly usersRepository: UsersRepository) {}
+    constructor(
+        @Inject(CACHE_MANAGER) private cacheManager: Cache,
+        private readonly usersRepository: UsersRepository,
+    ) {}
 
     async execute(command: DeleteUserCommand) {
         const { id } = command;
@@ -26,6 +31,15 @@ export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand> {
         }
 
         await this.usersRepository.deleteUserAccount(id);
+
+        // await deleteCache(this.cacheManager, 'users');
+        // const redisClient = (this.cacheManager.stores as any).getClient();
+        // const keys = await redisClient.keys('users:page:*');
+
+        // await Promise.all(
+        //     keys.map((key: string) => this.cacheManager.del(key)),
+        // );
+        // await this.cacheManager.del(`user:${id}`);
 
         return `User was deleted ${userIsAdmin.name}`;
     }

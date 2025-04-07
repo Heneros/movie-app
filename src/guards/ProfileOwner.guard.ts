@@ -26,9 +26,7 @@ export class ProfileOwnerGuard implements CanActivate {
             const gqlContext = GqlExecutionContext.create(context);
             request = gqlContext.getContext().req;
             const args = gqlContext.getArgs();
-
             idFromParams = +args.userId || +args.id || args.input.userId;
-
             // console.log(idFromParams);
         }
 

@@ -31,7 +31,7 @@ import { GqlThrottlerGuard } from './guards/gql-throttler.guard';
         ConfigModule.forRoot({
             isGlobal: true,
         }),
-        CacheModule.registerAsync(RedisOptions),
+          CacheModule.registerAsync(RedisOptions),
         WinstonModule.forRoot({}),
         ThrottlerModule.forRootAsync({
             imports: [ConfigModule],

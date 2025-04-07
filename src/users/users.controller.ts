@@ -49,16 +49,12 @@ import { FindAllUsersQuery, GetIdUserQuery } from './queries';
 import { plainToInstance } from 'class-transformer';
 import { USERS_CONTROLLER, USERS_ROUTES } from '@/sites/site.constants';
 import { DeleteUserCommand, UpdateUserCommand } from './commands';
+import { CacheTTL } from '@nestjs/cache-manager';
 
 @Controller(USERS_CONTROLLER)
 @ApiTags('Users')
 export class UsersController {
     constructor(
-        private readonly usersService: UsersService,
-        private readonly getAllUsersService: GetAllUsersService,
-        private readonly updateUserService: UpdateUserService,
-        private readonly getIdUsersService: GetIdUsersService,
-        private readonly removeUserAccountService: RemoveUserAccountService,
         private readonly removeMyAccountService: RemoveMyAccountService,
         private readonly changeRoleService: ChangeRoleService,
         private readonly deactivateUserService: DeactivateUserService,

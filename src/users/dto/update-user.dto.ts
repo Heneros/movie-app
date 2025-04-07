@@ -29,16 +29,16 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
     // @ApiProperty()
     // updatedAt: Date;
 
-    @ApiProperty({
-        example: ['Admin'],
-        description: 'User role',
-        isArray: true,
-    })
-    @IsArray()
-    @ArrayMinSize(1)
-    @IsEnum(UserRole, { each: true })
-    @IsNotEmpty()
-    roles: string[];
+    // @ApiProperty({
+    //     example: ['Admin'],
+    //     description: 'User role',
+    //     isArray: true,
+    // })
+    // @IsArray()
+    // @ArrayMinSize(1)
+    // @IsEnum(UserRole, { each: true })
+    // @IsNotEmpty()
+    // roles: string[];
 
     @ApiProperty()
     @Field(() => String, { nullable: true })

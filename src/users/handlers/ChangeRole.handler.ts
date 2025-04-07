@@ -1,11 +1,12 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { UsersRepository } from './../repositories/users.repository';
-import { ChangeRoleCommand, DeleteUserCommand } from '../commands';
+import { ChangeRoleCommand } from '../commands';
 
 @CommandHandler(ChangeRoleCommand)
 export class ChangeRoleHandler implements ICommandHandler<ChangeRoleCommand> {
     constructor(private readonly usersRepository: UsersRepository) {}
+
 
     async execute(command: ChangeRoleCommand) {
         const { id, updateUserDto } = command;

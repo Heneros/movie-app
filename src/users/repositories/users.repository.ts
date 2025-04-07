@@ -2,6 +2,7 @@ import { PAGINATION_LIMIT } from '@/data/defaultData';
 import { PrismaService } from '@/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { UpdateUserDto } from '../dto/update-user.dto';
+import { UpdateUserRole } from '../dto/update-user-role.dto';
 
 @Injectable()
 export class UsersRepository {
@@ -10,7 +11,7 @@ export class UsersRepository {
     async findAllUsers(skip: number) {
         return await this.prisma.user.findMany({
             skip: skip,
-            take: PAGINATION_LIMIT,
+            // take: PAGINATION_LIMIT,
         });
     }
 
@@ -18,7 +19,10 @@ export class UsersRepository {
         return await this.prisma.user.findUnique({ where: { id } });
     }
 
-    async updateUser(id: number, updateUserDto: UpdateUserDto) {
+    async updateUser(
+        id: number,
+        updateUserDto: UpdateUserDto | UpdateUserRole,
+    ) {
         return await this.prisma.user.update({
             where: {
                 id,
