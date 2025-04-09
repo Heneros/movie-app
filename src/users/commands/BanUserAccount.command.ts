@@ -1,5 +1,5 @@
 import { ICommand } from '@nestjs/cqrs';
 
-export class DeactivateUserAccountCommand implements ICommand {
+export class BanUserAccountCommand implements ICommand {
     constructor(public id: number) {}
 }

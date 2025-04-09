@@ -12,8 +12,8 @@ import { ChangeRoleService } from './services/changeRoleUser.service';
 import { DeactivateUserService } from './services/deactivateUser.service';
 import { UsersRepository } from './repositories/users.repository';
 import {
+    BanUserAccount,
     ChangeRoleHandler,
-    DeactivateUserAccount,
     DeleteMyAccountHandler,
     DeleteUserHandler,
     FindAllUsersHandler,
@@ -40,7 +40,7 @@ import {
         DeleteUserHandler,
         ChangeRoleHandler,
         DeleteMyAccountHandler,
-        DeactivateUserAccount,
+        BanUserAccount,
     ],
     imports: [PrismaModule, MailModule],
     exports: [UsersService],

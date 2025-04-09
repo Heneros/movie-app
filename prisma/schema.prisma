@@ -101,14 +101,15 @@ model User{
   movies Movie[]
   token VerifyResetToken[]
   reviews Reviews[]
-
   favoriteMovies UserFavoriteMovies[] 
+  ratings Rating[]
+
 
 
   isEmailVerified Boolean @default(false)
   refreshToken String[]
 
-  ratings Rating[]
+  blocked Boolean @default(false)
   avatar String
  }
 

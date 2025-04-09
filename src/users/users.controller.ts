@@ -42,15 +42,15 @@ import { RemoveUserAccountService } from './services/removeUser.service';
 import { RemoveMyAccountService } from './services/removeMyAccount.services';
 import { ChangeRoleService } from './services/changeRoleUser.service';
 import { UpdateUserRole } from './dto/update-user-role.dto';
-import { UserUpdatedProfileEntity } from './entities/updated-profile.entity';
+// import { UserUpdatedProfileEntity } from './entities/updated-profile.entity';
 import { DeactivateUserService } from './services/deactivateUser.service';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { FindAllUsersQuery, GetIdUserQuery } from './queries';
 import { plainToInstance } from 'class-transformer';
 import { USERS_CONTROLLER, USERS_ROUTES } from '@/sites/site.constants';
 import {
+    BanUserAccountCommand,
     ChangeRoleCommand,
-    DeactivateUserAccountCommand,
     DeleteMyAccountCommand,
     DeleteUserCommand,
     UpdateUserCommand,
@@ -61,10 +61,6 @@ import { CacheTTL } from '@nestjs/cache-manager';
 @ApiTags('Users')
 export class UsersController {
     constructor(
-        private readonly removeMyAccountService: RemoveMyAccountService,
-        private readonly changeRoleService: ChangeRoleService,
-        private readonly deactivateUserService: DeactivateUserService,
-
         private readonly commandBus: CommandBus,
         private readonly queryBus: QueryBus,
     ) {}
@@ -146,13 +142,13 @@ export class UsersController {
     @ApiOperation({ summary: 'Change role for users. Only for admin user' })
     @ApiBearerAuth('access-token')
     // @UsePipes(CheckUserExistPipe)
-    @ApiCreatedResponse({ type: UserUpdatedProfileEntity })
+    @ApiCreatedResponse({ type: UserEntity })
     async changeRole(
         @Param('id', CheckUserExistPipe) id: number,
         @Body() updateUserRole: UpdateUserRole,
     ) {
         // console.log(updateUserRole);
-        return new UserUpdatedProfileEntity(
+        return new UserEntity(
             await this.commandBus.execute(
                 new ChangeRoleCommand(id, updateUserRole),
             ),
@@ -172,17 +168,13 @@ export class UsersController {
         // return await this.removeMyAccountService.remove(id);
     }
 
-    @Put(USERS_ROUTES.DEACTIVATE_USER_ACCOUNT)
+    @Put(USERS_ROUTES.BAN_USER_ACCOUNT)
     @UseGuards(AuthGuard)
     @Roles('Admin')
     @ApiOperation({ summary: 'Change role for users. Only for admin user' })
     @ApiBearerAuth('access-token')
-    // @UsePipes(CheckUserExistPipe)
-    //@ApiCreatedResponse({ type: UserEntity })
-    async deactivate(@Param('id', CheckUserExistPipe) id: number) {
-        return await this.commandBus.execute(
-            new DeactivateUserAccountCommand(id),
-        );
+    async banUser(@Param('id', CheckUserExistPipe) id: number) {
+        return await this.commandBus.execute(new BanUserAccountCommand(id));
         // return new UserEntity(await this.deactivateUserService.deactivate(id));
     }
 }

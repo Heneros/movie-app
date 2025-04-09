@@ -3,6 +3,7 @@ import { PrismaService } from '@/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { UpdateUserRole } from '../dto/update-user-role.dto';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class UsersRepository {
@@ -53,10 +54,10 @@ export class UsersRepository {
         });
     }
 
-    async deactivate(id: number) {
+    async banUserAccount(id: number): Promise<User> {
         return await this.prisma.user.update({
             where: { id },
-            data: { isEmailVerified: false, refreshToken: [] },
+            data: { blocked: true, refreshToken: [] },
         });
     }
 }

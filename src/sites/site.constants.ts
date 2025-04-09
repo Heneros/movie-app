@@ -19,7 +19,7 @@ export const USERS_ROUTES = {
     DELETE_USER: ':id',
     CHANGE_ROLE: ':id/role',
     DELETE_MY_ACCOUNT: ':id/myaccount',
-    DEACTIVATE_USER_ACCOUNT: ':id/deactivate',
+    BAN_USER_ACCOUNT: ':id/ban',
     LIST_BLOCKED_USERS: 'blocked-list',
     SEND_COMPLAINT: ':id/complaint',
 };

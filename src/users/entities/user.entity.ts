@@ -34,6 +34,14 @@ export class UserEntity implements User {
     isEmailVerified: boolean;
 
     @ApiProperty()
+    @Field(() => Boolean, { nullable: false })
+    blocked: boolean;
+
+    @ApiProperty()
+    @Field(() => String, { nullable: false })
+    avatar: string;
+
+    @ApiProperty()
     @Field(() => String, { nullable: false })
     preview: string;
 

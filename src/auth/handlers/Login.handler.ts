@@ -24,6 +24,10 @@ export class LoginUserHandler implements ICommandHandler<LoginUserCommand> {
                 throw new BadRequestException('User not found');
             }
 
+            if (user.blocked) {
+                throw new BadRequestException('User is blocked');
+            }
+
             const isPasswordValid = await bcrypt.compare(
                 logInDto.password,
                 user.password,

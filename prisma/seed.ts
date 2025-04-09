@@ -20,6 +20,7 @@ async function main() {
       roles: ['Admin', 'Editor', 'User'],
       password: passwordAdmin,
       isEmailVerified: true,
+      avatar: "default.jpg"
     },
   });
 
@@ -34,6 +35,7 @@ async function main() {
       name: 'Default User',
       roles: ['User'],
       password: passwordUser,
+      avatar: "default.jpg"
     },
   });
 
