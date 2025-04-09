@@ -13,6 +13,7 @@ import { DeactivateUserService } from './services/deactivateUser.service';
 import { UsersRepository } from './repositories/users.repository';
 import {
     ChangeRoleHandler,
+    DeactivateUserAccount,
     DeleteMyAccountHandler,
     DeleteUserHandler,
     FindAllUsersHandler,
@@ -39,6 +40,7 @@ import {
         DeleteUserHandler,
         ChangeRoleHandler,
         DeleteMyAccountHandler,
+        DeactivateUserAccount,
     ],
     imports: [PrismaModule, MailModule],
     exports: [UsersService],

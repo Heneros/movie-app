@@ -50,6 +50,7 @@ import { plainToInstance } from 'class-transformer';
 import { USERS_CONTROLLER, USERS_ROUTES } from '@/sites/site.constants';
 import {
     ChangeRoleCommand,
+    DeactivateUserAccountCommand,
     DeleteMyAccountCommand,
     DeleteUserCommand,
     UpdateUserCommand,
@@ -171,15 +172,17 @@ export class UsersController {
         // return await this.removeMyAccountService.remove(id);
     }
 
-    @Put(USERS_ROUTES.UPDATE_USER)
+    @Put(USERS_ROUTES.DEACTIVATE_USER_ACCOUNT)
     @UseGuards(AuthGuard)
     @Roles('Admin')
     @ApiOperation({ summary: 'Change role for users. Only for admin user' })
     @ApiBearerAuth('access-token')
     // @UsePipes(CheckUserExistPipe)
-    @ApiCreatedResponse({ type: UserEntity })
+    //@ApiCreatedResponse({ type: UserEntity })
     async deactivate(@Param('id', CheckUserExistPipe) id: number) {
-        
-        return new UserEntity(await this.deactivateUserService.deactivate(id));
+        return await this.commandBus.execute(
+            new DeactivateUserAccountCommand(id),
+        );
+        // return new UserEntity(await this.deactivateUserService.deactivate(id));
     }
 }

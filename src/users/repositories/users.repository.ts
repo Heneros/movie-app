@@ -52,4 +52,11 @@ export class UsersRepository {
             });
         });
     }
+
+    async deactivate(id: number) {
+        return await this.prisma.user.update({
+            where: { id },
+            data: { isEmailVerified: false, refreshToken: [] },
+        });
+    }
 }
