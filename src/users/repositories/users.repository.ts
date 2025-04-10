@@ -16,6 +16,13 @@ export class UsersRepository {
         });
     }
 
+    async findAllBlockedUsers(skip: number) {
+        return await this.prisma.user.findMany({
+            skip: skip,
+            // take: PAGINATION_LIMIT,
+        });
+    }
+
     async findIdUser(id: number) {
         return await this.prisma.user.findUnique({ where: { id } });
     }

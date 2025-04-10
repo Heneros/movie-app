@@ -14,9 +14,10 @@ import {
     Put,
     Req,
     DefaultValuePipe,
+    UseInterceptors,
+    UploadedFile,
 } from '@nestjs/common';
-import { UsersService } from './users.service';
-
+import { Express } from 'express';
 import { UpdateUserDto } from './dto/update-user.dto';
 import {
     ApiBearerAuth,
@@ -45,7 +46,11 @@ import { UpdateUserRole } from './dto/update-user-role.dto';
 // import { UserUpdatedProfileEntity } from './entities/updated-profile.entity';
 import { DeactivateUserService } from './services/deactivateUser.service';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { FindAllUsersQuery, GetIdUserQuery } from './queries';
+import {
+    FindAllUsersQuery,
+    GetAllBlockedUsersQuery,
+    GetIdUserQuery,
+} from './queries';
 import { plainToInstance } from 'class-transformer';
 import { USERS_CONTROLLER, USERS_ROUTES } from '@/sites/site.constants';
 import {
@@ -56,11 +61,14 @@ import {
     UpdateUserCommand,
 } from './commands';
 import { CacheTTL } from '@nestjs/cache-manager';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { CloudinaryService } from '@/cloudinary/cloudinary.service';
 
 @Controller(USERS_CONTROLLER)
 @ApiTags('Users')
 export class UsersController {
     constructor(
+        private readonly cloudinaryService: CloudinaryService,
         private readonly commandBus: CommandBus,
         private readonly queryBus: QueryBus,
     ) {}
@@ -171,10 +179,26 @@ export class UsersController {
     @Put(USERS_ROUTES.BAN_USER_ACCOUNT)
     @UseGuards(AuthGuard)
     @Roles('Admin')
-    @ApiOperation({ summary: 'Change role for users. Only for admin user' })
+    @ApiOperation({ summary: 'Ban account user' })
     @ApiBearerAuth('access-token')
     async banUser(@Param('id', CheckUserExistPipe) id: number) {
         return await this.commandBus.execute(new BanUserAccountCommand(id));
         // return new UserEntity(await this.deactivateUserService.deactivate(id));
+    }
+
+    @Get(USERS_ROUTES.LIST_BLOCKED_USERS)
+    @UseGuards(AuthGuard)
+    @Roles('Admin')
+    @ApiOperation({ summary: 'Get all accounts users blocked' })
+    @ApiBearerAuth('access-token')
+    async allBlocked(@Query('page') page: number) {
+        return await this.queryBus.execute(new GetAllBlockedUsersQuery(page));
+        // return new UserEntity(await this.deactivateUserService.deactivate(id));
+    }
+
+    @Post('upload')
+    @UseInterceptors(FileInterceptor('file'))
+    async uploadImage(@UploadedFile() file: Express.Multer.File) {
+        return await this.cloudinaryService.uploadFile(file);
     }
 }

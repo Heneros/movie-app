@@ -37,13 +37,13 @@ import { PubSub } from 'graphql-subscriptions';
     providers: [
         AuthService,
 
-        CreateUserService,
-        LoginAuthService,
-        VerifyEmailService,
-        ResendEmailService,
-        ResetPasswordService,
-        RequestResetPasswordService,
-        LogoutAuthService,
+        // CreateUserService,
+        // LoginAuthService,
+        // VerifyEmailService,
+        // ResendEmailService,
+        // ResetPasswordService,
+        // RequestResetPasswordService,
+        // LogoutAuthService,
 
         MailService,
         AuthRepository,
@@ -55,10 +55,6 @@ import { PubSub } from 'graphql-subscriptions';
         ResetPasswordHandler,
         LogoutHandler,
         AuthResolver,
-        // {
-        //     provide: 'PUB_SUB',
-        //     useValue: new PubSub(),
-        // },
     ],
     imports: [
         PrismaModule,

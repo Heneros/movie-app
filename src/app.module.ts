@@ -16,10 +16,9 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 
 import { WinstonModule } from 'nest-winston';
 import { CqrsModule } from '@nestjs/cqrs';
-import { RedisModule } from '@nestjs-modules/ioredis';
 import { RedisOptions } from './configs/redis-config';
-import { RedisService } from './redis/event-store.service';
 import { GqlThrottlerGuard } from './guards/gql-throttler.guard';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Module({
     imports: [
@@ -31,7 +30,7 @@ import { GqlThrottlerGuard } from './guards/gql-throttler.guard';
         ConfigModule.forRoot({
             isGlobal: true,
         }),
-          CacheModule.registerAsync(RedisOptions),
+        CacheModule.registerAsync(RedisOptions),
         WinstonModule.forRoot({}),
         ThrottlerModule.forRootAsync({
             imports: [ConfigModule],
@@ -57,6 +56,8 @@ import { GqlThrottlerGuard } from './guards/gql-throttler.guard';
         }),
 
         CqrsModule.forRoot(),
+
+        CloudinaryModule,
     ],
     controllers: [],
     providers: [

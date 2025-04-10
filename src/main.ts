@@ -5,7 +5,7 @@ import 'reflect-metadata';
 import * as cookieParser from 'cookie-parser';
 import * as session from 'express-session';
 import * as passport from 'passport';
-
+import * as cloudinary from 'cloudinary';
 import {
     BadRequestException,
     ClassSerializerInterceptor,

@@ -3,13 +3,6 @@ import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { PrismaModule } from '@/prisma/prisma.module';
 import { MailModule } from '@/mail/mail.module';
-import { GetAllUsersService } from './services/getAllUsers.service';
-import { UpdateUserService } from './services/updateMyProfile.service';
-import { GetIdUsersService } from './services/getIdUser.service';
-import { RemoveUserAccountService } from './services/removeUser.service';
-import { RemoveMyAccountService } from './services/removeMyAccount.services';
-import { ChangeRoleService } from './services/changeRoleUser.service';
-import { DeactivateUserService } from './services/deactivateUser.service';
 import { UsersRepository } from './repositories/users.repository';
 import {
     BanUserAccount,
@@ -17,21 +10,23 @@ import {
     DeleteMyAccountHandler,
     DeleteUserHandler,
     FindAllUsersHandler,
+    GetAllBlockedUsersHandler,
     GetIdUserHandler,
     UpdateUserHandler,
 } from './handlers';
+import { CloudinaryModule } from '@/cloudinary/cloudinary.module';
 
 @Module({
     controllers: [UsersController],
     providers: [
         UsersService,
-        GetAllUsersService,
-        UpdateUserService,
-        GetIdUsersService,
-        RemoveUserAccountService,
-        RemoveMyAccountService,
-        ChangeRoleService,
-        DeactivateUserService,
+        // GetAllUsersService,
+        // UpdateUserService,
+        // GetIdUsersService,
+        // RemoveUserAccountService,
+        // RemoveMyAccountService,
+        // ChangeRoleService,
+        // DeactivateUserService,
 
         UsersRepository,
         FindAllUsersHandler,
@@ -41,8 +36,9 @@ import {
         ChangeRoleHandler,
         DeleteMyAccountHandler,
         BanUserAccount,
+        GetAllBlockedUsersHandler,
     ],
-    imports: [PrismaModule, MailModule],
+    imports: [PrismaModule, MailModule, CloudinaryModule],
     exports: [UsersService],
 })
 export class UsersModule {}

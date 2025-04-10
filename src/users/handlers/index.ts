@@ -5,3 +5,4 @@ export * from './DeleteUser.handler';
 export * from './ChangeRole.handler';
 export * from './DeleteMyAccount.handler';
 export * from './BanUserAccount.handler';
+export * from './GetAllBlockedUser.handler';
