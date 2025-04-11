@@ -19,7 +19,7 @@ model Movie {
   title String @unique
   description String
   category String
-  preview String 
+
   published   Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -30,8 +30,11 @@ model Movie {
 
   favoriteMovies UserFavoriteMovies[] 
   actors ActorsOnMovies[]
-
   ratings Rating[]
+
+
+  previewId Int? @unique() 
+  preview Avatar? @relation(fields: [previewId], references: [id])
   // avgRating Float?
   avgRating Float @default(0)
 
@@ -54,11 +57,18 @@ model Reviews{
 
 model Actors{
     id Int @default(autoincrement())  @unique
-    preview String
     name String @unique
     age String
+
+    previewId Int @unique()
+    // avatar Avatar @relation(fields: [avatarId], references: [id])
     // movieId Int[] 
+
+    avatar Avatar @relation(name: "ActorsToAvatar", fields: [previewId], references: [id])
+
     movies ActorsOnMovies[]
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
 model ActorsOnMovies {
@@ -88,6 +98,7 @@ model UserFavoriteMovies{
   @@id([userId,movieId ])
 }
 
+
 model User{
   id Int @id @default(autoincrement())
   createdAt DateTime  @default(now())
@@ -104,15 +115,25 @@ model User{
   favoriteMovies UserFavoriteMovies[] 
   ratings Rating[]
 
-
-
   isEmailVerified Boolean @default(false)
   refreshToken String[]
 
   blocked Boolean @default(false)
-  avatar String
+
+   avatarId Int? @unique() 
+   avatar   Avatar? @relation(fields: [avatarId], references: [id])
  }
 
+ 
+model Avatar {
+  id        Int     @id @default(autoincrement())
+  url       String
+  publicId  String
+  user User?
+  movie Movie?
+  actors Actors? @relation(name: "ActorsToAvatar")
+  createdAt DateTime @default(now())
+}
 
 model Rating{
   id Int @id @default(autoincrement())

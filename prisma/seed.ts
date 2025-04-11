@@ -3,6 +3,7 @@ import * as bcrypt from 'bcrypt';
 const prisma = new PrismaClient();
 const roundsOfHashing = 10;
 
+
 async function main() {
   const passwordAdmin = await bcrypt.hash('password-admin', roundsOfHashing);
   const passwordUser = await bcrypt.hash('password-user', roundsOfHashing);
@@ -20,7 +21,7 @@ async function main() {
       roles: ['Admin', 'Editor', 'User'],
       password: passwordAdmin,
       isEmailVerified: true,
-      avatar: "default.jpg"
+    // avatarId: 2
     },
   });
 
@@ -35,7 +36,8 @@ async function main() {
       name: 'Default User',
       roles: ['User'],
       password: passwordUser,
-      avatar: "default.jpg"
+            isEmailVerified: true,
+    //   avatarId: 1
     },
   });
 
@@ -47,8 +49,6 @@ async function main() {
     create: {
       title: 'Kill Bill',
       category: 'Action',
-      // rating: 5,
-      preview: 'URL_to_preview_image_or_video',
       description: 'Good Movie',
       published: false,
       authorId: user1.id,
@@ -65,7 +65,7 @@ async function main() {
       title: 'Anna',
       category: 'Action',
       // rating: 5,
-      preview: 'URL_to_preview_image_or_video',
+    //   previewId: 2,
       description: 'Wonderful movie',
       published: false,
       authorId: user1.id,
@@ -99,7 +99,7 @@ async function main() {
       title: 'Back to the Future',
       category: 'Science Fiction',
       // rating: 7,
-      preview: 'URL_to_preview_image_or_video',
+    //   previewId: 1,
       description:
         'In the 1980s, an experiment by a weird scientist turns out to be faulty. ',
       published: true,
@@ -107,12 +107,20 @@ async function main() {
     },
   });
 
+const newAvatar = await prisma.avatar.create({
+    data:{
+            url: "https://example.com/avatar.jpg",
+    publicId: "avatar_123"
+    }
+})
+
   const actor1 = await prisma.actors.upsert({
     where: { name: 'Johnny Depp' },
     update: {},
     create: {
       name: 'Johnny Depp',
-      preview: '',
+      previewId: newAvatar.id,
+      
       age: '12-03-1996',
     },
   });

@@ -18,6 +18,8 @@ import {
     UploadedFile,
 } from '@nestjs/common';
 import { Express } from 'express';
+import * as fs from 'fs';
+
 import { UpdateUserDto } from './dto/update-user.dto';
 import {
     ApiBearerAuth,
@@ -198,7 +200,32 @@ export class UsersController {
 
     @Post('upload')
     @UseInterceptors(FileInterceptor('file'))
-    async uploadImage(@UploadedFile() file: Express.Multer.File) {
-        return await this.cloudinaryService.uploadFile(file);
+    async uploadImage(
+        @UploadedFile()
+        @Req()
+        req: Request,
+        @Res() res: Response,
+    ) {
+        try {
+            if (!req.file) {
+                res.status(400).json({
+                    message: 'Error during upload file',
+                });
+
+                return;
+            }
+
+            const localFilePath = req.file.path;
+            const originalName = req.file.originalname;
+            const fileBuffer = fs.readFileSync(localFilePath);
+
+            return await this.cloudinaryService.uploadFile(
+                fileBuffer,
+                originalName,
+            );
+        } catch (error) {
+            console.error('Upload error:', error);
+            res.status(500).send({ message: 'Upload failed' });
+        }
     }
 }

@@ -19,6 +19,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { RedisOptions } from './configs/redis-config';
 import { GqlThrottlerGuard } from './guards/gql-throttler.guard';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
     imports: [
@@ -58,6 +59,8 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
         CqrsModule.forRoot(),
 
         CloudinaryModule,
+
+        UploadModule,
     ],
     controllers: [],
     providers: [
