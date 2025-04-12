@@ -50,7 +50,21 @@ App analogue imdb/kinopoisk about movies. Site separated on 4 modules: auth(logi
 - ProfileOwner, restricted content to only owners can perform actions
 
 
-## Features and functionality app should be:
+## In future. Features and functionality app should be:
+
+- Premium status to user after purchase subscription through Paypal or Stripe. User can purchase every month pr year.  It should - include: 
+can edit after 1 minute review, 
+animated avatar, 
+show list all reviews/comments without button  "open more"
+everyday recieve letter to mail box about favorite movies, he subscribed
+
+- Review, editor and admin.
+- Live chat with users through ws
+- Temp link for 20 minutes and after expire link deleted himself
+- Create token on  only 31 day to access to data, you can share with other user token(only 3 times) after this token gonna be invalid
+- If you admin or editor, authorization through code. You should receive in mail box code and enter to proceed authorization
+- You can't change password on same. check prev password before update on new
+- WS online user or not. add functionality
 - Passport google/outlook/discord/github.
 - Bash write script
 - Mailing to user about new movies, comments,
@@ -80,19 +94,3 @@ App analogue imdb/kinopoisk about movies. Site separated on 4 modules: auth(logi
 - AES encryption 
 - Add field to table Users ban true or false. By default false
 - CQRS event if someone reply or 
-
-## In future:
-
-- Premium status to user after purchase subscription through Paypal or Stripe. User can purchase every month pr year.  It should - include: 
-can edit after 1 minute review, 
-animated avatar, 
-show list all reviews/comments without button  "open more"
-everyday recieve letter to mail box about favorite movies, he subscribed
-
-- Review edit me, editor and admin.
-- Live chat with users through ws
-- Temp link for 20 minutes and after expire link deleted himself
-- Create token on  only 31 day to access to data, you can share with other user token(only 3 times) after this token gonna be invalid
-- If you admin or editor, authorization through code. You should receive in mail box code and enter to proceed authorization
-- You can't change password on same. check prev password before update on new
-- WS online user or not. add functionality

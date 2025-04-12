@@ -13,6 +13,7 @@ type MovieEntity {
   createdAt: DateTime
   updatedAt: DateTime
   authorId: Int
+  previewId: Int
   author: [String!]!
   actorsList: [String!]!
   movieId: Int
@@ -134,9 +135,6 @@ input CreateMovieDto {
 
   """Description about movie"""
   description: String!
-
-  """Preview movie"""
-  preview: String!
 
   """Movie category"""
   category: String!

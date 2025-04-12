@@ -19,6 +19,9 @@ export class UsersRepository {
     async findAllBlockedUsers(skip: number) {
         return await this.prisma.user.findMany({
             skip: skip,
+            where: {
+                blocked: true,
+            },
             // take: PAGINATION_LIMIT,
         });
     }
@@ -27,7 +30,7 @@ export class UsersRepository {
         return await this.prisma.user.findUnique({ where: { id } });
     }
 
-    async updateUser(id: number, updateUserDto: UpdateUserDto | string[]) {
+    async updateUser(id: number, updateUserDto: UpdateUserDto) {
         return await this.prisma.user.update({
             where: {
                 id,

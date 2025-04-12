@@ -43,6 +43,10 @@ export class MovieEntity implements Movie {
     @Field(() => Int, { nullable: true })
     authorId: number;
 
+    @ApiProperty({ required: false, nullable: true })
+    @Field(() => Int, { nullable: true })
+    previewId: number;
+
     @ApiProperty({ required: false, type: UserEntity })
     @Field(() => [String], { nullable: false })
     author: UpdateUserDto;

@@ -1,4 +1,4 @@
-import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { Field, ID, Int, ObjectType } from '@nestjs/graphql';
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from '@prisma/client';
 import { Exclude } from 'class-transformer';
@@ -48,6 +48,10 @@ export class UserEntity implements User {
     @Exclude()
     @Field((type) => [String], { nullable: true })
     roles: string[];
+
+    @ApiProperty()
+    @Field(() => Int, { nullable: false })
+    avatarId: number;
 
     @Exclude()
     password: string;

@@ -44,15 +44,15 @@ export class CreateMovieDto {
     })
     public readonly description: string;
 
-    @IsString()
-    @Field(() => String, { nullable: false, description: 'Preview movie' })
-    @IsNotEmpty()
-    @ApiProperty({
-        required: true,
-        description: 'Movie Cate',
-        example: 'Inception',
-    })
-    public readonly preview: string;
+    // @IsString()
+    // @Field(() => String, { nullable: false, description: 'Preview movie' })
+    // @IsNotEmpty()
+    // @ApiProperty({
+    //     required: true,
+    //     description: 'Movie Cate',
+    //     example: 'Inception',
+    // })
+    // public readonly preview: string;
 
     @Field(() => String, { nullable: false, description: 'Movie category' })
     @IsString()

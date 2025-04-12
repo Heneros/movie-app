@@ -21,5 +21,6 @@ export const USERS_ROUTES = {
     DELETE_MY_ACCOUNT: ':id/myaccount',
     BAN_USER_ACCOUNT: ':id/ban',
     LIST_BLOCKED_USERS: 'blocked-list',
+    UPLOAD_AVATAR_USER: 'upload/:userId',
     SEND_COMPLAINT: ':id/complaint',
 };

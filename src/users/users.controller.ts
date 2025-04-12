@@ -16,6 +16,8 @@ import {
     DefaultValuePipe,
     UseInterceptors,
     UploadedFile,
+    BadRequestException,
+    BadGatewayException,
 } from '@nestjs/common';
 import { Express } from 'express';
 import * as fs from 'fs';
@@ -65,6 +67,7 @@ import {
 import { CacheTTL } from '@nestjs/cache-manager';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from '@/cloudinary/cloudinary.service';
+import { memoryStorage } from 'multer';
 
 @Controller(USERS_CONTROLLER)
 @ApiTags('Users')
@@ -198,34 +201,43 @@ export class UsersController {
         // return new UserEntity(await this.deactivateUserService.deactivate(id));
     }
 
-    @Post('upload')
-    @UseInterceptors(FileInterceptor('file'))
+    @Post(USERS_ROUTES.UPLOAD_AVATAR_USER)
+    @UseInterceptors(
+        FileInterceptor('file', {
+            storage: memoryStorage(),
+            limits: { fileSize: 5 * 1024 * 1024 },
+        }),
+    )
     async uploadImage(
-        @UploadedFile()
-        @Req()
-        req: Request,
-        @Res() res: Response,
+        @Param('userId') userId: string,
+        @UploadedFile() file: Express.Multer.File,
+
+        // @Res() res: Response,
     ) {
         try {
-            if (!req.file) {
-                res.status(400).json({
-                    message: 'Error during upload file',
-                });
-
-                return;
+            if (!file) {
+                console.log('file:', file);
+                return 'Error during upload file';
             }
+            // console.log('file:', file.originalname);
 
-            const localFilePath = req.file.path;
-            const originalName = req.file.originalname;
-            const fileBuffer = fs.readFileSync(localFilePath);
-
-            return await this.cloudinaryService.uploadFile(
-                fileBuffer,
-                originalName,
+            const result = await this.cloudinaryService.uploadFileAvatarUser(
+                +userId,
+                file,
+                file.originalname,
             );
+
+            return result;
         } catch (error) {
+            if (error instanceof BadRequestException) {
+                throw error;
+            }
             console.error('Upload error:', error);
-            res.status(500).send({ message: 'Upload failed' });
+            throw new BadGatewayException(
+                error.message || 'Authentication failed',
+            );
+
+            // res.status(500).send({ message: 'Upload failed' });
         }
     }
 }
