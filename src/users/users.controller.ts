@@ -36,19 +36,11 @@ import {
 import { UserEntity } from './entities/user.entity';
 import { AuthGuard } from '@/guards/auth.guard';
 import { Roles } from '@/decorators/roles.decorator';
-import { PAGINATION_LIMIT } from '@/data/defaultData';
-import { GetAllUsersService } from './services/getAllUsers.service';
-import { Request, Response } from 'express';
+
 import { CheckUserExistPipe } from './pipe/CheckUserExist.pipe';
-import { UpdateUserService } from './services/updateMyProfile.service';
 import { ProfileOwnerGuard } from '../guards/ProfileOwner.guard';
-import { GetIdUsersService } from './services/getIdUser.service';
-import { RemoveUserAccountService } from './services/removeUser.service';
-import { RemoveMyAccountService } from './services/removeMyAccount.services';
-import { ChangeRoleService } from './services/changeRoleUser.service';
 import { UpdateUserRole } from './dto/update-user-role.dto';
 // import { UserUpdatedProfileEntity } from './entities/updated-profile.entity';
-import { DeactivateUserService } from './services/deactivateUser.service';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {
     FindAllUsersQuery,
@@ -216,10 +208,8 @@ export class UsersController {
     ) {
         try {
             if (!file) {
-                console.log('file:', file);
                 return 'Error during upload file';
             }
-            // console.log('file:', file.originalname);
 
             const result = await this.cloudinaryService.uploadFileAvatarUser(
                 +userId,

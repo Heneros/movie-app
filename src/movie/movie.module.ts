@@ -31,6 +31,7 @@ import { FindDraftsHandler } from './handlers/findDrafts.handler';
 import { CreatedMovieReviewHandler } from './handlers/reviews/createdReview.handler';
 import { RedisService } from '@/redis/event-store.service';
 import { RemoveMReviewHandler } from './handlers/reviews/removeReview.handler';
+import { CloudinaryModule } from '@/cloudinary/cloudinary.module';
 
 @Module({
     controllers: [MovieController],
@@ -61,12 +62,11 @@ import { RemoveMReviewHandler } from './handlers/reviews/removeReview.handler';
         CreatedMovieReviewHandler,
         RedisService,
         RemoveMReviewHandler,
-
     ],
     imports: [
         PrismaModule,
         CqrsModule,
-
+        CloudinaryModule,
         // CacheModule.register({
         //     isGlobal: true,
         // }),

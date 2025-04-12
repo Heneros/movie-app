@@ -4,7 +4,9 @@ import { UsersRepository } from '../repositories/users.repository';
 import { BanUserAccountCommand } from '../commands';
 
 @CommandHandler(BanUserAccountCommand)
-export class BanUserAccount implements ICommandHandler<BanUserAccountCommand> {
+export class BanUserAccountHandler
+    implements ICommandHandler<BanUserAccountCommand>
+{
     constructor(private readonly usersRepository: UsersRepository) {}
 
     async execute(command: BanUserAccountCommand) {

@@ -99,4 +99,54 @@ export class CloudinaryService {
     async deleteImage(publicId: string) {
         return cloudinary.uploader.destroy(publicId);
     }
+
+    async uploadGalleryImages(movieId: number, files: Express.Multer.File[]) {
+        const mainFolder = 'nestjsMoviedb';
+
+        const savedImages = [];
+
+        for (const file of files) {
+            const originalName = file.originalname;
+            const fileName = path.parse(originalName).name;
+            const uniqueFileName = `${fileName}_${Date.now()}`;
+            const filePathOnCloudinary = `${mainFolder}/${uniqueFileName}`;
+
+            const uploaded = await new Promise<{
+                url: string;
+                publicId: string;
+            }>((resolve, reject) => {
+                const uploadStream = cloudinary.uploader.upload_stream(
+                    {
+                        public_id: filePathOnCloudinary,
+                        resource_type: 'image',
+                        fetch_format: 'auto',
+                        quality: 'auto:eco',
+                    },
+                    (err, result) => {
+                        if (err) reject(err);
+                        else if (result?.secure_url)
+                            resolve({
+                                url: result.secure_url,
+                                publicId: result.public_id,
+                            });
+                        else reject(new Error('No Cloudinary URL'));
+                    },
+                );
+                streamifier.createReadStream(file.buffer).pipe(uploadStream);
+            });
+
+            const saved = await this.prisma.gallery.create({
+                data: {
+                    url: uploaded.url,
+                    publicId: uploaded.publicId,
+                    movie: {
+                        connect: { id: movieId },
+                    },
+                },
+            });
+            savedImages.push(saved);
+        }
+
+        return { images: savedImages };
+    }
 }

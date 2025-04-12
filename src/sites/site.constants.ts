@@ -24,3 +24,27 @@ export const USERS_ROUTES = {
     UPLOAD_AVATAR_USER: 'upload/:userId',
     SEND_COMPLAINT: ':id/complaint',
 };
+
+export const MOVIE_CONTROLLER = 'movie' as const;
+
+export const MOVIE_ROUTES = {
+    GET_ALL: '',
+    EVENTS: 'events',
+    SEARCH: 'search',
+    REVIEWS_ALL: 'reviewsAll',
+    DRAFTS: 'drafts',
+    GET_ID_MOVIE: ':id',
+    CREATE_MOVIE: '',
+    UPDATE_MOVIE: ':id',
+    DELETE_MOVIE: ':id',
+    ADD_FAVORITE: ':id/addFav',
+    REMOVE_FAVORITE: ':id/removeFav',
+    ALL_FAVORITE: ':id/allFavorites',
+    RATE_MOVIE: ':id/rateMovie',
+    GET_All_REVIEW_FROM_MOVIE: ':id/review',
+    GET_SINGLE_REVIEW_FROM_MOVIE: ':id/singleReview',
+    CREATE_REVIEW: ':id/review',
+    UPDATE_REVIEW: ':id/review',
+    DELETE_REVIEW: ':id/review',
+    UPLOAD_IMAGES: 'gallery/:id',
+};

@@ -5,7 +5,7 @@ import { PrismaModule } from '@/prisma/prisma.module';
 import { MailModule } from '@/mail/mail.module';
 import { UsersRepository } from './repositories/users.repository';
 import {
-    BanUserAccount,
+    BanUserAccountHandler,
     ChangeRoleHandler,
     DeleteMyAccountHandler,
     DeleteUserHandler,
@@ -35,7 +35,7 @@ import { CloudinaryModule } from '@/cloudinary/cloudinary.module';
         DeleteUserHandler,
         ChangeRoleHandler,
         DeleteMyAccountHandler,
-        BanUserAccount,
+        BanUserAccountHandler,
         GetAllBlockedUsersHandler,
     ],
     imports: [PrismaModule, MailModule, CloudinaryModule],

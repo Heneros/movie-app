@@ -30,6 +30,7 @@ model Movie {
   favoriteMovies UserFavoriteMovies[]
   actors         ActorsOnMovies[]
   ratings        Rating[]
+  gallery Gallery[]
 
   previewId Int?    @unique()
   preview   Avatar? @relation(name: "PreviewMovie", fields: [previewId], references: [id])
@@ -63,6 +64,7 @@ model Actors {
   avatar Avatar? @relation(name: "ActorsToAvatar", fields: [previewId], references: [id], onDelete: Cascade)
 
   movies    ActorsOnMovies[]
+  gallery Gallery[]
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
 }
@@ -112,6 +114,7 @@ model User {
   isEmailVerified Boolean  @default(false)
   refreshToken    String[]
 
+
   blocked Boolean @default(false)
 
   avatarId Int?    @unique()
@@ -129,6 +132,19 @@ model Avatar {
 
   createdAt DateTime @default(now())
 }
+
+model Gallery{
+    id Int @id @default(autoincrement())
+    url String 
+    publicId String 
+    movie Movie? @relation(fields: [movieId], references: [id])
+    movieId Int?
+    actors Actors? @relation(fields: [actorId], references: [id]) 
+    actorId Int?
+    createdAt DateTime @default(now())
+}
+
+
 
 model Rating {
   id      Int   @id @default(autoincrement())

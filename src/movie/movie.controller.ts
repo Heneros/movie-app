@@ -14,7 +14,10 @@ import {
     Put,
     DefaultValuePipe,
     UseInterceptors,
+    UploadedFile,
+    UploadedFiles,
 } from '@nestjs/common';
+import { Express } from 'express';
 import { MovieService } from './movie.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
@@ -64,8 +67,12 @@ import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { RedisService } from '../redis/event-store.service';
 import { RemoveReviewCommand } from './commands/reviews/removeReview.command';
 import { GqlThrottlerGuard } from '../guards/gql-throttler.guard';
+import { MOVIE_CONTROLLER, MOVIE_ROUTES } from '@/sites/site.constants';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { CloudinaryService } from '@/cloudinary/cloudinary.service';
+import { memoryStorage } from 'multer';
 
-@Controller('movie')
+@Controller(MOVIE_CONTROLLER)
 @ApiTags('Movie')
 @UseInterceptors(CacheInterceptor)
 @UseGuards(GqlThrottlerGuard)
@@ -76,9 +83,10 @@ export class MovieController {
         private readonly movieRepository: MovieRepository,
         private readonly commandBus: CommandBus,
         private readonly queryBus: QueryBus,
+        private readonly cloudinaryService: CloudinaryService,
     ) {}
 
-    @Get()
+    @Get(MOVIE_ROUTES.GET_ALL)
     @CacheTTL(45)
     @ApiQuery({
         name: 'page',
@@ -91,20 +99,18 @@ export class MovieController {
         const page = pageString ? parseInt(pageString, 10) : 1;
         const skip = (page - 1) * PAGINATION_LIMIT;
 
-        // const movies = (await this.movieFindAllService.findAll(
-        //     skip,
-        // )) as Movie[];
         const movies = await this.queryBus.execute(new FindAllMovieQuery(skip));
-        // console.log(movies);
-        // return movies;
+
         return movies.allMovies.map((movie: Movie) => new MovieEntity(movie));
     }
-    @Get('events')
+
+    @Get(MOVIE_ROUTES.EVENTS)
     async getEvents() {
         const events = await this.redisService.getEvents('movie_events');
         return { events };
     }
-    @Get('search')
+
+    @Get(MOVIE_ROUTES.SEARCH)
     // @Throttle({ default: { limit: 3, ttl: 60000 } })
     @ApiProperty({ description: 'Search movie by title' })
     @ApiQuery({
@@ -138,7 +144,7 @@ export class MovieController {
         // return movies.map((movie) => new MovieEntity(movie));
     }
 
-    @Get('reviewsAll')
+    @Get(MOVIE_ROUTES.REVIEWS_ALL)
     @ApiOperation({ summary: 'Get all reviews from site' })
     @ApiOkResponse({ type: [MovieReviewEntity] })
     async getAllReviews(@Query('page') pageString?: string) {
@@ -157,11 +163,9 @@ export class MovieController {
             new GetReviewsQuery(skip),
         );
         return { reviews, total, page, limit: PAGINATION_LIMIT };
-        // console.log(page, skip);
-        // return await this.queryBus.execute(new GetReviewsQuery(skip));
     }
 
-    @Get('drafts')
+    @Get(MOVIE_ROUTES.DRAFTS)
     @UseGuards(AuthGuard)
     @Roles('Admin', 'Editor')
     @ApiBearerAuth('access-token')
@@ -169,10 +173,6 @@ export class MovieController {
     async findDrafts(@Query('page') pageString?: string) {
         const page = pageString ? parseInt(pageString, 10) : 1;
         const skip = (page - 1) * PAGINATION_LIMIT;
-
-        // const drafts = (await this.movieFindDraftsService.findDrafts(
-        //     skip,
-        // )) as Movie[];
         const movies = await this.queryBus.execute(
             new FindDraftsMovieQuery(skip),
         );
@@ -180,20 +180,16 @@ export class MovieController {
         return movies.map((draft) => new MovieEntity(draft));
     }
 
-    // @Public()
-    @Get(':id')
+    @Get(MOVIE_ROUTES.GET_ID_MOVIE)
     @Throttle({ default: { limit: 3, ttl: 60000 } })
     @ApiOkResponse({ type: MovieEntity })
     async findOne(@Param('id', ParseIntPipe, CheckMovieExistPipe) id: number) {
-        // const movie = await this.movieFindOneService.findOne(+id);
         const movie = await this.queryBus.execute(new FindOneMovieQuery(+id));
-        // if (!movie) {
-        //     throw new NotFoundException(`movie with ${id} does not exist.`);
-        // }
+
         return new MovieEntity(movie);
     }
 
-    @Post()
+    @Post(MOVIE_ROUTES.CREATE_MOVIE)
     @UseGuards(AuthGuard)
     @Roles('Admin', 'Editor')
     @ApiCreatedResponse({ type: MovieEntity })
@@ -210,7 +206,7 @@ export class MovieController {
         return new MovieEntity(movie);
     }
 
-    @Patch(':id')
+    @Patch(MOVIE_ROUTES.UPDATE_MOVIE)
     @UseGuards(AuthGuard)
     @Roles('Admin', 'Editor')
     @ApiBearerAuth('access-token')
@@ -224,7 +220,7 @@ export class MovieController {
         );
     }
 
-    @Delete(':id')
+    @Delete(MOVIE_ROUTES.DELETE_MOVIE)
     @Roles('Admin', 'Editor')
     @UseGuards(AuthGuard)
     @ApiBearerAuth('access-token')
@@ -235,7 +231,6 @@ export class MovieController {
         type: MovieEntity,
     })
     async remove(@Param('id', ParseIntPipe, CheckMovieExistPipe) id: number) {
-        // const movie = await this.movieFindOneService.findOne(id);
         const movie = await this.queryBus.execute(new FindOneMovieQuery(id));
         if (!movie) {
             throw new NotFoundException(`movie with ${id} does not exist.`);
@@ -246,7 +241,7 @@ export class MovieController {
         // return new MovieEntity(await this.movieRemoveService.remove(id));
     }
 
-    @Post(':id/addFav')
+    @Post(MOVIE_ROUTES.ADD_FAVORITE)
     @UseGuards(AuthGuard)
     @ApiBearerAuth('access-token')
     @ApiOperation({ summary: 'Add to favorite list user.' })
@@ -265,7 +260,7 @@ export class MovieController {
         );
     }
 
-    @Delete(':userId/removeFav')
+    @Delete(MOVIE_ROUTES.REMOVE_FAVORITE)
     @UseGuards(AuthGuard, ProfileOwnerGuard)
     @ApiOperation({ summary: 'Remove from favorite list user.' })
     @ApiOkResponse({
@@ -284,7 +279,7 @@ export class MovieController {
         );
     }
 
-    @Get(':id/allFavorites')
+    @Get(MOVIE_ROUTES.ALL_FAVORITE)
     @UseGuards(AuthGuard, ProfileOwnerGuard)
     @ApiBearerAuth('access-token')
     @ApiOperation({ summary: 'All favorite list user.' })
@@ -312,7 +307,7 @@ export class MovieController {
         return movies.map((movie) => new MovieEntity(movie));
     }
 
-    @Patch(':id/rateMovie')
+    @Patch(MOVIE_ROUTES.RATE_MOVIE)
     @UseGuards(AuthGuard)
     @ApiOperation({ summary: 'Rate Movie' })
     @ApiOkResponse({ type: [MovieEntity] })
@@ -322,14 +317,12 @@ export class MovieController {
         @User('id') user: User,
         @Body() rateMovieDto: RateMovieDto,
     ): Promise<Movie> {
-        // console.log(rateMovieDto);
-
         return await this.commandBus.execute(
             new RateMovieCommand(movieId, user.id, rateMovieDto.rating),
         );
     }
 
-    @Get(':id/review')
+    @Get(MOVIE_ROUTES.GET_All_REVIEW_FROM_MOVIE)
     @ApiOperation({ summary: 'Get all reviews from movie' })
     @ApiOkResponse({ type: [MovieEntity] })
     @ApiBearerAuth('access-token')
@@ -343,7 +336,7 @@ export class MovieController {
         return { reviews, total, page, limit: PAGINATION_LIMIT };
     }
 
-    @Get(':id/singleReview')
+    @Get(MOVIE_ROUTES.GET_SINGLE_REVIEW_FROM_MOVIE)
     @ApiOperation({ summary: 'Get single review from movie' })
     @ApiOkResponse({ type: [MovieEntity] })
     async getSingleReview(@Param('id', ParseIntPipe) id: number) {
@@ -353,7 +346,7 @@ export class MovieController {
         return review;
     }
 
-    @Post(':id/review')
+    @Post(MOVIE_ROUTES.CREATE_REVIEW)
     @UseGuards(AuthGuard)
     @ApiOperation({ summary: 'Create review movie' })
     @ApiOkResponse({ type: [MovieReviewEntity] })
@@ -369,7 +362,7 @@ export class MovieController {
         return newReview;
     }
 
-    @Put(':id/review')
+    @Put(MOVIE_ROUTES.UPDATE_REVIEW)
     @UseGuards(AuthGuard, ProfileOwnerGuard)
     @ApiOperation({
         summary: 'Update review movie. You can edit during 15 minutes',
@@ -387,8 +380,9 @@ export class MovieController {
         return newReview;
     }
 
-    @Delete(':id/review')
-    @UseGuards(AuthGuard, ProfileOwnerGuard)
+    @Delete(MOVIE_ROUTES.DELETE_REVIEW)
+    @UseGuards(AuthGuard)
+    @Roles('Admin', 'Editor')
     @ApiOperation({ summary: 'Delete review movie' })
     @ApiOkResponse({ type: [MovieReviewEntity] })
     @ApiBearerAuth('access-token')
@@ -400,5 +394,29 @@ export class MovieController {
             new RemoveReviewCommand(reviewId, user.id),
         );
         return newReview;
+    }
+
+    @Post(MOVIE_ROUTES.UPLOAD_IMAGES)
+    @UseInterceptors(
+        FilesInterceptor('files', 5, {
+            storage: memoryStorage(),
+            limits: { fileSize: 5 * 1024 * 1024 },
+        }),
+    )
+    @UseGuards(AuthGuard)
+    @Roles('Admin', 'Editor')
+    uploadGallery(
+        @Param('id', ParseIntPipe) movieId: number,
+        @UploadedFiles() files: Express.Multer.File[],
+    ) {
+        try {
+            if (!files) {
+                return 'Error during upload files';
+            }
+            console.log('FILES:', files);
+            return this.cloudinaryService.uploadGalleryImages(movieId, files);
+        } catch (error) {
+            console.log('FILES:', error);
+        }
     }
 }
