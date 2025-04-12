@@ -30,12 +30,16 @@ model Movie {
   favoriteMovies UserFavoriteMovies[]
   actors         ActorsOnMovies[]
   ratings        Rating[]
-  gallery Gallery[]
+
+//   gallery        Gallery[] @relation(name: "GalleryMovie")
+   galleryId Int? @unique()
+   gallery   Gallery? @relation(name: "GalleryMovie", fields: [galleryId], references: [id])
+
 
   previewId Int?    @unique()
   preview   Avatar? @relation(name: "PreviewMovie", fields: [previewId], references: [id])
-  // avgRating Float?
   avgRating Float   @default(0)
+  
 
   actorsList String[]
   authorId   Int
@@ -137,9 +141,11 @@ model Gallery{
     id Int @id @default(autoincrement())
     url String 
     publicId String 
-    movie Movie? @relation(fields: [movieId], references: [id])
+    // movie Movie? @relation(name: "GalleryMovie",fields: [movieId], references: [id])
+    movie Movie? @relation(name: "GalleryMovie")
+
     movieId Int?
-    actors Actors? @relation(fields: [actorId], references: [id]) 
+    actors Actors? @relation( fields: [actorId], references: [id]) 
     actorId Int?
     createdAt DateTime @default(now())
 }

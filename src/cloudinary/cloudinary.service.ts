@@ -135,16 +135,22 @@ export class CloudinaryService {
                 streamifier.createReadStream(file.buffer).pipe(uploadStream);
             });
 
-            const saved = await this.prisma.gallery.create({
+        
+            const newGallery = await this.prisma.gallery.create({
                 data: {
                     url: uploaded.url,
                     publicId: uploaded.publicId,
-                    movie: {
-                        connect: { id: movieId },
-                    },
                 },
             });
-            savedImages.push(saved);
+
+            await this.prisma.movie.update({
+                where: { id: movieId },
+                data: {
+                    galleryId: newGallery.id,
+                },
+            });
+
+            savedImages.push(newGallery);
         }
 
         return { images: savedImages };

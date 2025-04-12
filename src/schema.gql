@@ -18,6 +18,7 @@ type MovieEntity {
   actorsList: [String!]!
   movieId: Int
   userId: Int
+  galleryId: Int
   avgRating: Float
   value: Int
 }

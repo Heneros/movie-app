@@ -64,6 +64,10 @@ export class MovieEntity implements Movie {
     userId: number;
 
     @ApiProperty()
+    @Field(() => Int, { nullable: true })
+    galleryId: number;
+
+    @ApiProperty()
     @Field(() => Float, { nullable: true })
     avgRating: number;
 
