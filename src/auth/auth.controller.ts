@@ -11,6 +11,7 @@ import {
     Query,
     Req,
     Res,
+    UseGuards,
     UseInterceptors,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
@@ -48,6 +49,9 @@ import { VerifyEmailQuery } from './queries';
 import { EmailDto } from './dto/Resend-email.dto';
 import { Throttle } from '@nestjs/throttler';
 import { isDevelopment } from '@/data/defaultData';
+import { AuthGuard } from '@nestjs/passport';
+import { GoogleService } from './services/Google.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Controller(AUTH_CONTROLLER)
 @ApiTags('Auth')
@@ -56,7 +60,8 @@ export class AuthController {
     constructor(
         private readonly commandBus: CommandBus,
         private readonly queryBus: QueryBus,
-        private readonly authRepository: AuthRepository,
+        private readonly googleService: GoogleService,
+        private jwt: JwtService,
     ) {}
 
     @Throttle({ default: { limit: 5, ttl: 60000 } })
@@ -217,17 +222,21 @@ export class AuthController {
         summary: 'Log out for application ',
     })
     async logout(@Req() req: Request, @Res() res: Response) {
-        // return new AuthEntity(
-        //     await this.commandBus.execute(new LogoutCommand(req, res)),
-        // );
-        // const message = await this.commandBus.execute(
-        //     new LogoutCommand(context.req, context.res),
-        // );
-
-        // return new AuthEntity({ message });
         const message = await this.commandBus.execute(
             new LogoutCommand(req, res),
         );
         res.status(200).json({ message });
+    }
+
+    @Get(AUTH_ROUTES.GOOGLE)
+    @UseGuards(AuthGuard('google'))
+    async googleAuth() {}
+
+    @Get(AUTH_ROUTES.GOOGLE_REDIRECT)
+    @UseGuards(AuthGuard('google'))
+    async googleAuthRedirect(@Req() req: Request, @Res() res: Response) {
+        const user = await this.googleService.validateGoogleUser(req.user);
+        const token = this.jwt.sign({ userId: user.id });
+        return res.redirect(`http://localhost:3000?token=${token}`);
     }
 }

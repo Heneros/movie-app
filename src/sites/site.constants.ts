@@ -8,6 +8,13 @@ export const AUTH_ROUTES = {
     RESEND_EMAIL: 'resend_email_token/:userId',
     RESET_PASSWORD: 'reset_password',
     RESET_PASSWORD_REQUEST: 'reset_password_request/:userId',
+    GOOGLE: 'google',
+    GOOGLE_CALLBACK: 'google/callback',
+    GOOGLE_REDIRECT: 'google/redirect',
+    GITHUB: 'github',
+    GITHUB_CALLBACK: 'github/callback',
+    DISCORD: 'discord',
+    DISCORD_CALLBACK: 'discord/callback',
 };
 
 export const USERS_CONTROLLER = 'users' as const;

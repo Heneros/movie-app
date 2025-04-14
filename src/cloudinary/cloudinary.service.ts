@@ -18,7 +18,7 @@ export class CloudinaryService {
         userId: number,
         // fileBuffer: Buffer,
         file: Express.Multer.File,
-        originalName: string,
+        originalName?: string,
     ) {
         // : Promise<{ url: string } | undefined>
         try {
@@ -96,6 +96,36 @@ export class CloudinaryService {
         }
     }
 
+    async uploadFromUrl(
+        imageUrl: string,
+        publicId: string,
+    ): Promise<{ url: string; publicId: string }> {
+        return new Promise((resolve, reject) => {
+            cloudinary.uploader.upload(
+                imageUrl,
+                {
+                    public_id: publicId,
+                    resource_type: 'image',
+                },
+                (error, result) => {
+                    console.log(publicId, imageUrl);
+                    if (error) {
+                        console.error('Cloudinary upload error:', error);
+                        return reject(error);
+                    }
+                    if (!result?.secure_url) {
+                        return reject(new Error('Upload failed'));
+                    }
+                    // console.log({ result });
+
+                    resolve({
+                        url: result.secure_url,
+                        publicId: result.public_id,
+                    });
+                },
+            );
+        });
+    }
     async deleteImage(publicId: string) {
         return cloudinary.uploader.destroy(publicId);
     }
@@ -135,7 +165,6 @@ export class CloudinaryService {
                 streamifier.createReadStream(file.buffer).pipe(uploadStream);
             });
 
-        
             const newGallery = await this.prisma.gallery.create({
                 data: {
                     url: uploaded.url,

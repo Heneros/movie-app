@@ -123,6 +123,10 @@ model User {
 
   avatarId Int?    @unique()
   avatar   Avatar? @relation(name: "AvatarUser", fields: [avatarId], references: [id])
+
+  googleId String? @unique()
+  githubId String? @unique()
+  discordId String? @unique()
 }
 
 model Avatar {

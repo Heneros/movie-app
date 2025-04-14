@@ -30,13 +30,18 @@ import {
 import { CqrsModule } from '@nestjs/cqrs';
 import { AuthRepository } from './repositories/Auth.repository';
 import { PubSub } from 'graphql-subscriptions';
+import { GoogleService } from './services/Google.service';
+import { GoogleStrategy } from './passport/GoogleStrategy';
+import { CloudinaryService } from '@/cloudinary/cloudinary.service';
 
 @Module({
     controllers: [AuthController],
     exports: [AuthModule],
     providers: [
         AuthService,
-
+        GoogleService,
+        GoogleStrategy,
+        CloudinaryService,
         // CreateUserService,
         // LoginAuthService,
         // VerifyEmailService,

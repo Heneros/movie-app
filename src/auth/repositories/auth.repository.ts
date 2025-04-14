@@ -43,8 +43,6 @@ export class AuthRepository {
 
     async createToken(criteria: { userId?; token?; tempDate? }) {
         const { userId, token, tempDate } = criteria;
-        // console.log(userId, token);
-        //   const emailVerificationToken =
 
         return await this.prisma.verifyResetToken.create({
             data: {
