@@ -8,14 +8,6 @@ import { UsersModule } from '@/users/users.module';
 
 import { jwtConstants } from '@/data/defaultData';
 import { MailService } from '@/mail/mail.service';
-
-import { CreateUserService } from './services/createUser.service';
-import { LoginAuthService } from './services/login.service';
-import { VerifyEmailService } from './services/verifyEmail.service';
-import { ResendEmailService } from './services/resendEmailValidation.service';
-import { ResetPasswordService } from './services/resetPassword.service';
-import { LogoutAuthService } from './services/logout.service';
-import { RequestResetPasswordService } from './services/requestResetPassword.service';
 import { AuthResolver } from './auth.resolver';
 
 import {
@@ -29,10 +21,9 @@ import {
 } from './handlers/index';
 import { CqrsModule } from '@nestjs/cqrs';
 import { AuthRepository } from './repositories/Auth.repository';
-import { PubSub } from 'graphql-subscriptions';
-import { GoogleService } from './services/Google.service';
 import { GoogleStrategy } from './passport/GoogleStrategy';
 import { CloudinaryService } from '@/cloudinary/cloudinary.service';
+import { GithubService, GoogleService } from './services';
 
 @Module({
     controllers: [AuthController],
@@ -40,15 +31,9 @@ import { CloudinaryService } from '@/cloudinary/cloudinary.service';
     providers: [
         AuthService,
         GoogleService,
+        GithubService,
         GoogleStrategy,
         CloudinaryService,
-        // CreateUserService,
-        // LoginAuthService,
-        // VerifyEmailService,
-        // ResendEmailService,
-        // ResetPasswordService,
-        // RequestResetPasswordService,
-        // LogoutAuthService,
 
         MailService,
         AuthRepository,

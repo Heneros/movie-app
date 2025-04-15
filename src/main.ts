@@ -2,7 +2,7 @@ import { HttpAdapterHost, NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import 'reflect-metadata';
-import  cookieParser from 'cookie-parser';
+import cookieParser from 'cookie-parser';
 
 import session from 'express-session';
 import passport from 'passport';
@@ -22,7 +22,12 @@ async function bootstrap() {
     });
 
     // const httpServer = createServer(app.getHttpAdapter().getInstance());
-    app.enableShutdownHooks();
+    // app.enableShutdownHooks();
+    app.enableCors({
+        origin: 'http://localhost:3000',
+        credentials: true,
+    });
+
     app.use(cookieParser());
     app.use(
         session({

@@ -235,8 +235,30 @@ export class AuthController {
     @Get(AUTH_ROUTES.GOOGLE_REDIRECT)
     @UseGuards(AuthGuard('google'))
     async googleAuthRedirect(@Req() req: Request, @Res() res: Response) {
-        const user = await this.googleService.validateGoogleUser(req.user);
-        const token = this.jwt.sign({ userId: user.id });
-        return res.redirect(`http://localhost:3000?token=${token}`);
+        try {
+            const user = await this.googleService.validateGoogleUser(req.user);
+            const token = this.jwt.sign({
+                userId: user.id,
+                name: user.name,
+                roles: user.roles,
+            });
+            res.cookie('jwtMovie', token, {
+                httpOnly: !isDevelopment,
+                sameSite: isDevelopment ? 'none' : 'strict',
+                maxAge: 31 * 24 * 60 * 60 * 1000,
+                secure: !isDevelopment,
+            });
+            return res.redirect(
+                `http://localhost:3000/auth/callback?token=${token}`,
+            );
+        } catch (error) {
+            if (error instanceof BadRequestException) {
+                throw error;
+            }
+
+            throw new BadGatewayException(
+                error.message || 'Authentication failed',
+            );
+        }
     }
 }
