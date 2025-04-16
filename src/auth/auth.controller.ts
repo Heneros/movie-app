@@ -52,6 +52,7 @@ import { isDevelopment } from '@/data/defaultData';
 import { AuthGuard } from '@nestjs/passport';
 import { GoogleService } from './services/Google.service';
 import { JwtService } from '@nestjs/jwt';
+import { GoogleStrategy } from './passport/GoogleStrategy';
 
 @Controller(AUTH_CONTROLLER)
 @ApiTags('Auth')
@@ -228,30 +229,37 @@ export class AuthController {
         res.status(200).json({ message });
     }
 
-    @Get(AUTH_ROUTES.GOOGLE)
+    @Get('google')
     @UseGuards(AuthGuard('google'))
     async googleAuth() {}
 
-    @Get(AUTH_ROUTES.GOOGLE_REDIRECT)
+    @Get('google/callback')
     @UseGuards(AuthGuard('google'))
     async googleAuthRedirect(@Req() req: Request, @Res() res: Response) {
         try {
             const user = await this.googleService.validateGoogleUser(req.user);
+
+            if (!user) {
+                return res.status(400).json({ message: 'User not found' });
+            }
+
             const token = this.jwt.sign({
                 userId: user.id,
                 name: user.name,
                 roles: user.roles,
             });
-            res.cookie('jwtMovie', token, {
-                httpOnly: !isDevelopment,
-                sameSite: isDevelopment ? 'none' : 'strict',
-                maxAge: 31 * 24 * 60 * 60 * 1000,
-                secure: !isDevelopment,
-            });
-            return res.redirect(
-                `http://localhost:3000/auth/callback?token=${token}`,
-            );
+
+   
+            return res
+                .cookie('jwtMovie', token, {
+                    httpOnly: true,
+                    sameSite: !isDevelopment ? 'lax' : 'strict',
+                    maxAge: 31 * 24 * 60 * 60 * 1000,
+                    secure: !isDevelopment,
+                })
+                .redirect('/');
         } catch (error) {
+            console.error('Google Auth Error:', error);
             if (error instanceof BadRequestException) {
                 throw error;
             }
@@ -261,4 +269,7 @@ export class AuthController {
             );
         }
     }
+
+    @Get('google/redirect')
+    async googleAuthRedirectC() {}
 }

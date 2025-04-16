@@ -24,6 +24,7 @@ import { AuthRepository } from './repositories/Auth.repository';
 import { GoogleStrategy } from './passport/GoogleStrategy';
 import { CloudinaryService } from '@/cloudinary/cloudinary.service';
 import { GithubService, GoogleService } from './services';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
     controllers: [AuthController],
@@ -47,6 +48,7 @@ import { GithubService, GoogleService } from './services';
         AuthResolver,
     ],
     imports: [
+        ConfigModule,
         PrismaModule,
         CqrsModule,
         PassportModule,

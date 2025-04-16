@@ -31,7 +31,7 @@ async function bootstrap() {
     app.use(cookieParser());
     app.use(
         session({
-            secret: process.env.SECRET_SESSION,
+            secret: 'process.env.SECRET_SESSION,',
             resave: false,
             saveUninitialized: false,
             cookie: {

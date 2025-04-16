@@ -26,7 +26,8 @@ export class GoogleService {
             // console.log(user)
 
             if (user) {
-                throw new BadRequestException('User registered');
+                // throw new BadRequestException('User registered');
+                return user;
             }
             // console.log(profile);
             const avatarPublicId = `nestjsMoviedb/avatars/${profile.id}_${Date.now()}`;
@@ -63,6 +64,7 @@ export class GoogleService {
                 },
             });
             // }
+
             return user;
         } catch (error) {
             throw new BadRequestException('Something wrong happened');
