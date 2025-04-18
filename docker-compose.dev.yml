@@ -25,36 +25,36 @@ services:
     networks:
       app_movie:
 
- postgres-slave:
-    image: postgres:17.4
-    container_name: postgres-slave
-    restart: always
-    env_file: ./.env
-    environment: 
-      POSTGRES_USER:  ${POSTGRES_USER}
-      POSTGRES_PASSWORD:  ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-      PGDATA: /var/lib/postgresql/data
-    command: >
-      bash -c '
-      chown -R 999:999 /var/lib/postgresql/data;
-      chmod -R 750 /var/lib/postgresql/data;
-      until pg_isready -h postgres-master -p 5432; do sleep 1; done;
-      rm -rf /var/lib/postgresql/data/*;
-      PGPASSWORD=${POSTGRES_PASSWORD} pg_basebackup -h postgres-master -U ${POSTGRES_USER} -D /var/lib/postgresql/data -Fp -Xs -R -P;
-      echo "primary_conninfo = '\''host=postgres-master port=5432 user=${POSTGRES_USER} password=${POSTGRES_PASSWORD}'\''" >> /var/lib/postgresql/data/postgresql.auto.conf;
-      touch /var/lib/postgresql/data/standby.signal;
-      chown -R 999:999 /var/lib/postgresql/data;
-      exec postgres'
-    user: "999:999"
-    ports:
-      - "5433:5432"
-    volumes: 
-      - slave_data:/var/lib/postgresql/data
-    depends_on:
-      - postgres-master
-    networks:
-      - app_movie
+#  postgres-slave:
+#     image: postgres:17.4
+#     container_name: postgres-slave
+#     restart: always
+#     env_file: ./.env
+#     environment: 
+#       POSTGRES_USER:  ${POSTGRES_USER}
+#       POSTGRES_PASSWORD:  ${POSTGRES_PASSWORD}
+#       POSTGRES_DB: ${POSTGRES_DB}
+#       PGDATA: /var/lib/postgresql/data
+#     command: >
+#       bash -c '
+#       chown -R 999:999 /var/lib/postgresql/data;
+#       chmod -R 750 /var/lib/postgresql/data;
+#       until pg_isready -h postgres-master -p 5432; do sleep 1; done;
+#       rm -rf /var/lib/postgresql/data/*;
+#       PGPASSWORD=${POSTGRES_PASSWORD} pg_basebackup -h postgres-master -U ${POSTGRES_USER} -D /var/lib/postgresql/data -Fp -Xs -R -P;
+#       echo "primary_conninfo = '\''host=postgres-master port=5432 user=${POSTGRES_USER} password=${POSTGRES_PASSWORD}'\''" >> /var/lib/postgresql/data/postgresql.auto.conf;
+#       touch /var/lib/postgresql/data/standby.signal;
+#       chown -R 999:999 /var/lib/postgresql/data;
+#       exec postgres'
+#     user: "999:999"
+#     ports:
+#       - "5433:5432"
+#     volumes: 
+#       - slave_data:/var/lib/postgresql/data
+#     depends_on:
+#       - postgres-master
+#     networks:
+#       - app_movie
 
 
  pgadmin:

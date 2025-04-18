@@ -43,7 +43,7 @@ export class LoginUserHandler implements ICommandHandler<LoginUserCommand> {
             };
 
             const accessToken = await this.jwtService.signAsync(payload, {
-                expiresIn: '7d',
+                expiresIn: '15m',
             });
             const refreshToken = await this.jwtService.signAsync(payload, {
                 expiresIn: '31d',

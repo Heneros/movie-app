@@ -108,7 +108,7 @@ export class CloudinaryService {
                     resource_type: 'image',
                 },
                 (error, result) => {
-                    console.log(publicId, imageUrl);
+                    // console.log(publicId, imageUrl);
                     if (error) {
                         console.error('Cloudinary upload error:', error);
                         return reject(error);

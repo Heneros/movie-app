@@ -1,28 +1,24 @@
 import { PrismaService } from '@/prisma/prisma.service';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { AuthRepository } from '../repositories/Auth.repository';
-import { JwtService } from '@nestjs/jwt';
 import bcrypt from 'bcrypt';
-import {
-    v2 as cloudinary,
-    UploadApiErrorResponse,
-    UploadApiResponse,
-} from 'cloudinary';
+
 import { CloudinaryService } from '@/cloudinary/cloudinary.service';
 
 @Injectable()
 export class GoogleService {
     constructor(
+        private authRepository: AuthRepository,
         private prisma: PrismaService,
         private cloudinaryService: CloudinaryService,
     ) {}
 
     async validateGoogleUser(profile: any) {
         try {
-            let user = await this.prisma.user.findUnique({
-                where: { email: profile.email },
-            });
+            // console.log('user');
 
+            let email = profile.email;
+            let user = await this.authRepository.findUser({ email });
             // console.log(user)
 
             if (user) {
@@ -30,7 +26,7 @@ export class GoogleService {
                 return user;
             }
             // console.log(profile);
-            const avatarPublicId = `nestjsMoviedb/avatars/${profile.id}_${Date.now()}`;
+            const avatarPublicId = `nestjsMoviedb/avatars/${profile.googleId}_${Date.now()}`;
 
             let cloudinaryAvatar = null;
             if (profile.avatar) {
@@ -64,7 +60,6 @@ export class GoogleService {
                 },
             });
             // }
-
             return user;
         } catch (error) {
             throw new BadRequestException('Something wrong happened');

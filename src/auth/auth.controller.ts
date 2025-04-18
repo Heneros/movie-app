@@ -50,9 +50,8 @@ import { EmailDto } from './dto/Resend-email.dto';
 import { Throttle } from '@nestjs/throttler';
 import { isDevelopment } from '@/data/defaultData';
 import { AuthGuard } from '@nestjs/passport';
-import { GoogleService } from './services/Google.service';
 import { JwtService } from '@nestjs/jwt';
-import { GoogleStrategy } from './passport/GoogleStrategy';
+import { GithubService, GoogleService } from './services';
 
 @Controller(AUTH_CONTROLLER)
 @ApiTags('Auth')
@@ -62,6 +61,8 @@ export class AuthController {
         private readonly commandBus: CommandBus,
         private readonly queryBus: QueryBus,
         private readonly googleService: GoogleService,
+        private readonly githubService: GithubService,
+
         private jwt: JwtService,
     ) {}
 
@@ -229,11 +230,11 @@ export class AuthController {
         res.status(200).json({ message });
     }
 
-    @Get('google')
+    @Get(AUTH_ROUTES.GOOGLE)
     @UseGuards(AuthGuard('google'))
     async googleAuth() {}
 
-    @Get('google/callback')
+    @Get(AUTH_ROUTES.GOOGLE_CALLBACK)
     @UseGuards(AuthGuard('google'))
     async googleAuthRedirect(@Req() req: Request, @Res() res: Response) {
         try {
@@ -249,7 +250,6 @@ export class AuthController {
                 roles: user.roles,
             });
 
-   
             return res
                 .cookie('jwtMovie', token, {
                     httpOnly: true,
@@ -270,6 +270,45 @@ export class AuthController {
         }
     }
 
-    @Get('google/redirect')
-    async googleAuthRedirectC() {}
+    @Get(AUTH_ROUTES.GITHUB)
+    @UseGuards(AuthGuard('github'))
+    githubAuth() {
+        // console.log(123);
+    }
+
+    @Get(AUTH_ROUTES.GITHUB_CALLBACK)
+    @UseGuards(AuthGuard('github'))
+    async githubAuthCallback(@Req() req, @Res() res: Response) {
+        try {
+            const user = await this.githubService.validateGithubUser(req.user);
+
+            // console.log(user, 12343434)
+            if (!user) {
+                return res.status(400).json({ message: 'User not found' });
+            }
+
+            // console.log(user);
+
+            // if (user.blocked) {
+            //     throw new BadRequestException('User is blocked');
+            // }
+
+            const token = this.jwt.sign({
+                userId: user.id,
+                name: user.name,
+                roles: user.roles,
+            });
+            res.cookie('jwtMovie', token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'lax',
+                maxAge: 30 * 24 * 60 * 60 * 1000,
+            }).redirect('/');
+        } catch (error) {
+            res.redirect('/auth-error');
+        }
+    }
+
+    // @Get('google/redirect')
+    // async googleAuthRedirectC() {}
 }

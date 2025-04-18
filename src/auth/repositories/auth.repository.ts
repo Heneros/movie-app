@@ -108,6 +108,7 @@ export class AuthRepository {
     }
 
     async createOrUpdateToken(userId: number, token: string) {
+        console.log(token)
         return this.prisma.verifyResetToken.update({
             where: { userId },
             data: { token },

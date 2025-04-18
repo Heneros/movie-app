@@ -13,5 +13,4 @@ export const tempRequestPassDate = new Date(Date.now() + 15 * 60 * 1000);
 
 export const isDevelopment = process.env.NODE_ENV === 'development';
 
-
 export const CLOUDINARY = 'CLOUDINARY';
