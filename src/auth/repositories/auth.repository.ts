@@ -43,7 +43,7 @@ export class AuthRepository {
 
     async createToken(criteria: { userId?; token?; tempDate? }) {
         const { userId, token, tempDate } = criteria;
-
+        console.log(123);
         return await this.prisma.verifyResetToken.create({
             data: {
                 userId: userId,
@@ -108,7 +108,7 @@ export class AuthRepository {
     }
 
     async createOrUpdateToken(userId: number, token: string) {
-        console.log(token)
+        console.log(token);
         return this.prisma.verifyResetToken.update({
             where: { userId },
             data: { token },

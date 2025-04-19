@@ -21,14 +21,6 @@ export class GithubService {
                 email: profile.email,
             });
 
-            // console.log('123', profile);
-            // console.log('123', user);
-            // if (!user) {
-            //     return user;
-            // }
-
-            // console.log(profile);
-
             const payload = {
                 id: user.id,
                 name: user.name,
@@ -42,20 +34,35 @@ export class GithubService {
                 expiresIn: '31d',
             });
 
-            // console.log(refreshTokenJwt);
-            // await this.authRepository.deleteToken({
-            //     where: { userId: user.id },
-            // });
-            await this.authRepository.createToken({
-                userId: user.id,
-                token: refreshTokenJwt,
-                tempDate: tempRegisterDate,
-            });
+            const token = await this.authRepository.findTokenByUserId(user.id);
+
+            // console.log(token);
+            if (!token) {
+                await this.authRepository.createToken({
+                    userId: user.id,
+                    token: refreshTokenJwt,
+                    tempDate: tempRegisterDate,
+                });
+                return user;
+            } else {
+                ///Remove
+                await this.authRepository.deleteToken({
+                    where: { userId: user.id },
+                });
+
+                await this.authRepository.createToken({
+                    userId: user.id,
+                    token: refreshTokenJwt,
+                    tempDate: tempRegisterDate,
+                });
+
+                // console.log(payload);
+            }
 
             await this.authRepository.updateProfile(user.id, {
                 refreshToken: [accessTokenJwt],
             });
-            // console.log(payload);
+
             return user;
         } catch (error) {
             console.log(error, 'error');
