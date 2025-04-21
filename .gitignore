@@ -3,7 +3,7 @@
 /node_modules
 /build
 1features.txt
-
+*.pem
 
 1features.txt
 # Logs

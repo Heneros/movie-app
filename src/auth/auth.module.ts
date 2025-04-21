@@ -26,6 +26,7 @@ import { CloudinaryService } from '@/cloudinary/cloudinary.service';
 import { GithubService, GoogleService } from './services';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GithubStrategy } from './passport/GithubStrategy';
+import { HandleIOauth } from './services/HandleIOauth.service';
 
 @Module({
     controllers: [AuthController],
@@ -37,6 +38,7 @@ import { GithubStrategy } from './passport/GithubStrategy';
         GithubService,
         GithubStrategy,
         CloudinaryService,
+        HandleIOauth,
 
         MailService,
         AuthRepository,

@@ -287,12 +287,6 @@ export class AuthController {
                 return res.status(400).json({ message: 'User not found' });
             }
 
-            // console.log(user);
-
-            // if (user.blocked) {
-            //     throw new BadRequestException('User is blocked');
-            // }
-
             const token = this.jwt.sign({
                 userId: user.id,
                 name: user.name,
