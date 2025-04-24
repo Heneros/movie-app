@@ -23,10 +23,11 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { AuthRepository } from './repositories/Auth.repository';
 import { GoogleStrategy } from './passport/GoogleStrategy';
 import { CloudinaryService } from '@/cloudinary/cloudinary.service';
-import { GithubService, GoogleService } from './services';
+import { DiscordService, GithubService, GoogleService } from './services';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GithubStrategy } from './passport/GithubStrategy';
 import { HandleIOauth } from './services/HandleIOauth.service';
+import { DiscordStrategy } from './passport/DiscordStrategy';
 
 @Module({
     controllers: [AuthController],
@@ -39,6 +40,8 @@ import { HandleIOauth } from './services/HandleIOauth.service';
         GithubStrategy,
         CloudinaryService,
         HandleIOauth,
+        DiscordService,
+        DiscordStrategy,
 
         MailService,
         AuthRepository,

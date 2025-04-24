@@ -13,6 +13,7 @@ export const AUTH_ROUTES = {
     GOOGLE_REDIRECT: 'google/redirect',
     GITHUB: 'github',
     GITHUB_CALLBACK: 'github/callback',
+
     DISCORD: 'discord',
     DISCORD_CALLBACK: 'discord/callback',
 };

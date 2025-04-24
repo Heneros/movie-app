@@ -1,14 +1,12 @@
-import { PrismaService } from '@/prisma/prisma.service';
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { AuthRepository } from '../repositories/Auth.repository';
-import bcrypt from 'bcrypt';
-
 import { CloudinaryService } from '@/cloudinary/cloudinary.service';
-import { HandleIOauth } from './HandleIOauth.service';
+import { Injectable } from '@nestjs/common';
+import { AuthRepository } from '../repositories/Auth.repository';
 import { JwtService } from '@nestjs/jwt';
+import { HandleIOauth } from './HandleIOauth.service';
+import { PrismaService } from '@/prisma/prisma.service';
 
 @Injectable()
-export class GoogleService extends HandleIOauth {
+export class DiscordService extends HandleIOauth {
     constructor(
         protected readonly authRepository: AuthRepository,
         protected readonly JwtService: JwtService,
@@ -18,11 +16,11 @@ export class GoogleService extends HandleIOauth {
         super(authRepository, JwtService, cloudinaryService, prisma);
     }
 
-    async validateGoogleUser(profile: any) {
+    async validateDiscordUser(profile: any) {
         try {
             return await this.handleOauthLogin(profile.email);
         } catch (error) {
-            throw new BadRequestException('Something wrong happened');
+            console.log(error, 'error');
         }
     }
 }

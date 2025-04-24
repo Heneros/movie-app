@@ -1,5 +1,5 @@
 import { CloudinaryService } from '@/cloudinary/cloudinary.service';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { AuthRepository } from '../repositories/Auth.repository';
 import { JwtService } from '@nestjs/jwt';
 import { HandleIOauth } from './HandleIOauth.service';

@@ -7,7 +7,7 @@ export class CreateUserDto {
     @IsString()
     @IsNotEmpty()
     @Field(() => String, { nullable: false, description: 'Name of user' })
-    @ApiProperty({ description: 'testuser', example: 'qwerty' })
+    @ApiProperty({ description: 'Name of User', example: 'qwerty' })
     public name: string;
 
     @IsEmail()

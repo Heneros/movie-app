@@ -3,19 +3,17 @@ import {
     Injectable,
     NotFoundException,
 } from '@nestjs/common';
+import bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
-import { Strategy } from 'passport-github2';
-import bcrypt from 'bcrypt';
-
+import Strategy from 'passport-discord';
 import { AuthRepository } from '../repositories/Auth.repository';
-
-import { PrismaService } from '@/prisma/prisma.service';
-import { CloudinaryService } from '@/cloudinary/cloudinary.service';
 import { HandleIOauth } from '../services';
+import { CloudinaryService } from '@/cloudinary/cloudinary.service';
+import { PrismaService } from '@/prisma/prisma.service';
 
 @Injectable()
-export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
+export class DiscordStrategy extends PassportStrategy(Strategy, 'discord') {
     constructor(
         private readonly authRepository: AuthRepository,
         private readonly prisma: PrismaService,
@@ -25,11 +23,11 @@ export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
         config: ConfigService,
     ) {
         super({
-            clientID: config.get('GITHUB_CLIENT_ID'),
-            clientSecret: config.get('GITHUB_CLIENT_SECRET'),
-            callbackURL: config.get('GITHUB_CALLBACK_URL'),
-            proxy: true,
-            scope: ['user:email'],
+            clientID: config.get('DISCORD_CLIENT_ID'),
+            clientSecret: config.get('DISCORD_CLIENT_SECRET'),
+            callbackURL: config.get('DISCORD_CALLBACK_URI'),
+            // proxy: true,
+            scope: ['identify', 'email'],
             // scope: ['email', 'profile'],
         });
     }
@@ -39,9 +37,7 @@ export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
         refreshToken: string,
         profile: any,
     ): Promise<any> {
-        const { displayName, emails, id } = profile;
-        // console.log(accessToken, refreshToken);
-        const email = profile?.emails?.[0]?.value;
+        const { global_name, email, id, provider, avatar } = profile;
 
         if (!email) {
             throw new NotFoundException('Email not found');
@@ -50,6 +46,7 @@ export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
         const user = await this.authRepository.findUser({
             email,
         });
+
         if (user?.blocked) {
             throw new BadRequestException('User is blocked');
         }
@@ -63,25 +60,26 @@ export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
         const userData = {
             providerId: id,
             email,
-            name: displayName,
-            provider: profile.provider,
+            name: global_name,
+            provider: provider,
             password: hashedPassword,
-            avatarUrl: profile._json.avatar_url,
+            avatarUrl: avatar || '',
         };
 
+        // console.log({ userData });
         await this.handleIOauth.createUserViaOauth({
-    
             ...userData,
         });
 
-
         return {
             email: email,
-            name: displayName || 'Unknown',
-            avatar: profile._json.avatar_url,
-            githubId: id,
+            name: global_name,
+            avatar: avatar || '',
+            discordId: id,
             accessToken,
             refreshToken,
         };
+
+        // console.log(profile);
     }
 }

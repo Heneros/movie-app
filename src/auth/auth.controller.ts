@@ -51,7 +51,7 @@ import { Throttle } from '@nestjs/throttler';
 import { isDevelopment } from '@/data/defaultData';
 import { AuthGuard } from '@nestjs/passport';
 import { JwtService } from '@nestjs/jwt';
-import { GithubService, GoogleService } from './services';
+import { DiscordService, GithubService, GoogleService } from './services';
 
 @Controller(AUTH_CONTROLLER)
 @ApiTags('Auth')
@@ -62,7 +62,7 @@ export class AuthController {
         private readonly queryBus: QueryBus,
         private readonly googleService: GoogleService,
         private readonly githubService: GithubService,
-
+        private readonly discordService: DiscordService,
         private jwt: JwtService,
     ) {}
 
@@ -300,9 +300,56 @@ export class AuthController {
             }).redirect('/');
         } catch (error) {
             res.redirect('/auth-error');
+            if (error instanceof BadRequestException) {
+                throw error;
+            }
+
+            throw new BadGatewayException(
+                error.message || 'Authentication failed',
+            );
         }
     }
 
+    @Get(AUTH_ROUTES.DISCORD)
+    @UseGuards(AuthGuard('discord'))
+    discordAuth() {
+        // console.log(123);
+    }
+
+    @Get(AUTH_ROUTES.DISCORD_CALLBACK)
+    @UseGuards(AuthGuard('discord'))
+    async discordAuthCallback(@Req() req, @Res() res: Response) {
+        try {
+            const user = await this.discordService.validateDiscordUser(
+                req.user,
+            );
+
+            if (!user) {
+                return res.status(400).json({ message: 'User not found' });
+            }
+
+            const token = this.jwt.sign({
+                userId: user.id,
+                name: user.name,
+                roles: user.roles,
+            });
+            res.cookie('jwtMovie', token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'lax',
+                maxAge: 30 * 24 * 60 * 60 * 1000,
+            }).redirect('/');
+        } catch (error) {
+            // res.redirect('/auth-error');
+            if (error instanceof BadRequestException) {
+                throw error;
+            }
+
+            throw new BadGatewayException(
+                error.message || 'Authentication failed',
+            );
+        }
+    }
     // @Get('google/redirect')
     // async googleAuthRedirectC() {}
 }
