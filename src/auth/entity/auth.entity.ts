@@ -3,6 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 @ObjectType({ description: 'Auth' })
 export class AuthEntity {
+    @ApiProperty()
     @Field()
     message?: string;
 
