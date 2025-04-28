@@ -1,4 +1,8 @@
-import { ClassSerializerInterceptor, Module } from '@nestjs/common';
+import {
+    ClassSerializerInterceptor,
+    MiddlewareConsumer,
+    Module,
+} from '@nestjs/common';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
 
@@ -19,6 +23,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { RedisOptions } from './configs/redis-config';
 import { GqlThrottlerGuard } from './guards/gql-throttler.guard';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { RedisModule } from '@nestjs-modules/ioredis';
 
 @Module({
     imports: [
@@ -29,6 +34,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
         MailModule,
         ConfigModule.forRoot({
             isGlobal: true,
+            expandVariables: true,
         }),
         CacheModule.registerAsync(RedisOptions),
         WinstonModule.forRoot({}),
@@ -56,7 +62,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
         }),
 
         CqrsModule.forRoot(),
-
+        RedisModule,
         CloudinaryModule,
     ],
     controllers: [],
@@ -78,4 +84,8 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
         },
     ],
 })
-export class AppModule {}
+export class AppModule {
+    public configure(consumer: MiddlewareConsumer): void | MiddlewareConsumer {
+        // consumer.apply()
+    }
+}

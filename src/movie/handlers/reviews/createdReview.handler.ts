@@ -1,7 +1,7 @@
 import { CreateReviewCommand } from '@/movie/commands/reviews/createReview.command';
 
 import { CommandHandler, EventsHandler, IEventHandler } from '@nestjs/cqrs';
-import { RedisService } from '../../../redis/event-store.service';
+import { RedisService } from '@/redis/redis.service';
 import { CreatedReviewEvent } from '@/movie/events/createReview.event';
 
 @EventsHandler(CreatedReviewEvent)

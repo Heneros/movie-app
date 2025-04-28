@@ -16,8 +16,6 @@ services:
     #   - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
        -  movies_db_data:/var/lib/postgresql/data
-    #    - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-     #    - ./docker/dev/postgresql_master/postgresql.conf:/etc/postgresql/postgresql.conf
     ports:
       -  '5432:5432' 
     command: ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]

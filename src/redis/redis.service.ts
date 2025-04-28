@@ -1,6 +1,13 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { createClient, RedisClientType } from 'redis';
 
+export interface IRedisSubscribeMessage {
+    readonly message: string;
+    readonly channel: string;
+}
+
+const REDIS_EXPIRE_TIME = 7 * 24 * 60 * 60;
+
 @Injectable()
 export class RedisService implements OnModuleInit, OnModuleDestroy {
     private client: RedisClientType;

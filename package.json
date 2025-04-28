@@ -47,6 +47,7 @@
         "@nestjs/swagger": "^11.0.6",
         "@nestjs/throttler": "^6.4.0",
         "@prisma/client": "^6.5.0",
+        "@types/uuid": "^10.0.0",
         "amqplib": "^0.10.5",
         "bcrypt": "^5.1.1",
         "buffer-to-stream": "^1.0.0",
@@ -72,6 +73,7 @@
         "reflect-metadata": "^0.2.2",
         "rxjs": "^7.8.1",
         "streamifier": "^0.1.1",
+        "uuid": "^11.1.0",
         "winston": "^3.17.0",
         "winston-daily-rotate-file": "^5.0.0"
     },

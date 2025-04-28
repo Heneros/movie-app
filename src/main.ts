@@ -16,6 +16,9 @@ import { PrismaClientExceptionFilter } from './prisma-client-exception/prisma-cl
 
 import { LoggerFactory } from './Logger';
 import { domain } from './data/defaultData';
+import { ConfigService } from '@nestjs/config';
+import { RedisService } from './redis/redis.service';
+
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule, {
@@ -103,6 +106,8 @@ async function bootstrap() {
         .build();
     const document = SwaggerModule.createDocument(app, config);
 
+    app.get(RedisService);
+
     SwaggerModule.setup('api', app, document, {
         swaggerOptions: {
             persistAuthorization: true,
@@ -115,6 +120,7 @@ async function bootstrap() {
         },
     });
 
+    // app.useWebSocketAdapter(new WsAdapter(app, config, redis, jwt));
     // const { httpAdapter } = app.get(HttpAdapterHost);
     // app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
 

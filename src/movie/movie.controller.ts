@@ -64,7 +64,7 @@ import { GetSingleReviewQuery } from './queries/reviews/getSingleReview.query';
 import { UpdateReviewCommand } from './commands/reviews/updateReview.command';
 import { CreateReviewCommand } from './commands/reviews/createReview.command';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
-import { RedisService } from '../redis/event-store.service';
+import { RedisService } from '../redis/redis.service';
 import { RemoveReviewCommand } from './commands/reviews/removeReview.command';
 import { GqlThrottlerGuard } from '../guards/gql-throttler.guard';
 import { MOVIE_CONTROLLER, MOVIE_ROUTES } from '@/sites/site.constants';

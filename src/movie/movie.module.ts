@@ -29,7 +29,7 @@ import { ReviewRepository } from './repositories/review.repository';
 import { UpdateReviewHandler } from './handlers/reviews/updateReview.handler';
 import { FindDraftsHandler } from './handlers/findDrafts.handler';
 import { CreatedMovieReviewHandler } from './handlers/reviews/createdReview.handler';
-import { RedisService } from '@/redis/event-store.service';
+import { RedisService } from '@/redis/redis.service';
 import { RemoveMReviewHandler } from './handlers/reviews/removeReview.handler';
 import { CloudinaryModule } from '@/cloudinary/cloudinary.module';
 
