@@ -22,7 +22,7 @@ import {
 import { Express } from 'express';
 import * as fs from 'fs';
 
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserDto } from './dto-input/update-user.dto';
 import {
     ApiBearerAuth,
     ApiCookieAuth,
@@ -39,7 +39,7 @@ import { Roles } from '@/decorators/roles.decorator';
 
 import { CheckUserExistPipe } from './pipe/CheckUserExist.pipe';
 import { ProfileOwnerGuard } from '../guards/ProfileOwner.guard';
-import { UpdateUserRole } from './dto/update-user-role.dto';
+import { UpdateUserRole } from './dto-input/update-user-role.dto';
 // import { UserUpdatedProfileEntity } from './entities/updated-profile.entity';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {

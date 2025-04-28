@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '@/prisma/prisma.service';
-import { LogInDto } from '../dto/Login.dto';
+import { LogInDto } from '../dto-input/Login.dto';
 import * as bcrypt from 'bcrypt';
 import { isDevelopment, tempLoginDate } from '@/data/defaultData';
 // import { isDevelopment, tempLoginDate } from '@/data/defaultData';
@@ -55,7 +55,6 @@ export class LoginAuthService {
         }
 
         user.refreshToken = [...newRefreshTokenArray, newRefreshToken];
-
 
         const refreshToken = this.jwtService.sign(payload, {
             expiresIn: '7d',

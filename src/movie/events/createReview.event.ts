@@ -1,4 +1,4 @@
-import { CreateMovieReviewDto } from '@/movie/dto/create-review.dto';
+import { CreateMovieReviewDto } from '@/movie/dto-input/create-review.dto';
 import { IEvent } from '@nestjs/cqrs';
 
 export class CreatedReviewEvent implements IEvent {

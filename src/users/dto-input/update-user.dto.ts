@@ -1,6 +1,6 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
-import { CreateUserDto } from '@/auth/dto/Create-user.dto';
+import { CreateUserDto } from '@/auth/dto-input/Create-user.dto';
 import { Field, ID, InputType } from '@nestjs/graphql';
 import {
     ArrayMinSize,

@@ -1,5 +1,5 @@
 import { ICommand } from '@nestjs/cqrs';
-import { UpdateMovieDto } from '../dto/update-movie.dto';
+import { UpdateMovieDto } from '../dto-input/update-movie.dto';
 
 export class UpdateMovieCommand implements ICommand {
     constructor(

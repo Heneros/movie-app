@@ -1,5 +1,5 @@
 import { PAGINATION_LIMIT } from '@/data/defaultData';
-import { CreateMovieReviewDto } from '@/movie/dto/create-review.dto';
+import { CreateMovieReviewDto } from '@/movie/dto-input/create-review.dto';
 import { PrismaService } from '@/prisma/prisma.service';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 

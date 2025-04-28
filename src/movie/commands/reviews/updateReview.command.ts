@@ -1,5 +1,5 @@
 import { ICommand } from '@nestjs/cqrs';
-import { CreateMovieReviewDto } from '@/movie/dto/create-review.dto';
+import { CreateMovieReviewDto } from '@/movie/dto-input/create-review.dto';
 
 export class UpdateReviewCommand implements ICommand {
     constructor(

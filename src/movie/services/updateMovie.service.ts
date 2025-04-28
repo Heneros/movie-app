@@ -1,6 +1,6 @@
 import { PrismaService } from '@/prisma/prisma.service';
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { UpdateMovieDto } from '../dto/update-movie.dto';
+import { UpdateMovieDto } from '../dto-input/update-movie.dto';
 
 @Injectable()
 export class MovieUpdateService {

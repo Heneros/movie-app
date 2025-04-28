@@ -1,7 +1,7 @@
 import { ICommand } from '@nestjs/cqrs';
 import { Response } from 'express';
 
-import { ResetPasswordDto } from '../dto/Reset-password.dto';
+import { ResetPasswordDto } from '../dto-input/Reset-password.dto';
 
 export class ResetPasswordCommand implements ICommand {
     constructor(

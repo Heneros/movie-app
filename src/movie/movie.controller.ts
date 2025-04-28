@@ -19,8 +19,8 @@ import {
 } from '@nestjs/common';
 import { Express } from 'express';
 import { MovieService } from './movie.service';
-import { CreateMovieDto } from './dto/create-movie.dto';
-import { UpdateMovieDto } from './dto/update-movie.dto';
+import { CreateMovieDto } from './dto-input/create-movie.dto';
+import { UpdateMovieDto } from './dto-input/update-movie.dto';
 import {
     ApiBearerAuth,
     ApiCreatedResponse,
@@ -40,7 +40,7 @@ import { AuthGuard } from '@/guards/auth.guard';
 
 import { CheckMovieExistPipe } from './guard/checkIfMovieExist.guard';
 import { ProfileOwnerGuard } from '@/guards/ProfileOwner.guard';
-import { RateMovieDto } from './dto/rate-movie.dto';
+import { RateMovieDto } from './dto-input/rate-movie.dto';
 import { Throttle } from '@nestjs/throttler';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { GetAllFavoritesQuery } from './queries/favorite/getAllFavorite.query';
@@ -56,7 +56,7 @@ import { AddMovieFavCommand } from './commands/favorite/addMovieFavorite.command
 import { RemoveMovieFavCommand } from './commands/favorite/removeMovieFavorite.command';
 import { RateMovieCommand } from './commands/rateMovie.command';
 import { MovieRepository } from './repositories/movie.repository';
-import { CreateMovieReviewDto } from './dto/create-review.dto';
+import { CreateMovieReviewDto } from './dto-input/create-review.dto';
 import { MovieReviewEntity } from './entities/movieReview.entity';
 import { GetReviewsQuery } from './queries/reviews/getAllReviews.query';
 import { GetReviewsByMovieQuery } from './queries/reviews/getAllReviewsMovie.query';

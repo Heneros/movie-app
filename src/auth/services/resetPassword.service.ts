@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '@/prisma/prisma.service';
-import { ResetPasswordDto } from '../dto/Reset-password.dto';
+import { ResetPasswordDto } from '../dto-input/Reset-password.dto';
 import { MailService } from '@/mail/mail.service';
 import * as bcrypt from 'bcrypt';
 import { roundsOfHashing } from '@/data/defaultData';

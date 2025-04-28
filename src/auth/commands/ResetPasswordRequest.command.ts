@@ -1,6 +1,6 @@
 import { ICommand } from '@nestjs/cqrs';
 import { Response } from 'express';
-import { EmailDto } from '../dto/Resend-email.dto';
+import { EmailDto } from '../dto-input/Resend-email.dto';
 
 export class ResetPasswordRequestCommand implements ICommand {
     constructor(

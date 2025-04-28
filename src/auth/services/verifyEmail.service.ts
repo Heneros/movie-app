@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '@/prisma/prisma.service';
 import { MailService } from '@/mail/mail.service';
-import { VerifyEmailDto } from '../dto/Verify-email.dto';
+import { VerifyEmailDto } from '../dto-input/Verify-email.dto';
 import { Response } from 'express';
 import { tempLoginDate } from '@/data/defaultData';
 

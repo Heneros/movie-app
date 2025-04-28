@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateUserDto } from '../dto/Create-user.dto';
+import { CreateUserDto } from '../dto-input/Create-user.dto';
 import { randomBytes } from 'crypto';
 import { PrismaService } from '@/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';

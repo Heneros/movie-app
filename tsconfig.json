@@ -1,12 +1,14 @@
 {
     "compilerOptions": {
         "module": "CommonJS",
+        "target": "ESNext",
+        "moduleResolution": "node",
         "declaration": true,
+        "composite": true,
         "removeComments": true,
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         "allowSyntheticDefaultImports": true,
-        "target": "ES2017",
         "sourceMap": true,
         "types": [
             "express",

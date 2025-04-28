@@ -2,8 +2,8 @@ import { PrismaService } from '@/prisma/prisma.service';
 import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { roundsOfHashing, tempLoginDate } from '@/data/defaultData';
-import { LogInDto } from '../dto/Login.dto';
-import { EmailDto } from '../dto/Resend-email.dto';
+import { LogInDto } from '../dto-input/Login.dto';
+import { EmailDto } from '../dto-input/Resend-email.dto';
 
 @Injectable()
 export class AuthRepository {

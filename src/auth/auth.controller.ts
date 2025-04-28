@@ -25,11 +25,11 @@ import {
     ApiTags,
 } from '@nestjs/swagger';
 import { AuthEntity } from './entity/auth.entity';
-import { LogInDto } from './dto/Login.dto';
+import { LogInDto } from './dto-input/Login.dto';
 import { TimeoutInterceptor } from '@/interceptor/timeout.interceptor';
 import { UserEntity } from '@/users/entities/user.entity';
-import { CreateUserDto } from './dto/Create-user.dto';
-import { ResetPasswordDto } from './dto/Reset-password.dto';
+import { CreateUserDto } from './dto-input/Create-user.dto';
+import { ResetPasswordDto } from './dto-input/Reset-password.dto';
 import { AuthRegister } from './entity/register.entity';
 import { EmailValidationPipe } from './pipe/EmailValidation.pipe';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
@@ -46,7 +46,7 @@ import {
 import { CustomRequest } from '@/types/cus-request';
 import { AUTH_CONTROLLER, AUTH_ROUTES } from '@/sites/site.constants';
 import { VerifyEmailQuery } from './queries';
-import { EmailDto } from './dto/Resend-email.dto';
+import { EmailDto } from './dto-input/Resend-email.dto';
 import { Throttle } from '@nestjs/throttler';
 import { isDevelopment } from '@/data/defaultData';
 import { AuthGuard } from '@nestjs/passport';

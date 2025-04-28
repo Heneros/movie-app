@@ -1,6 +1,6 @@
 import { ICommand } from '@nestjs/cqrs';
 import { Response } from 'express';
-import { LogInDto } from '../dto/Login.dto';
+import { LogInDto } from '../dto-input/Login.dto';
 import { CustomRequest } from '@/types/cus-request';
 
 export class LoginUserCommand implements ICommand {

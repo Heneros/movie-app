@@ -4,7 +4,7 @@ import {
     NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '@/prisma/prisma.service';
-import { EmailDto } from '../dto/Resend-email.dto';
+import { EmailDto } from '../dto-input/Resend-email.dto';
 import { MailService } from '@/mail/mail.service';
 import { domain, tempRegisterDate } from '@/data/defaultData';
 import { randomBytes } from 'crypto';
@@ -25,8 +25,7 @@ export class ResendEmailService {
             throw new NotFoundException('User not found');
         }
 
-
-        console.log('test123')
+        console.log('test123');
         if (user.isEmailVerified) {
             throw new BadRequestException('User already verified');
         }

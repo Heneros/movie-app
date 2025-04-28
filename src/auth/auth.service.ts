@@ -10,7 +10,7 @@ import { PrismaService } from '@/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import { MailService } from '@/mail/mail.service';
-import { CreateUserDto } from './dto/Create-user.dto';
+import { CreateUserDto } from './dto-input/Create-user.dto';
 import { domain, isDevelopment, roundsOfHashing } from '@/data/defaultData';
 import { randomBytes } from 'crypto';
 

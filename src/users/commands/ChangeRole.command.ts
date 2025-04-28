@@ -1,5 +1,5 @@
 import { ICommand } from '@nestjs/cqrs';
-import { UpdateUserRole } from '../dto/update-user-role.dto';
+import { UpdateUserRole } from '../dto-input/update-user-role.dto';
 
 export class ChangeRoleCommand implements ICommand {
     constructor(

@@ -35,6 +35,7 @@ import { RedisModule } from '@nestjs-modules/ioredis';
         ConfigModule.forRoot({
             isGlobal: true,
             expandVariables: true,
+            envFilePath: './.env',
         }),
         CacheModule.registerAsync(RedisOptions),
         WinstonModule.forRoot({}),

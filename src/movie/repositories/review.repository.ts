@@ -2,7 +2,7 @@ import { PAGINATION_LIMIT } from '@/data/defaultData';
 import { PrismaService } from '@/prisma/prisma.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Reviews } from '@prisma/client';
-import { CreateMovieReviewDto } from '@/movie/dto/create-review.dto';
+import { CreateMovieReviewDto } from '@/movie/dto-input/create-review.dto';
 
 @Injectable()
 export class ReviewRepository {

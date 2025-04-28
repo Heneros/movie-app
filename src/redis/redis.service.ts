@@ -1,5 +1,8 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { createClient, RedisClientType } from 'redis';
+import { Observable } from 'rxjs';
+import { RedisClient } from './redis.client';
 
 export interface IRedisSubscribeMessage {
     readonly message: string;
@@ -12,7 +15,7 @@ const REDIS_EXPIRE_TIME = 7 * 24 * 60 * 60;
 export class RedisService implements OnModuleInit, OnModuleDestroy {
     private client: RedisClientType;
 
-    constructor() {
+    constructor() { // private readonly client: RedisClient, // private readonly config: ConfigService,
         this.client = createClient({
             url: 'redis://localhost:6379',
         });
@@ -55,6 +58,14 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
         }
     }
 
+    // public get pub_client() {
+    //     return this.client.pub;
+    // }
+
+    // public get sub_client() {
+    //     return this.client.sub;
+    // }
+
     async getEvents(stream: string) {
         try {
             if (!(await this.isConnected())) {
@@ -75,4 +86,18 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
             return [];
         }
     }
+
+    // public fromEvent<T>(event_name: string): Observable<T> {
+    //     const REDIS_KEY = this.config.getOrThrow<string>('REDIS_KEY');
+
+    //     const key = `${REDIS_KEY}_${event_name}`;
+
+    //     this.client.subscribe(key);
+
+    //     return this.client.events$.pipe(
+    //         filter(({ channel }) => channel === key),
+    //         map(({ message }) => JSON.parse(message)),
+    //         filter((message) => message.redis_id !== this.id),
+    //     );
+    // }
 }

@@ -1,9 +1,9 @@
 import { PrismaService } from '@/prisma/prisma.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateMovieDto } from '../dto/create-movie.dto';
+import { CreateMovieDto } from '../dto-input/create-movie.dto';
 import { Movie } from '@prisma/client';
 import { PAGINATION_LIMIT } from '@/data/defaultData';
-import { UpdateMovieDto } from '../dto/update-movie.dto';
+import { UpdateMovieDto } from '../dto-input/update-movie.dto';
 
 @Injectable()
 export class MovieRepository {

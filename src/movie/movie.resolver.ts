@@ -41,14 +41,14 @@ import { GetReviewsByMovieQuery } from './queries/reviews/getAllReviewsMovie.que
 import { GetSingleReviewQuery } from './queries/reviews/getSingleReview.query';
 import { MovieReviewEntity } from './entities/movieReview.entity';
 import { CreateReviewCommand } from './commands/reviews/createReview.command';
-import { CreateMovieReviewDto } from './dto/create-review.dto';
+import { CreateMovieReviewDto } from './dto-input/create-review.dto';
 import { UpdateReviewCommand } from './commands/reviews/updateReview.command';
 import { RemoveReviewCommand } from './commands/reviews/removeReview.command';
 import { RemoveMovieCommand } from './commands/removeMovie.command';
-import { CreateMovieDto } from './dto/create-movie.dto';
+import { CreateMovieDto } from './dto-input/create-movie.dto';
 import { CreateMovieCommand } from './commands/createMovie.command';
 import { UpdateMovieCommand } from './commands/updateMovie.command';
-import { UpdateMovieDto } from './dto/update-movie.dto';
+import { UpdateMovieDto } from './dto-input/update-movie.dto';
 
 @Resolver((of) => MovieEntity)
 export class MovieResolver {

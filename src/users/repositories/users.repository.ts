@@ -1,8 +1,8 @@
 import { PAGINATION_LIMIT } from '@/data/defaultData';
 import { PrismaService } from '@/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
-import { UpdateUserDto } from '../dto/update-user.dto';
-import { UpdateUserRole } from '../dto/update-user-role.dto';
+import { UpdateUserDto } from '../dto-input/update-user.dto';
+import { UpdateUserRole } from '../dto-input/update-user-role.dto';
 import { User } from '@prisma/client';
 
 @Injectable()
