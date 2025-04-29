@@ -1,8 +1,14 @@
-import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import {
+    Inject,
+    Injectable,
+    OnModuleDestroy,
+    OnModuleInit,
+} from '@nestjs/common';
 import { createClient, RedisClientType } from 'redis';
-import { Observable } from 'rxjs';
-import { RedisClient } from './redis.client';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
+
+import { RedisStore } from 'cache-manager-redis-store';
 
 export interface IRedisSubscribeMessage {
     readonly message: string;
@@ -15,7 +21,8 @@ const REDIS_EXPIRE_TIME = 7 * 24 * 60 * 60;
 export class RedisService implements OnModuleInit, OnModuleDestroy {
     private client: RedisClientType;
 
-    constructor() { // private readonly client: RedisClient, // private readonly config: ConfigService,
+    constructor(@Inject(CACHE_MANAGER) private readonly cache: Cache) {
+        // private readonly client: RedisClient, // private readonly config: ConfigService,
         this.client = createClient({
             url: 'redis://localhost:6379',
         });
@@ -85,6 +92,18 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
             console.error('Error fetching events:', error);
             return [];
         }
+    }
+
+    async getValue(key: string): Promise<string | null | undefined> {
+        return await this.cache.get(key);
+    }
+
+    async setValue(key: string, value: string): Promise<void> {
+        await this.cache.set(key, value);
+    }
+
+    async delete(key: string): Promise<void> {
+        await this.cache.del(key);
     }
 
     // public fromEvent<T>(event_name: string): Observable<T> {
