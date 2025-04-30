@@ -19,7 +19,6 @@ import { domain } from './data/defaultData';
 import { ConfigService } from '@nestjs/config';
 import { RedisService } from './redis/redis.service';
 
-
 async function bootstrap() {
     const app = await NestFactory.create(AppModule, {
         // logger: LoggerFactory('MovieApp'),
@@ -106,7 +105,7 @@ async function bootstrap() {
         .build();
     const document = SwaggerModule.createDocument(app, config);
 
-    app.get(RedisService);
+    // app.get(RedisService);
 
     SwaggerModule.setup('api', app, document, {
         swaggerOptions: {

@@ -16,10 +16,10 @@ export class CreatedMovieReviewHandler
     async handle(event: CreatedReviewEvent) {
         // const { movieId, auId, createMovieReviewDto } = event;
         // console.log('Movie added event received:', event);
-        await this.redisService.saveEvent('movie_events', {
-            type: 'MovieAdded',
-            data: event,
-            timestamp: new Date().toISOString(),
-        });
+        // await this.redisService.saveEvent('movie_events', {
+        //     type: 'MovieAdded',
+        //     data: event,
+        //     timestamp: new Date().toISOString(),
+        // });
     }
 }
