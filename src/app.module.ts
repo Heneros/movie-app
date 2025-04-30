@@ -1,8 +1,8 @@
 import {
-  ClassSerializerInterceptor,
-  ExecutionContext,
-  MiddlewareConsumer,
-  Module,
+    ClassSerializerInterceptor,
+    ExecutionContext,
+    MiddlewareConsumer,
+    Module,
 } from '@nestjs/common';
 import { seconds, ThrottlerModule } from '@nestjs/throttler';
 import { CacheModule } from '@nestjs/cache-manager';
@@ -31,66 +31,70 @@ import { RedisService } from './redis/redis.service';
 import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
 
 @Module({
-  imports: [
-    PrismaModule,
-    MovieModule,
-    UsersModule,
-    AuthModule,
-    MailModule,
-    ConfigModule.forRoot({
-      isGlobal: true,
-      expandVariables: true,
-      envFilePath: './.env',
-      load: [cacheConfig],
-    }),
-    CacheModule.registerAsync(RedisOptions),
-    WinstonModule.forRoot({}),
-    ThrottlerModule.forRoot({
-      throttlers: [{ ttl: seconds(60), limit: 10000 }],
-      storage: new ThrottlerStorageRedisService(),
-      getTracker: (req: Record<string, any>, context: ExecutionContext) => {
-        console.log(req.headers['x-device-id']);
-        return req.headers['x-device-id'];
-      },
-    }),
-    GraphQLModule.forRoot<ApolloDriverConfig>({
-      driver: ApolloDriver,
-      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
-      installSubscriptionHandlers: true,
-      subscriptions: {
-        'graphql-ws': true,
-      },
-      context: ({ req, res }: { req: Request; res: Response }) => ({
-        req,
-        res,
-      }),
-    }),
-    CqrsModule.forRoot(),
-    RedisModule,
-    CloudinaryModule,
-  ],
-  controllers: [],
-  providers: [
-    // AppService,
-    //  MovieResolver,
-    // MailService,
-    // {
-    //     provide: APP_INTERCEPTOR,
-    //     useClass: ClassSerializerInterceptor,
-    // },
-    // {
-    //     provide: APP_INTERCEPTOR,
-    //     useClass: CacheInterceptor,
+    imports: [
+        PrismaModule,
+        MovieModule,
+        UsersModule,
+        AuthModule,
+        MailModule,
+        ConfigModule.forRoot({
+            isGlobal: true,
+            expandVariables: true,
+            envFilePath: './.env',
+            load: [cacheConfig],
+        }),
 
-    // },
-    {
-      provide: APP_GUARD,
-      useClass: GqlThrottlerGuard,
-    },
-  ],
+        CacheModule.registerAsync(RedisOptions),
+        WinstonModule.forRoot({}),
+        ThrottlerModule.forRoot({
+            throttlers: [{ ttl: seconds(60), limit: 10000 }],
+            storage: new ThrottlerStorageRedisService(),
+            getTracker: (
+                req: Record<string, any>,
+                context: ExecutionContext,
+            ) => {
+                console.log(req.headers['x-device-id']);
+                return req.headers['x-device-id'];
+            },
+        }),
+        GraphQLModule.forRoot<ApolloDriverConfig>({
+            driver: ApolloDriver,
+            autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+            installSubscriptionHandlers: true,
+            subscriptions: {
+                'graphql-ws': true,
+            },
+            context: ({ req, res }: { req: Request; res: Response }) => ({
+                req,
+                res,
+            }),
+        }),
+        CqrsModule.forRoot(),
+        RedisModule,
+        CloudinaryModule,
+    ],
+    controllers: [],
+    providers: [
+        // AppService,
+        //  MovieResolver,
+        // MailService,
+        // {
+        //     provide: APP_INTERCEPTOR,
+        //     useClass: ClassSerializerInterceptor,
+        // },
+        // {
+        //     provide: APP_INTERCEPTOR,
+        //     useClass: CacheInterceptor,
+
+        // },
+        {
+            provide: APP_GUARD,
+            useClass: GqlThrottlerGuard,
+        },
+    ],
 })
 export class AppModule {
-  public configure(consumer: MiddlewareConsumer): void | MiddlewareConsumer {
-    // consumer.apply()
-  }
+    public configure(consumer: MiddlewareConsumer): void | MiddlewareConsumer {
+        // consumer.apply()
+    }
 }

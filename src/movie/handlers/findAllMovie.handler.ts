@@ -7,6 +7,7 @@ import { Inject, NotFoundException } from '@nestjs/common';
 import { MovieRepository } from './../repositories/movie.repository';
 import { Movie } from '@prisma/client';
 import { CACHE_TTL } from '@/data/ttl';
+import { RedisPrefixEnum } from '@/data/redis-prefix-enum';
 
 @QueryHandler(FindAllMovieQuery)
 export class FindAllMovieHandler implements IQueryHandler<FindAllMovieQuery> {
@@ -18,7 +19,7 @@ export class FindAllMovieHandler implements IQueryHandler<FindAllMovieQuery> {
 
     async execute(query: FindAllMovieQuery) {
         const { skip } = query;
-        const cacheKey = `movies:${skip}`;
+        const cacheKey = `${RedisPrefixEnum.MOVIE}:${skip}`;
 
         const cachedData = await this.cacheManager.get<Movie[]>(cacheKey);
         const start = Date.now();

@@ -32,6 +32,7 @@ import { CreatedMovieReviewHandler } from './handlers/reviews/createdReview.hand
 import { RedisService } from '@/redis/redis.service';
 import { RemoveMReviewHandler } from './handlers/reviews/removeReview.handler';
 import { CloudinaryModule } from '@/cloudinary/cloudinary.module';
+import { RedisModule } from '@nestjs-modules/ioredis';
 
 @Module({
     controllers: [MovieController],
@@ -67,6 +68,7 @@ import { CloudinaryModule } from '@/cloudinary/cloudinary.module';
         PrismaModule,
         CqrsModule,
         CloudinaryModule,
+
         // CacheModule.register({
         //     isGlobal: true,
         // }),

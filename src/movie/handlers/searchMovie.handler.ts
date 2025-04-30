@@ -7,6 +7,7 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { CACHE_TTL } from '@/data/ttl';
 import { RedisPrefixEnum } from '@/data/redis-prefix-enum';
+import { Movie } from '@prisma/client';
 
 @QueryHandler(SearchMovieQuery)
 export class SearchMovieHandler implements IQueryHandler<SearchMovieQuery> {
@@ -20,7 +21,7 @@ export class SearchMovieHandler implements IQueryHandler<SearchMovieQuery> {
         const cacheKey = `${RedisPrefixEnum.MOVIE}:search:${searchText}:${skip}`;
 
         try {
-            const cached = await this.cacheManager.get(cacheKey);
+            const cached = await this.cacheManager.get<Movie>(cacheKey);
             if (cached) {
                 return cached;
             }
