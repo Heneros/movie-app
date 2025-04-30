@@ -74,7 +74,7 @@ import { memoryStorage } from 'multer';
 
 @Controller(MOVIE_CONTROLLER)
 @ApiTags('Movie')
-@UseInterceptors(CacheInterceptor)
+// @UseInterceptors(CacheInterceptor)
 @UseGuards(GqlThrottlerGuard)
 // @UseInterceptors(TimeoutInterceptor)
 export class MovieController {
@@ -87,7 +87,7 @@ export class MovieController {
     ) {}
 
     @Get(MOVIE_ROUTES.GET_ALL)
-    @CacheTTL(45)
+    // @CacheTTL(60)
     @ApiQuery({
         name: 'page',
         required: false,

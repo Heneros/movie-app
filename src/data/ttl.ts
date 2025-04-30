@@ -1,5 +1,6 @@
 export enum CACHE_TTL {
     TEN_SECONDS = 1000 * 10,
+    
     ONE_MINUTE = 1000 * 60,
     HALF_HOUR = 1000 * 60 * 30,
     ONE_HOUR = 1000 * 60 * 60,

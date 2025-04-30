@@ -10,12 +10,13 @@ App analogue imdb/kinopoisk about movies. Site separated on 4 modules: auth(logi
 - Mongodb
 - Redis
 - Nginx 
-- Passport(Google, Github, Outlook)
+- Passport(Google, Github, Discord)
 - Socket io
 - Nodemailer
 - Github Actions
 - Jest (e2e)
 - Docker-Compose
+- JWT
 
 
 ## Technologies should be

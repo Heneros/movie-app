@@ -31,6 +31,7 @@
     },
     "dependencies": {
         "@apollo/server": "^4.11.3",
+        "@nest-lab/throttler-storage-redis": "^1.1.0",
         "@nestjs-modules/ioredis": "^2.0.2",
         "@nestjs-modules/mailer": "^2.0.2",
         "@nestjs/apollo": "^13.0.3",

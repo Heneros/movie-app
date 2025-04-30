@@ -5,6 +5,8 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 import { Inject, NotFoundException } from '@nestjs/common';
 import { MovieRepository } from './../repositories/movie.repository';
+import { Movie } from '@prisma/client';
+import { CACHE_TTL } from '@/data/ttl';
 
 @QueryHandler(FindAllMovieQuery)
 export class FindAllMovieHandler implements IQueryHandler<FindAllMovieQuery> {
@@ -18,14 +20,12 @@ export class FindAllMovieHandler implements IQueryHandler<FindAllMovieQuery> {
         const { skip } = query;
         const cacheKey = `movies:${skip}`;
 
-        // const cachedData = await this.cacheManager.get<Movie[]>(cacheKey);
-
-        // if (cachedData && cachedData.length > 0) {
-        //     const ttl = await this.cacheManager.ttl(cacheKey);
-        //     const remainingTime = ttl > 0 ? ttl : 0;
-
-        //     return cachedData;
-        // }
+        const cachedData = await this.cacheManager.get<Movie[]>(cacheKey);
+        const start = Date.now();
+        if (cachedData) {
+            console.log('Cash Data', Date.now() - start, 'ms');
+            return { allMovies: cachedData };
+        }
 
         const allMovies = await this.movieRepository.findAllMovie(skip);
 
@@ -33,7 +33,8 @@ export class FindAllMovieHandler implements IQueryHandler<FindAllMovieQuery> {
             throw new NotFoundException('No movies Exist');
         }
 
-        await this.cacheManager.set(cacheKey, allMovies, 3500);
+        await this.cacheManager.set(cacheKey, allMovies, CACHE_TTL.ONE_MINUTE);
+        console.log('BD', Date.now() - start, 'ms');
         return { allMovies };
     }
 }

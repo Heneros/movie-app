@@ -1,10 +1,11 @@
 import {
-    ClassSerializerInterceptor,
-    MiddlewareConsumer,
-    Module,
+  ClassSerializerInterceptor,
+  ExecutionContext,
+  MiddlewareConsumer,
+  Module,
 } from '@nestjs/common';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
+import { seconds, ThrottlerModule } from '@nestjs/throttler';
+import { CacheModule } from '@nestjs/cache-manager';
 
 import { join } from 'node:path';
 
@@ -25,68 +26,71 @@ import { GqlThrottlerGuard } from './guards/gql-throttler.guard';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { RedisModule } from '@nestjs-modules/ioredis';
 
-@Module({
-    imports: [
-        PrismaModule,
-        MovieModule,
-        UsersModule,
-        AuthModule,
-        MailModule,
-        ConfigModule.forRoot({
-            isGlobal: true,
-            expandVariables: true,
-            envFilePath: './.env',
-        }),
-        CacheModule.registerAsync(RedisOptions),
-        WinstonModule.forRoot({}),
-        ThrottlerModule.forRootAsync({
-            imports: [ConfigModule],
-            inject: [ConfigService],
-            useFactory: (config: ConfigService) => [
-                {
-                    ttl: config.get('THROTTLE_TTL'),
-                    limit: config.get('THROTTLE_LIMIT'),
-                },
-            ],
-        }),
-        GraphQLModule.forRoot<ApolloDriverConfig>({
-            driver: ApolloDriver,
-            autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
-            installSubscriptionHandlers: true,
-            subscriptions: {
-                'graphql-ws': true,
-            },
-            context: ({ req, res }: { req: Request; res: Response }) => ({
-                req,
-                res,
-            }),
-        }),
+import cacheConfig from './redis/cache.config';
+import { RedisService } from './redis/redis.service';
+import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
 
-        CqrsModule.forRoot(),
-        RedisModule,
-        CloudinaryModule,
-    ],
-    controllers: [],
-    providers: [
-        // AppService,
-        //  MovieResolver,
-        // MailService,
-        // {
-        //     provide: APP_INTERCEPTOR,
-        //     useClass: ClassSerializerInterceptor,
-        // },
-        // {
-        //     provide: APP_INTERCEPTOR,
-        //     useClass: CacheInterceptor,
-        // },
-        {
-            provide: APP_GUARD,
-            useClass: GqlThrottlerGuard,
-        },
-    ],
+@Module({
+  imports: [
+    PrismaModule,
+    MovieModule,
+    UsersModule,
+    AuthModule,
+    MailModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+      expandVariables: true,
+      envFilePath: './.env',
+      load: [cacheConfig],
+    }),
+    CacheModule.registerAsync(RedisOptions),
+    WinstonModule.forRoot({}),
+    ThrottlerModule.forRoot({
+      throttlers: [{ ttl: seconds(60), limit: 10000 }],
+      storage: new ThrottlerStorageRedisService(),
+      getTracker: (req: Record<string, any>, context: ExecutionContext) => {
+        console.log(req.headers['x-device-id']);
+        return req.headers['x-device-id'];
+      },
+    }),
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      installSubscriptionHandlers: true,
+      subscriptions: {
+        'graphql-ws': true,
+      },
+      context: ({ req, res }: { req: Request; res: Response }) => ({
+        req,
+        res,
+      }),
+    }),
+    CqrsModule.forRoot(),
+    RedisModule,
+    CloudinaryModule,
+  ],
+  controllers: [],
+  providers: [
+    // AppService,
+    //  MovieResolver,
+    // MailService,
+    // {
+    //     provide: APP_INTERCEPTOR,
+    //     useClass: ClassSerializerInterceptor,
+    // },
+    // {
+    //     provide: APP_INTERCEPTOR,
+    //     useClass: CacheInterceptor,
+
+    // },
+    {
+      provide: APP_GUARD,
+      useClass: GqlThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {
-    public configure(consumer: MiddlewareConsumer): void | MiddlewareConsumer {
-        // consumer.apply()
-    }
+  public configure(consumer: MiddlewareConsumer): void | MiddlewareConsumer {
+    // consumer.apply()
+  }
 }
