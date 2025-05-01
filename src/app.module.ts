@@ -48,7 +48,7 @@ import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis'
         WinstonModule.forRoot({}),
         ThrottlerModule.forRoot({
             throttlers: [{ ttl: seconds(60), limit: 10000 }],
-            storage: new ThrottlerStorageRedisService(),
+            storage: new ThrottlerStorageRedisService(new RedisModule()),
             getTracker: (
                 req: Record<string, any>,
                 context: ExecutionContext,

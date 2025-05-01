@@ -20,10 +20,6 @@ export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand> {
             throw new NotFoundException('No user found');
         }
 
-        if (!userIsAdmin) {
-            throw new ForbiddenException('User not found');
-        }
-
         if (userIsAdmin.roles?.includes['Admin']) {
             throw new ForbiddenException(
                 'Admin cannot delete their own account',

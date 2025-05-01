@@ -1,11 +1,16 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateMovieCommand } from '../commands/createMovie.command';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, Inject } from '@nestjs/common';
 import { MovieRepository } from '../repositories/movie.repository';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @CommandHandler(CreateMovieCommand)
 export class CreateMovieHandler implements ICommandHandler<CreateMovieCommand> {
-    constructor(private readonly movieRepository: MovieRepository) {}
+    constructor(
+        @Inject(CACHE_MANAGER) private cacheManager: Cache,
+        private readonly movieRepository: MovieRepository,
+    ) {}
 
     async execute(command: CreateMovieCommand) {
         const { createMovieDto } = command;

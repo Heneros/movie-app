@@ -43,34 +43,40 @@ import { ProfileOwnerGuard } from '@/guards/ProfileOwner.guard';
 import { RateMovieDto } from './dto-input/rate-movie.dto';
 import { Throttle } from '@nestjs/throttler';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { GetAllFavoritesQuery } from './queries/favorite/getAllFavorite.query';
-import { UpdateMovieCommand } from './commands/updateMovie.command';
-import { SearchMovieQuery } from './queries/searchMovie.query';
 import { plainToInstance } from 'class-transformer';
-import { FindAllMovieQuery } from './queries/findAllMovie.query';
-import { FindDraftsMovieQuery } from './queries/findDrafts.query';
-import { FindOneMovieQuery } from './queries/findOneMovie.query';
-import { CreateMovieCommand } from './commands/createMovie.command';
-import { RemoveMovieCommand } from './commands/removeMovie.command';
-import { AddMovieFavCommand } from './commands/favorite/addMovieFavorite.command';
-import { RemoveMovieFavCommand } from './commands/favorite/removeMovieFavorite.command';
-import { RateMovieCommand } from './commands/rateMovie.command';
 import { MovieRepository } from './repositories/movie.repository';
 import { CreateMovieReviewDto } from './dto-input/create-review.dto';
 import { MovieReviewEntity } from './entities/movieReview.entity';
-import { GetReviewsQuery } from './queries/reviews/getAllReviews.query';
-import { GetReviewsByMovieQuery } from './queries/reviews/getAllReviewsMovie.query';
-import { GetSingleReviewQuery } from './queries/reviews/getSingleReview.query';
-import { UpdateReviewCommand } from './commands/reviews/updateReview.command';
-import { CreateReviewCommand } from './commands/reviews/createReview.command';
+
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { RedisService } from '../redis/redis.service';
-import { RemoveReviewCommand } from './commands/reviews/removeReview.command';
+
 import { GqlThrottlerGuard } from '../guards/gql-throttler.guard';
 import { MOVIE_CONTROLLER, MOVIE_ROUTES } from '@/sites/site.constants';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from '@/cloudinary/cloudinary.service';
 import { memoryStorage } from 'multer';
+import {
+    AddMovieFavCommand,
+    CreateMovieCommand,
+    CreateReviewCommand,
+    RateMovieCommand,
+    RemoveMovieCommand,
+    RemoveMovieFavCommand,
+    RemoveReviewCommand,
+    UpdateMovieCommand,
+    UpdateReviewCommand,
+} from './commands';
+import {
+    FindAllMovieQuery,
+    FindDraftsMovieQuery,
+    FindOneMovieQuery,
+    GetAllFavoritesQuery,
+    GetReviewsByMovieQuery,
+    GetReviewsQuery,
+    GetSingleReviewQuery,
+    SearchMovieQuery,
+} from './queries';
 
 @Controller(MOVIE_CONTROLLER)
 @ApiTags('Movie')
