@@ -117,6 +117,8 @@ export class AuthController {
                 new LoginUserCommand(logInDto),
             );
 
+            console.log('refreshToken', result.refreshToken);
+
             res.cookie('jwtMovie', result.refreshToken, {
                 httpOnly: !isDevelopment,
                 sameSite: isDevelopment ? 'none' : 'strict',
@@ -127,6 +129,7 @@ export class AuthController {
             return new AuthEntity({
                 message: 'Login successful',
                 accessToken: result.accessToken,
+                refreshToken: result.refreshToken,
                 name: result.user.name,
                 id: result.user.id,
                 email: result.user.email,

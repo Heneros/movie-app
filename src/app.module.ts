@@ -5,7 +5,7 @@ import {
     Module,
 } from '@nestjs/common';
 import { seconds, ThrottlerModule } from '@nestjs/throttler';
-import { CacheModule } from '@nestjs/cache-manager';
+import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
 
 import { join } from 'node:path';
 
@@ -18,17 +18,19 @@ import { MailModule } from './mail/mail.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-
 import { WinstonModule } from 'nest-winston';
 import { CqrsModule } from '@nestjs/cqrs';
-import { RedisOptions } from './configs/redis-config';
+import { RedisConfig, RedisOptions } from './redis/redis-config';
 import { GqlThrottlerGuard } from './guards/gql-throttler.guard';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
-import { RedisModule } from '@nestjs-modules/ioredis';
-
-import cacheConfig from './redis/cache.config';
-import { RedisService } from './redis/redis.service';
+// import { RedisModule } from '@nestjs-modules/ioredis';
+// import cacheConfig from './redis/cache.config';
 import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
+import Redis from 'ioredis';
+import * as redisStore from 'cache-manager-redis-store';
+
+import { RedisModule } from './redis/redis.module';
+import { RedisService } from './redis/redis.service';
 
 @Module({
     imports: [
@@ -41,21 +43,35 @@ import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis'
             isGlobal: true,
             expandVariables: true,
             envFilePath: './.env',
-            load: [cacheConfig],
+            load: [RedisConfig],
         }),
 
         CacheModule.registerAsync(RedisOptions),
+        // RedisModule,
+        // CacheModule.registerAsync(RedisOptions),
         WinstonModule.forRoot({}),
-        ThrottlerModule.forRoot({
-            throttlers: [{ ttl: seconds(60), limit: 10000 }],
-            storage: new ThrottlerStorageRedisService(new RedisModule()),
-            getTracker: (
-                req: Record<string, any>,
-                context: ExecutionContext,
-            ) => {
-                console.log(req.headers['x-device-id']);
-                return req.headers['x-device-id'];
+        ThrottlerModule.forRootAsync({
+            imports: [ConfigModule],
+            inject: [ConfigService],
+            useFactory: async (configService: ConfigService) => {
+                const redisClient = new Redis({
+                    host: configService.get('REDIS_HOST'),
+                    port: configService.get('REDIS_PORT'),
+                    password: configService.get('REDIS_PASSWORD'),
+                });
+                return {
+                    throttlers: [{ ttl: 60, limit: 10000 }],
+                    storage: new ThrottlerStorageRedisService(redisClient),
+                    getTracker: (req, context) => req.headers['x-device-id'],
+                };
             },
+            // getTracker: (
+            //     req: Record<string, any>,
+            //     context: ExecutionContext,
+            // ) => {
+            //     console.log(req.headers['x-device-id']);
+            //     return req.headers['x-device-id'];
+            // },
         }),
         GraphQLModule.forRoot<ApolloDriverConfig>({
             driver: ApolloDriver,
@@ -70,11 +86,12 @@ import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis'
             }),
         }),
         CqrsModule.forRoot(),
-        RedisModule,
+
         CloudinaryModule,
     ],
     controllers: [],
     providers: [
+        RedisService,
         // AppService,
         //  MovieResolver,
         // MailService,
@@ -85,8 +102,8 @@ import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis'
         // {
         //     provide: APP_INTERCEPTOR,
         //     useClass: CacheInterceptor,
-
         // },
+
         {
             provide: APP_GUARD,
             useClass: GqlThrottlerGuard,

@@ -55,7 +55,7 @@ export class LoginUserHandler implements ICommandHandler<LoginUserCommand> {
             await this.authRepository.updateToken(user.id, refreshToken);
 
             await this.authRepository.updateProfile(user.id, {
-                refreshToken: [refreshToken],
+                refreshToken: [accessToken],
             });
             return {
                 accessToken,
@@ -71,7 +71,6 @@ export class LoginUserHandler implements ICommandHandler<LoginUserCommand> {
         } catch (error) {
             console.error('Error setting cookie or sending response:', error);
         }
-
         // return isPasswordValid;
     }
 }

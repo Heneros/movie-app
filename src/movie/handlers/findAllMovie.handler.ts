@@ -35,7 +35,7 @@ export class FindAllMovieHandler implements IQueryHandler<FindAllMovieQuery> {
         }
 
         await this.cacheManager.set(cacheKey, allMovies, CACHE_TTL.ONE_MINUTE);
-        console.log('BD', Date.now() - start, 'ms');
+        // console.log('BD', Date.now() - start, 'ms');
         return { allMovies };
     }
 }

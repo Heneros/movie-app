@@ -10,61 +10,42 @@ import { AddMovieFavoriteHandler } from './handlers/favorite/addMovieFavorite.ha
 import { CqrsModule } from '@nestjs/cqrs';
 import { RedisService } from '@/redis/redis.service';
 import { CloudinaryModule } from '@/cloudinary/cloudinary.module';
-import {
-    CreateMovieHandler,
-    CreateMovieReviewHandler,
-    FindAllMovieHandler,
-    FindDraftsHandler,
-    GetAllFavoritesHandler,
-    GetAllReviewsByMovieHandler,
-    GetAllReviewsHandler,
-    RateMovieHandler,
-    RemoveMovieFavHandler,
-    RemoveMovieHandler,
-    RemoveMReviewHandler,
-    SearchMovieHandler,
-    UpdateMovieHandler,
-    UpdateReviewHandler,
-} from './handlers';
-import { GetSingleReviewHandler } from './handlers/reviews/getSingleReview.handler';
-import { FindOneHandler } from './handlers/findOneMovie.handler';
+// import {
+//     CreateMovieHandler,
+//     CreateMovieReviewHandler,
+//     FindAllMovieHandler,
+//     FindDraftsHandler,
+//     GetAllFavoritesHandler,
+//     GetAllReviewsByMovieHandler,
+//     GetAllReviewsHandler,
+//     RateMovieHandler,
+//     RemoveMovieFavHandler,
+//     RemoveMovieHandler,
+//     RemoveMReviewHandler,
+//     SearchMovieHandler,
+//     UpdateMovieHandler,
+//     UpdateReviewHandler,
+// } from './handlers';
+import * as Handlers from './handlers';
 import { MovieRepository } from './repositories/movie.repository';
 import { ReviewRepository } from './repositories/review.repository';
+import { RedisModule } from '@/redis/redis.module';
 
 @Module({
     controllers: [MovieController],
     providers: [
-        MovieService,
-        MovieFavorite,
-
-        MovieResolver,
-
+        ...Object.values(Handlers),
         MovieRepository,
         ReviewRepository,
-        AddMovieFavoriteHandler,
-        RemoveMovieFavHandler,
-        GetAllFavoritesHandler,
-        UpdateMovieHandler,
-        SearchMovieHandler,
-        RateMovieHandler,
-        CreateMovieHandler,
-        RemoveMovieHandler,
-        FindAllMovieHandler,
-        FindOneHandler,
-        CreateMovieReviewHandler,
-        GetAllReviewsHandler,
-        GetAllReviewsByMovieHandler,
-        GetSingleReviewHandler,
-        UpdateReviewHandler,
-        FindDraftsHandler,
-
+        MovieResolver,
         RedisService,
-        RemoveMReviewHandler,
+
     ],
     imports: [
         PrismaModule,
         CqrsModule,
         CloudinaryModule,
+        RedisModule,
 
         // CacheModule.register({
         //     isGlobal: true,
