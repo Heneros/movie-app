@@ -17,8 +17,6 @@ import {
     UploadedFile,
     UploadedFiles,
 } from '@nestjs/common';
-import { Express } from 'express';
-import { MovieService } from './movie.service';
 import { CreateMovieDto } from './dto-input/create-movie.dto';
 import { UpdateMovieDto } from './dto-input/update-movie.dto';
 import {
@@ -41,25 +39,23 @@ import { AuthGuard } from '@/guards/auth.guard';
 import { CheckMovieExistPipe } from './guard/checkIfMovieExist.guard';
 import { ProfileOwnerGuard } from '@/guards/ProfileOwner.guard';
 import { RateMovieDto } from './dto-input/rate-movie.dto';
-import { Throttle } from '@nestjs/throttler';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { plainToInstance } from 'class-transformer';
 import { MovieRepository } from './repositories/movie.repository';
 import { CreateMovieReviewDto } from './dto-input/create-review.dto';
 import { MovieReviewEntity } from './entities/movieReview.entity';
-
-import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { RedisService } from '../redis/redis.service';
 
 import { GqlThrottlerGuard } from '../guards/gql-throttler.guard';
 import { MOVIE_CONTROLLER, MOVIE_ROUTES } from '@/sites/site.constants';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from '@/cloudinary/cloudinary.service';
 import { memoryStorage } from 'multer';
 import {
     AddMovieFavCommand,
     CreateMovieCommand,
     CreateReviewCommand,
+    FilterMoviesCommand,
     RateMovieCommand,
     RemoveMovieCommand,
     RemoveMovieFavCommand,
@@ -77,6 +73,7 @@ import {
     GetSingleReviewQuery,
     SearchMovieQuery,
 } from './queries';
+import { FilterMovieDto } from './dto-input/filter-movie.dto';
 
 @Controller(MOVIE_CONTROLLER)
 @ApiTags('Movie')
@@ -419,10 +416,22 @@ export class MovieController {
             if (!files) {
                 return 'Error during upload files';
             }
-            console.log('FILES:', files);
+            // console.log('FILES:', files);
             return this.cloudinaryService.uploadGalleryImages(movieId, files);
         } catch (error) {
             console.log('FILES:', error);
         }
+    }
+
+    @Get(MOVIE_ROUTES.FILTER)
+    @ApiOperation({ summary: 'Filter movies' })
+    @ApiOkResponse({ type: MovieEntity })
+    async filterMovie(
+        @Query() filterMovieDto: FilterMovieDto,
+    ): Promise<FilterMovieDto | null> {
+        console.log('debug', 'Received filters:', filterMovieDto);
+        return await this.commandBus.execute(
+            new FilterMoviesCommand(filterMovieDto),
+        );
     }
 }

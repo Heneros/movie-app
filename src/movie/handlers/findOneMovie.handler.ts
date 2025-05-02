@@ -41,14 +41,7 @@ export class FindOneHandler implements IQueryHandler<FindOneMovieQuery> {
 
             this.logger.debug(`Movie exist ${movieId} `);
             if (!movieId) {
-                this.logger.error(`Movie dont exist ${id}`);
-                this.logger.debug(`Movie dont exist 2 ${id}`);
-                this.logger.warn(`Movie dont exist  3 ${id}`);
-                // this.logger.error(`Movie not found: ${id}`);
-
-                // this.logger.error(`Failed to find movie with ID `);
-                //   this.logger.warn('Movie dont exist', movieId);
-                throw new BadRequestException('Movie dont exist');
+              throw new BadRequestException(`Movie dont exist', ${id}`);
             }
 
             if (cachedData) {

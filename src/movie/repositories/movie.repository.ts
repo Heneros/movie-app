@@ -4,6 +4,7 @@ import { CreateMovieDto } from '../dto-input/create-movie.dto';
 import { Movie } from '@prisma/client';
 import { PAGINATION_LIMIT } from '@/data/defaultData';
 import { UpdateMovieDto } from '../dto-input/update-movie.dto';
+import { FilterMovieDto } from '../dto-input/filter-movie.dto';
 
 @Injectable()
 export class MovieRepository {
@@ -108,7 +109,6 @@ export class MovieRepository {
         updateMovieDto?: UpdateMovieDto;
     }) {
         const { id, updateMovieDto, avg } = criteria;
-        // console.log('id, updateMovieDto, avg', id, avg);
         return await this.prisma.movie.update({
             where: { id },
             data: {
@@ -198,5 +198,45 @@ export class MovieRepository {
             this.prisma.movie.delete({ where: { id } }),
         ]);
         return movie;
+    }
+
+    async filterMovie(filterMovieDto: FilterMovieDto) {
+        const {
+            year,
+            category,
+
+            minRating,
+            maxRating,
+            orderBy = 'year',
+            order = 'desc',
+            limit = 10,
+            offset = 0,
+        } = filterMovieDto;
+
+        return await this.prisma.movie.findMany({
+            where: {
+                ...(year ? { year } : {}),
+                ...(category
+                    ? { category: { contains: category, mode: 'insensitive' } }
+                    : {}),
+                ...(minRating !== undefined || maxRating !== undefined
+                    ? {
+                          rating: {
+                              ...(minRating !== undefined
+                                  ? { gte: minRating }
+                                  : {}),
+                              ...(maxRating !== undefined
+                                  ? { lte: maxRating }
+                                  : {}),
+                          },
+                      }
+                    : {}),
+            },
+            orderBy: {
+                [orderBy]: order,
+            },
+            skip: offset,
+            take: limit,
+        });
     }
 }

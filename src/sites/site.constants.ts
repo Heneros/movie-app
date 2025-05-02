@@ -55,4 +55,5 @@ export const MOVIE_ROUTES = {
     UPDATE_REVIEW: ':id/review',
     DELETE_REVIEW: ':id/review',
     UPLOAD_IMAGES: 'gallery/:id',
+    FILTER: 'filter',
 };

@@ -19,6 +19,9 @@ export class RemoveMovieHandler implements ICommandHandler<RemoveMovieCommand> {
 
         await this.cacheManager.del(`${RedisPrefixEnum.MOVIE}:${id}`);
 
+        await this.cacheManager.del(
+            `${RedisPrefixEnum.MOVIE}:${RedisPrefixEnum.MOVIE_LIST}`,
+        );
         return movie;
     }
 }

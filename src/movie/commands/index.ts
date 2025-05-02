@@ -2,6 +2,7 @@ export * from './createMovie.command';
 export * from './rateMovie.command';
 export * from './removeMovie.command';
 export * from './updateMovie.command';
+export * from './filterMovies.command';
 export * from './favorite/addMovieFavorite.command';
 export * from './favorite/removeMovieFavorite.command';
 export * from './reviews/createReview.command';
