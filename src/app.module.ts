@@ -1,9 +1,4 @@
-import {
-    ClassSerializerInterceptor,
-    ExecutionContext,
-    MiddlewareConsumer,
-    Module,
-} from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { seconds, ThrottlerModule } from '@nestjs/throttler';
 import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
 
@@ -18,19 +13,17 @@ import { MailModule } from './mail/mail.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { WinstonModule } from 'nest-winston';
 import { CqrsModule } from '@nestjs/cqrs';
 import { RedisConfig, RedisOptions } from './redis/redis-config';
 import { GqlThrottlerGuard } from './guards/gql-throttler.guard';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
-// import { RedisModule } from '@nestjs-modules/ioredis';
-// import cacheConfig from './redis/cache.config';
+
 import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
 import Redis from 'ioredis';
-import * as redisStore from 'cache-manager-redis-store';
-
-import { RedisModule } from './redis/redis.module';
 import { RedisService } from './redis/redis.service';
+import { WinstonModule } from 'nest-winston';
+import { winstonLoggerOptions } from './Logger';
+import { Logger } from 'winston';
 
 @Module({
     imports: [
@@ -45,11 +38,12 @@ import { RedisService } from './redis/redis.service';
             envFilePath: './.env',
             load: [RedisConfig],
         }),
-
+        // WinstonModule.forRoot(createWinstonOptions('Movie')),
         CacheModule.registerAsync(RedisOptions),
+        WinstonModule.forRoot(winstonLoggerOptions),
+        Logger,
         // RedisModule,
         // CacheModule.registerAsync(RedisOptions),
-        WinstonModule.forRoot({}),
         ThrottlerModule.forRootAsync({
             imports: [ConfigModule],
             inject: [ConfigService],
@@ -65,13 +59,6 @@ import { RedisService } from './redis/redis.service';
                     getTracker: (req, context) => req.headers['x-device-id'],
                 };
             },
-            // getTracker: (
-            //     req: Record<string, any>,
-            //     context: ExecutionContext,
-            // ) => {
-            //     console.log(req.headers['x-device-id']);
-            //     return req.headers['x-device-id'];
-            // },
         }),
         GraphQLModule.forRoot<ApolloDriverConfig>({
             driver: ApolloDriver,
@@ -86,24 +73,12 @@ import { RedisService } from './redis/redis.service';
             }),
         }),
         CqrsModule.forRoot(),
-
         CloudinaryModule,
     ],
     controllers: [],
     providers: [
         RedisService,
-        // AppService,
-        //  MovieResolver,
-        // MailService,
-        // {
-        //     provide: APP_INTERCEPTOR,
-        //     useClass: ClassSerializerInterceptor,
-        // },
-        // {
-        //     provide: APP_INTERCEPTOR,
-        //     useClass: CacheInterceptor,
-        // },
-
+        Logger,
         {
             provide: APP_GUARD,
             useClass: GqlThrottlerGuard,

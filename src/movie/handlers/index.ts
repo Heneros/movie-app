@@ -1,5 +1,6 @@
 export * from './createMovie.handler';
 export * from './findAllMovie.handler';
+export * from './findOneMovie.handler';
 export * from './searchMovie.handler';
 export * from './findDrafts.handler';
 export * from './updateMovie.handler';

@@ -13,15 +13,23 @@ import {
     ValidationPipe,
 } from '@nestjs/common';
 import { PrismaClientExceptionFilter } from './prisma-client-exception/prisma-client-exception.filter';
-
-import { LoggerFactory } from './Logger';
 import { domain } from './data/defaultData';
-import { ConfigService } from '@nestjs/config';
-import { RedisService } from './redis/redis.service';
+import { winstonLoggerOptions } from './Logger';
+import { WinstonModule } from 'nest-winston';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule, {
-        // logger: LoggerFactory('MovieApp'),
+        // logger: ['error', 'warn'],
+        // logger: new ConsoleLogger({
+        //     // json: true,
+        //     // depth: 1,
+        //     colors: true,
+        //     showHidden: true,
+        // }),
+        logger: WinstonModule.createLogger(winstonLoggerOptions),
+        // logger: WinstonLogger(new winstonConfig()),
+        // logger: WinstonModule.createLogger(createWinstonOptions('MovieApp')),
+        bufferLogs: true,
     });
 
     // const httpServer = createServer(app.getHttpAdapter().getInstance());

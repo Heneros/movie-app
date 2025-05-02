@@ -187,7 +187,7 @@ export class MovieController {
     }
 
     @Get(MOVIE_ROUTES.GET_ID_MOVIE)
-    @Throttle({ default: { limit: 3, ttl: 60000 } })
+    // @Throttle({ default: { limit: 3, ttl: 60000 } })
     @ApiOkResponse({ type: MovieEntity })
     async findOne(@Param('id', ParseIntPipe, CheckMovieExistPipe) id: number) {
         const movie = await this.queryBus.execute(new FindOneMovieQuery(+id));
