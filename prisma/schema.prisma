@@ -18,6 +18,9 @@ model Movie {
   title       String @unique
   description String
   category    String
+  year          Int
+  director     DirectorsOnMovie[]
+
 
   published Boolean  @default(false)
   createdAt DateTime @default(now())
@@ -31,10 +34,8 @@ model Movie {
   actors         ActorsOnMovies[]
   ratings        Rating[]
 
-//   gallery        Gallery[] @relation(name: "GalleryMovie")
-   galleryId Int? @unique()
-   gallery   Gallery? @relation(name: "GalleryMovie", fields: [galleryId], references: [id])
-
+  galleryId Int? @unique()
+  gallery   Gallery? @relation(name: "GalleryMovie", fields: [galleryId], references: [id])
 
   previewId Int?    @unique()
   preview   Avatar? @relation(name: "PreviewMovie", fields: [previewId], references: [id])
@@ -81,6 +82,24 @@ model ActorsOnMovies {
 
   @@id([actorId, movieId])
 }
+
+model Director {
+  id     Int                @id @default(autoincrement())
+  name   String @unique()
+  movies DirectorsOnMovie[]
+}
+
+model DirectorsOnMovie {
+  movie     Movie    @relation(fields: [movieId], references: [id])
+  movieId   Int
+
+  director  Director @relation(fields: [directorId], references: [id])
+  directorId Int
+
+  @@id([directorId, movieId])
+}
+
+
 
 model VerifyResetToken {
   user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)

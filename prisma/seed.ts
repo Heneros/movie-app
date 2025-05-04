@@ -41,17 +41,36 @@ async function main() {
     },
   });
 
+    const director1 = await prisma.director.upsert({
+    where: { name: 'Quentin Tarantino' },
+    update: {},
+    create: {
+      name: 'Quentin Tarantino'
+    }
+  });
+
+  const director2 = await prisma.director.upsert({
+    where: { name: 'Luc Besson' },
+    update: {},
+    create: {
+      name: 'Luc Besson'
+    }
+  });
+
+
   const movie1 = await prisma.movie.upsert({
     where: { title: 'Kill Bill' },
     update: {
       authorId: user1.id,
     },
+
     create: {
       title: 'Kill Bill',
       category: 'Action',
       description: 'Good Movie',
       published: false,
       authorId: user1.id,
+      year: 2003,
       actorsList: [],
     },
   });
@@ -66,11 +85,35 @@ async function main() {
       category: 'Action',
       // rating: 5,
     //   previewId: 2,
+          year: 2019,
       description: 'Wonderful movie',
       published: false,
       authorId: user1.id,
     },
   });
+
+
+  await prisma.directorsOnMovie.create({
+        data: {
+      movieId: movie1.id,
+      directorId: director1.id
+    }
+  })
+
+    await prisma.directorsOnMovie.create({
+        data: {
+      movieId: movie2.id,
+      directorId: director2.id
+    }
+  })
+  
+  const director = await prisma.director.upsert({
+    where: {id: movie1.id},
+    update:{},
+    create:{
+      name: 'Tarantino'
+    }
+  })
 
   const review1 = await prisma.reviews.upsert({
     where: { id: 1 },
@@ -95,7 +138,8 @@ async function main() {
       reviews: {
         connect: { id: review1.id },
       },
-
+ 
+year: 1985,
       title: 'Back to the Future',
       category: 'Science Fiction',
       // rating: 7,
@@ -120,7 +164,6 @@ const newAvatar = await prisma.avatar.create({
     create: {
       name: 'Johnny Depp',
       previewId: newAvatar.id,
-      
       age: '12-03-1996',
     },
   });

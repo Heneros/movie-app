@@ -16,6 +16,7 @@ import {
     UseInterceptors,
     UploadedFile,
     UploadedFiles,
+    ValidationPipe,
 } from '@nestjs/common';
 import { CreateMovieDto } from './dto-input/create-movie.dto';
 import { UpdateMovieDto } from './dto-input/update-movie.dto';
@@ -113,6 +114,19 @@ export class MovieController {
     //     return { events };
     // }
 
+    @Get(MOVIE_ROUTES.FILTER)
+    @ApiOperation({ summary: 'Filter movies' })
+    @ApiOkResponse({ type: MovieEntity })
+    async filterMovie(
+        @Query(new ValidationPipe({ transform: true }))
+        filterMovieDto: FilterMovieDto,
+    ): Promise<MovieEntity[]> {
+        const result = await this.commandBus.execute(
+            new FilterMoviesCommand(filterMovieDto),
+        );
+        return result;
+    }
+
     @Get(MOVIE_ROUTES.SEARCH)
     // @Throttle({ default: { limit: 3, ttl: 60000 } })
     @ApiProperty({ description: 'Search movie by title' })
@@ -143,7 +157,7 @@ export class MovieController {
             );
         }
 
-        return movies.map((draft) => new MovieEntity(draft));
+        return movies.map((draft: Movie) => new MovieEntity(draft));
         // return movies.map((movie) => new MovieEntity(movie));
     }
 
@@ -421,17 +435,5 @@ export class MovieController {
         } catch (error) {
             console.log('FILES:', error);
         }
-    }
-
-    @Get(MOVIE_ROUTES.FILTER)
-    @ApiOperation({ summary: 'Filter movies' })
-    @ApiOkResponse({ type: MovieEntity })
-    async filterMovie(
-        @Query() filterMovieDto: FilterMovieDto,
-    ): Promise<FilterMovieDto | null> {
-        console.log('debug', 'Received filters:', filterMovieDto);
-        return await this.commandBus.execute(
-            new FilterMoviesCommand(filterMovieDto),
-        );
     }
 }

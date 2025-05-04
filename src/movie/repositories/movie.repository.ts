@@ -202,26 +202,28 @@ export class MovieRepository {
 
     async filterMovie(filterMovieDto: FilterMovieDto) {
         const {
-            year,
+            // year,
             category,
-
+            // director,
             minRating,
             maxRating,
-            orderBy = 'year',
+            orderBy = 'title',
             order = 'desc',
-            limit = 10,
+
             offset = 0,
         } = filterMovieDto;
 
+        // console.log('minRating:', minRating, typeof minRating);
+        // console.log('maxRating:', maxRating, typeof maxRating);
         return await this.prisma.movie.findMany({
             where: {
-                ...(year ? { year } : {}),
+                // ...(year ? { year } : {}),
                 ...(category
                     ? { category: { contains: category, mode: 'insensitive' } }
                     : {}),
                 ...(minRating !== undefined || maxRating !== undefined
                     ? {
-                          rating: {
+                          avgRating: {
                               ...(minRating !== undefined
                                   ? { gte: minRating }
                                   : {}),
@@ -236,7 +238,7 @@ export class MovieRepository {
                 [orderBy]: order,
             },
             skip: offset,
-            take: limit,
+            take: PAGINATION_LIMIT,
         });
     }
 }

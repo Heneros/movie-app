@@ -5,7 +5,10 @@ export * from './searchMovie.handler';
 export * from './findDrafts.handler';
 export * from './updateMovie.handler';
 export * from './removeMovie.handler';
+export * from './filterMovies.handler';
+
 export * from './rateMovie.handler';
+
 export * from './favorite/addMovieFavorite.handler';
 export * from './favorite/getAllFavorite.handler';
 export * from './favorite/removeMovieFavorite.handler';
