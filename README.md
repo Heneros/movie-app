@@ -49,6 +49,7 @@ App analogue imdb/kinopoisk about movies. Site separated on 4 modules: auth(logi
 - Edit review during 15 minutes. Latter gonna be edit without limitless for premium users. 
 - ApiLimiter  
 - ProfileOwner, restricted content to only owners can perform actions
+- You can upload for your profile
 
 
 ## In future. Features and functionality app should be:

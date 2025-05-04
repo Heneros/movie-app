@@ -8,18 +8,11 @@ import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Movie } from '@prisma/client';
 import { CACHE_TTL } from '@/data/ttl';
-import {
-    WINSTON_MODULE_NEST_PROVIDER,
-    WINSTON_MODULE_PROVIDER,
-} from 'nest-winston';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 @QueryHandler(FindOneMovieQuery)
 export class FindOneHandler implements IQueryHandler<FindOneMovieQuery> {
-    ///   protected readonly logger: Logger;
-
     constructor(
-        //   @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
-        // @Inject('winston') private readonly logger: Logger,
         @Inject(WINSTON_MODULE_NEST_PROVIDER)
         private readonly logger: LoggerService,
         @Inject(CACHE_MANAGER) private cacheManager: Cache,
@@ -37,11 +30,9 @@ export class FindOneHandler implements IQueryHandler<FindOneMovieQuery> {
                 id,
             });
 
-            this.logger.warn(`Movie exist ${movieId} `);
-
             this.logger.debug(`Movie exist ${movieId} `);
             if (!movieId) {
-              throw new BadRequestException(`Movie dont exist', ${id}`);
+                throw new BadRequestException(`Movie dont exist', ${id}`);
             }
 
             if (cachedData) {

@@ -33,7 +33,7 @@ export class GetIdUserHandler implements IQueryHandler<GetIdUserQuery> {
             }
 
             if (cachedUser) {
-                console.log(`✅ [User Cache] HIT for user ID: ${id}`);
+                // console.log(` [User Cache] HIT for user ID: ${id}`);
                 return plainToInstance(UserEntity, cachedUser);
             }
 

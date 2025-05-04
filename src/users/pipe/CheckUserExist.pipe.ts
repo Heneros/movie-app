@@ -12,7 +12,7 @@ export class CheckUserExistPipe implements PipeTransform {
 
     async transform(id?: number) {
         if (!id || isNaN(id)) {
-            throw new BadRequestException('Either userId must be provided');
+            throw new BadRequestException('Either userId must be provided 4');
         }
 
         const user = await this.prisma.user.findUnique({

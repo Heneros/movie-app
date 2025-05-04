@@ -22,6 +22,7 @@ import {
     ApiNotFoundResponse,
     ApiOkResponse,
     ApiOperation,
+    ApiResponse,
     ApiTags,
 } from '@nestjs/swagger';
 import { AuthEntity } from './entity/auth.entity';
@@ -80,7 +81,7 @@ export class AuthController {
         );
     }
 
-    @Throttle({ default: { limit: 15, ttl: 60000 } })
+    // @Throttle({ default: { limit: 15, ttl: 60000 } })
     @Get(AUTH_ROUTES.VERIFY)
     @ApiOperation({ summary: 'Verify email. Enter id user and token' })
     @ApiCreatedResponse({
@@ -117,7 +118,7 @@ export class AuthController {
                 new LoginUserCommand(logInDto),
             );
 
-            console.log('refreshToken', result.refreshToken);
+            // console.log('refreshToken', result.refreshToken);
 
             res.cookie('jwtMovie', result.refreshToken, {
                 httpOnly: !isDevelopment,
@@ -145,7 +146,6 @@ export class AuthController {
         }
     }
 
-    @Throttle({ default: { limit: 15, ttl: 60000 } })
     @Post(AUTH_ROUTES.RESEND_EMAIL)
     @ApiOperation({ summary: 'Action to resend email to receive token' })
     @ApiCreatedResponse({
@@ -158,11 +158,7 @@ export class AuthController {
         userId: number,
         @Body()
         emailDto: EmailDto,
-        // @Res() res: Response,
     ) {
-        // return await this.commandBus.execute(
-        //     new ResendEmailCommand(userId, emailDto.email, res),
-        // );
         try {
             const result = await this.commandBus.execute(
                 new ResendEmailCommand(userId, emailDto.email),
@@ -170,9 +166,6 @@ export class AuthController {
             return new AuthEntity(result);
         } catch (error) {
             console.error(error);
-            // res.status(400).json({
-            //     message: error.message || 'Something went wrong!',
-            // });
         }
     }
 
@@ -223,6 +216,10 @@ export class AuthController {
     }
 
     @Post(AUTH_ROUTES.LOGOUT)
+    @ApiResponse({
+        status: 302,
+        description: 'Log out successfully',
+    })
     @ApiOperation({
         summary: 'Log out for application ',
     })
@@ -234,10 +231,22 @@ export class AuthController {
     }
 
     @Get(AUTH_ROUTES.GOOGLE)
+    @ApiOperation({
+        summary: 'Google log in for application ',
+    })
+    @ApiResponse({
+        status: 302,
+        description: 'Redirects to Google OAuth login',
+    })
     @UseGuards(AuthGuard('google'))
     async googleAuth() {}
 
     @Get(AUTH_ROUTES.GOOGLE_CALLBACK)
+    @ApiOperation({ summary: 'Callback from Google OAuth' })
+    @ApiResponse({
+        status: 302,
+        description: 'Sets cookie and redirects to frontend',
+    })
     @UseGuards(AuthGuard('google'))
     async googleAuthRedirect(@Req() req: Request, @Res() res: Response) {
         try {
@@ -275,12 +284,24 @@ export class AuthController {
 
     @Get(AUTH_ROUTES.GITHUB)
     @UseGuards(AuthGuard('github'))
+    @ApiOperation({
+        summary: 'Github log in for application ',
+    })
+    @ApiResponse({
+        status: 302,
+        description: 'Redirects to Github OAuth login',
+    })
     githubAuth() {
         // console.log(123);
     }
 
     @Get(AUTH_ROUTES.GITHUB_CALLBACK)
     @UseGuards(AuthGuard('github'))
+    @ApiOperation({ summary: 'Callback from Github OAuth' })
+    @ApiResponse({
+        status: 302,
+        description: 'Sets cookie and redirects to frontend',
+    })
     async githubAuthCallback(@Req() req, @Res() res: Response) {
         try {
             const user = await this.githubService.validateGithubUser(req.user);
@@ -306,7 +327,6 @@ export class AuthController {
             if (error instanceof BadRequestException) {
                 throw error;
             }
-
             throw new BadGatewayException(
                 error.message || 'Authentication failed',
             );
@@ -315,12 +335,24 @@ export class AuthController {
 
     @Get(AUTH_ROUTES.DISCORD)
     @UseGuards(AuthGuard('discord'))
+    @ApiOperation({
+        summary: 'Discord log in for application ',
+    })
+    @ApiResponse({
+        status: 302,
+        description: 'Redirects to Discord OAuth login',
+    })
     discordAuth() {
         // console.log(123);
     }
 
     @Get(AUTH_ROUTES.DISCORD_CALLBACK)
     @UseGuards(AuthGuard('discord'))
+    @ApiOperation({ summary: 'Callback from Discord OAuth' })
+    @ApiResponse({
+        status: 302,
+        description: 'Sets cookie and redirects to frontend',
+    })
     async discordAuthCallback(@Req() req, @Res() res: Response) {
         try {
             const user = await this.discordService.validateDiscordUser(
@@ -353,6 +385,4 @@ export class AuthController {
             );
         }
     }
-    // @Get('google/redirect')
-    // async googleAuthRedirectC() {}
 }

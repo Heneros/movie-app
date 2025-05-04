@@ -61,6 +61,13 @@ export class CreateMovieDto {
     @ApiProperty({ required: false })
     authorId: number;
 
+    @Field(() => Int, { nullable: true, description: 'Year' })
+    @IsNumber()
+    @IsOptional()
+    @Type(() => Number)
+    @ApiProperty({ required: false })
+    year: number;
+
     @IsArray()
     @Field(() => [String], { nullable: false, description: 'List of actors' })
     // @ValidateNested()

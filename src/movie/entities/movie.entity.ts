@@ -72,7 +72,7 @@ export class MovieEntity implements Movie {
     avgRating: number;
 
     @Field(() => Int, { nullable: true })
-    value: number;
+    year: number;
 
     constructor({ author, ...data }: Partial<MovieEntity>) {
         Object.assign(this, data);

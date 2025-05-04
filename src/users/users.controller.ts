@@ -12,7 +12,6 @@ import {
     Res,
     UsePipes,
     Put,
-    Req,
     DefaultValuePipe,
     UseInterceptors,
     UploadedFile,
@@ -25,12 +24,15 @@ import * as fs from 'fs';
 import { UpdateUserDto } from './dto-input/update-user.dto';
 import {
     ApiBearerAuth,
+    ApiBody,
+    ApiConsumes,
     ApiCookieAuth,
     ApiCreatedResponse,
     ApiOkResponse,
     ApiOperation,
     ApiParam,
     ApiQuery,
+    ApiResponse,
     ApiTags,
 } from '@nestjs/swagger';
 import { UserEntity } from './entities/user.entity';
@@ -56,10 +58,10 @@ import {
     DeleteUserCommand,
     UpdateUserCommand,
 } from './commands';
-import { CacheTTL } from '@nestjs/cache-manager';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from '@/cloudinary/cloudinary.service';
 import { memoryStorage } from 'multer';
+import { FileUploadDto } from './dto-input/file-upload.dto';
 
 @Controller(USERS_CONTROLLER)
 @ApiTags('Users')
@@ -90,6 +92,21 @@ export class UsersController {
             new FindAllUsersQuery(page),
         );
         return plainToInstance(UserEntity, newUsers);
+    }
+
+    @Get(USERS_ROUTES.LIST_BLOCKED_USERS)
+    @UseGuards(AuthGuard)
+    @Roles('Admin')
+    @ApiResponse({
+        status: 302,
+        description: 'All users blocked',
+    })
+    @ApiOperation({ summary: 'Get all accounts users blocked' })
+    @ApiBearerAuth('access-token')
+    async allBlocked(@Query('page') page: number) {
+        console.log(12345);
+        return await this.queryBus.execute(new GetAllBlockedUsersQuery(page));
+        // return new UserEntity(await this.deactivateUserService.deactivate(id));
     }
 
     @Get(USERS_ROUTES.GET_ID_USER)
@@ -183,16 +200,6 @@ export class UsersController {
         // return new UserEntity(await this.deactivateUserService.deactivate(id));
     }
 
-    @Get(USERS_ROUTES.LIST_BLOCKED_USERS)
-    @UseGuards(AuthGuard)
-    @Roles('Admin')
-    @ApiOperation({ summary: 'Get all accounts users blocked' })
-    @ApiBearerAuth('access-token')
-    async allBlocked(@Query('page') page: number) {
-        return await this.queryBus.execute(new GetAllBlockedUsersQuery(page));
-        // return new UserEntity(await this.deactivateUserService.deactivate(id));
-    }
-
     @Post(USERS_ROUTES.UPLOAD_AVATAR_USER)
     @UseInterceptors(
         FileInterceptor('file', {
@@ -200,17 +207,20 @@ export class UsersController {
             limits: { fileSize: 5 * 1024 * 1024 },
         }),
     )
+    @ApiOperation({ summary: 'Upload file' })
+    @ApiBody({
+        description: 'File upload',
+        type: FileUploadDto,
+    })
+    @ApiConsumes('multipart/form-data')
     async uploadImage(
         @Param('userId') userId: string,
         @UploadedFile() file: Express.Multer.File,
-
-        // @Res() res: Response,
     ) {
         try {
             if (!file) {
                 return 'Error during upload file';
             }
-
             const result = await this.cloudinaryService.uploadFileAvatarUser(
                 +userId,
                 file,
@@ -226,7 +236,6 @@ export class UsersController {
             throw new BadGatewayException(
                 error.message || 'Authentication failed',
             );
-
             // res.status(500).send({ message: 'Upload failed' });
         }
     }

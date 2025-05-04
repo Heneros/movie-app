@@ -20,7 +20,7 @@ type MovieEntity {
   userId: Int
   galleryId: Int
   avgRating: Float
-  value: Int
+  year: Int
 }
 
 """
@@ -142,6 +142,9 @@ input CreateMovieDto {
 
   """Author ID"""
   authorId: Int
+
+  """Year"""
+  year: Int
 
   """List of actors"""
   actorsList: [String!]!

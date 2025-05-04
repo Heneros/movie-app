@@ -108,11 +108,7 @@ export class MovieController {
         return movies.allMovies.map((movie: Movie) => new MovieEntity(movie));
     }
 
-    // @Get(MOVIE_ROUTES.EVENTS)
-    // async getEvents() {
-    //     const events = await this.redisService.getEvents('movie_events');
-    //     return { events };
-    // }
+
 
     @Get(MOVIE_ROUTES.FILTER)
     @ApiOperation({ summary: 'Filter movies' })

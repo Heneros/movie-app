@@ -31,7 +31,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
                 ? exception.getResponse()
                 : exception;
 
-        this.logger.error('🚨 Exception', {
+        this.logger.error(' Exception', {
             statusCode: status,
             path: request.url,
             method: request.method,
