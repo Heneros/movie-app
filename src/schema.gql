@@ -81,6 +81,9 @@ type Query {
 
   """Verify email. Enter token user and id"""
   verifyEmail(emailToken: String!, userId: Float!): AuthEntity!
+  googleAuthUrl: String!
+  githubAuthUrl: String!
+  discordAuthUrl: String!
 }
 
 type Mutation {

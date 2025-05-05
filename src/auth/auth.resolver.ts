@@ -29,6 +29,7 @@ import { VerifyEmailQuery } from './queries';
 import { EmailDto } from './dto-input/Resend-email.dto';
 import { ResetPasswordDto } from './dto-input/Reset-password.dto';
 import { BadRequestException, ParseIntPipe } from '@nestjs/common';
+import { OAuthUrl } from './../types/auth.types';
 
 @ApiTags('Auth')
 @Resolver((of) => AuthEntity)
@@ -159,4 +160,21 @@ export class AuthResolver {
             new LogoutCommand(context.req, context.res),
         );
     }
+
+    @Query(() => String)
+    googleAuthUrl() {
+        return { url: 'http://localhost:3000/auth/google' };
+    }
+
+    @Query(() => String)
+    githubAuthUrl() {
+        return { url: 'http://localhost:3000/auth/github' };
+    }
+
+    @Query(() => String)
+    discordAuthUrl() {
+        return { url: 'http://localhost:3000/auth/discord' };
+    }
+
+    
 }
