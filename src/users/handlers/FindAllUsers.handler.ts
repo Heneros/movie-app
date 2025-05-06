@@ -6,19 +6,6 @@ import { UsersRepository } from './../repositories/users.repository';
 import { User } from '@prisma/client';
 import { CACHE_TTL } from '@/data/ttl';
 
-// const CACHE_KEY_PREFIX = 'users';
-export const deleteCache = async (cacheService: Cache, partialKey: string) => {
-    const keys = await cacheService.stores;
-    // console.log(keys);
-    keys.forEach((eachKey) => {
-        const keyString = String(eachKey);
-
-        if (keyString.includes(partialKey)) {
-            cacheService.del(keyString);
-        }
-    });
-};
-
 @QueryHandler(FindAllUsersQuery)
 export class FindAllUsersHandler implements IQueryHandler<FindAllUsersQuery> {
     constructor(
@@ -32,13 +19,12 @@ export class FindAllUsersHandler implements IQueryHandler<FindAllUsersQuery> {
         const cacheKey = `users:${page}`;
         const cached = await this.cacheManager.get<User[]>(cacheKey);
         if (cached) {
-            // console.log('✅ Cache HIT');
-
             return cached;
         }
-        // console.log('❌ Cache MISS');
 
         const allUsers = await this.usersRepository.findAllUsers(page);
+
+        // console.log(allUsers);
 
         if (allUsers.length === 0) {
             throw new NotFoundException('No users exist');

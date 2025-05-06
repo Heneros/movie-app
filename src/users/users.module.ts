@@ -15,19 +15,12 @@ import {
     UpdateUserHandler,
 } from './handlers';
 import { CloudinaryModule } from '@/cloudinary/cloudinary.module';
+import { UsersResolver } from './users.resolver';
 
 @Module({
     controllers: [UsersController],
     providers: [
         UsersService,
-        // GetAllUsersService,
-        // UpdateUserService,
-        // GetIdUsersService,
-        // RemoveUserAccountService,
-        // RemoveMyAccountService,
-        // ChangeRoleService,
-        // DeactivateUserService,
-
         UsersRepository,
         FindAllUsersHandler,
         GetIdUserHandler,
@@ -37,6 +30,8 @@ import { CloudinaryModule } from '@/cloudinary/cloudinary.module';
         DeleteMyAccountHandler,
         BanUserAccountHandler,
         GetAllBlockedUsersHandler,
+
+        UsersResolver,
     ],
     imports: [PrismaModule, MailModule, CloudinaryModule],
     exports: [UsersService],

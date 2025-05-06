@@ -36,6 +36,7 @@ export class GetIdUserHandler implements IQueryHandler<GetIdUserQuery> {
                 // console.log(` [User Cache] HIT for user ID: ${id}`);
                 return plainToInstance(UserEntity, cachedUser);
             }
+ 
 
             const userDto = plainToInstance(UserEntity, user);
 

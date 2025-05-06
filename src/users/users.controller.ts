@@ -104,9 +104,7 @@ export class UsersController {
     @ApiOperation({ summary: 'Get all accounts users blocked' })
     @ApiBearerAuth('access-token')
     async allBlocked(@Query('page') page: number) {
-        console.log(12345);
         return await this.queryBus.execute(new GetAllBlockedUsersQuery(page));
-        // return new UserEntity(await this.deactivateUserService.deactivate(id));
     }
 
     @Get(USERS_ROUTES.GET_ID_USER)
@@ -124,8 +122,6 @@ export class UsersController {
     @ApiOkResponse({ type: UserEntity })
     async findOne(@Param('id', ParseIntPipe) id: number) {
         const user = await this.queryBus.execute(new GetIdUserQuery(id));
-        // return user;
-        // const newUsers = awa
         return plainToInstance(UserEntity, user);
     }
 
@@ -169,15 +165,11 @@ export class UsersController {
         @Param('id', CheckUserExistPipe) id: number,
         @Body() updateUserRole: UpdateUserRole,
     ) {
-        // console.log(updateUserRole);
         return new UserEntity(
             await this.commandBus.execute(
                 new ChangeRoleCommand(id, updateUserRole),
             ),
         );
-        // return new UserUpdatedProfileEntity(
-        //     await this.changeRoleService.changeRole(req, id, updateUserRole),
-        // );
     }
 
     @Delete(USERS_ROUTES.DELETE_MY_ACCOUNT)

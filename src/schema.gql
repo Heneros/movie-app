@@ -2,6 +2,30 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type UserEntity {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  name: String
+  email: String
+  refreshToken: [String!]!
+  isEmailVerified: Boolean!
+  blocked: Boolean!
+  avatar: String!
+  preview: String!
+  googleId: String
+  githubId: String
+  discordId: String
+  roles: [String!]
+  avatarId: Int!
+  provider: String
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 """Movie"""
 type MovieEntity {
   id: Int!
@@ -22,11 +46,6 @@ type MovieEntity {
   avgRating: Float
   year: Int
 }
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
 
 """MovieReview"""
 type MovieReviewEntity {
@@ -79,11 +98,17 @@ type Query {
   """Get single review from movie"""
   getReviewSingleByMovie(id: Float!): MovieReviewEntity!
 
+  """Return all users"""
+  findAllUsers(page: Float!): [UserEntity!]!
+
+  """Return all blocked users"""
+  findAllBlocked(page: Float!): [UserEntity!]!
+
+  """Get User by id"""
+  findIdUser(id: Float!): UserEntity!
+
   """Verify email. Enter token user and id"""
   verifyEmail(emailToken: String!, userId: Float!): AuthEntity!
-  googleAuthUrl: String!
-  githubAuthUrl: String!
-  discordAuthUrl: String!
 }
 
 type Mutation {

@@ -19,8 +19,7 @@ import {
 } from './commands';
 import { Request, Response } from 'express';
 import { AuthRepository } from './repositories/Auth.repository';
-import { Throttle } from '@nestjs/throttler';
-import { isDevelopment } from '@/data/defaultData';
+import { domain, isDevelopment } from '@/data/defaultData';
 import { PubSub } from 'graphql-subscriptions';
 
 import { CreateUserDto } from './dto-input/Create-user.dto';
@@ -28,8 +27,14 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { VerifyEmailQuery } from './queries';
 import { EmailDto } from './dto-input/Resend-email.dto';
 import { ResetPasswordDto } from './dto-input/Reset-password.dto';
-import { BadRequestException, ParseIntPipe } from '@nestjs/common';
-import { OAuthUrl } from './../types/auth.types';
+import {
+    BadGatewayException,
+    BadRequestException,
+    ParseIntPipe,
+    UseGuards,
+} from '@nestjs/common';
+import { DiscordService, GithubService, GoogleService } from './services';
+import { JwtService } from '@nestjs/jwt';
 
 @ApiTags('Auth')
 @Resolver((of) => AuthEntity)
@@ -39,11 +44,15 @@ export class AuthResolver {
         private readonly authRepository: AuthRepository,
         private readonly commandBus: CommandBus,
         private readonly queryBus: QueryBus,
+        private readonly googleService: GoogleService,
+        private readonly githubService: GithubService,
+        private readonly discordService: DiscordService,
+        private jwt: JwtService,
     ) {
         this.pubSub = new PubSub();
     }
 
-    @Throttle({ default: { limit: 10, ttl: 60000 } })
+    // @Throttle({ default: { limit: 10, ttl: 60000 } })
     @Mutation(() => AuthEntity, {
         description: 'Login in',
     })
@@ -77,6 +86,7 @@ export class AuthResolver {
         return new AuthEntity({
             message: 'Login successful',
             accessToken: result.accessToken,
+            refreshToken: result.refreshToken,
             name: result.user.name,
             id: result.user.id,
             email: result.user.email,
@@ -161,20 +171,52 @@ export class AuthResolver {
         );
     }
 
-    @Query(() => String)
-    googleAuthUrl() {
-        return { url: 'http://localhost:3000/auth/google' };
-    }
+    // @Query(() => String)
+    // googleAuthUrl() {
+    //     return { url: `${domain}/auth/google` };
+    // }
 
-    @Query(() => String)
-    githubAuthUrl() {
-        return { url: 'http://localhost:3000/auth/github' };
-    }
+    // @Query(() => String)
+    // githubAuthUrl() {
+    //     return { url: `${domain}/auth/github` };
+    // }
 
-    @Query(() => String)
-    discordAuthUrl() {
-        return { url: 'http://localhost:3000/auth/discord' };
-    }
+    // @Query(() => String)
+    // discordAuthUrl() {
+    //     return { url: `${domain}/auth/discord` };
+    // }
 
-    
+    // @Mutation(() => AuthEntity)
+    // @UseGuards(AuthGuard('google'))
+    // async googleAuthCallback(
+    //     @Args('googleToken') googleToken: string,
+    //     @Context() { req, res },
+    // ) {
+    //     try {
+    //         const user =
+    //             await this.googleService.getGoogleUserByToken(googleToken);
+    //         if (!user) throw new BadRequestException('User not found');
+
+    //         // // console.log({ user });
+    //         // const token = this.jwt.sign({
+    //         //     userId: user.id,
+    //         //     name: user.name,
+    //         //     roles: user.roles,
+    //         // });
+
+    //         // res.cookie('jwtMovie', token, {
+    //         //     httpOnly: true,
+    //         //     sameSite:
+    //         //         process.env.NODE_ENV === 'development' ? 'strict' : 'lax',
+    //         //     maxAge: 31 * 24 * 60 * 60 * 1000,
+    //         //     secure: process.env.NODE_ENV !== 'development',
+    //         // });
+
+    //         // return { token, user };
+    //     } catch (error) {
+    //         throw new BadGatewayException(
+    //             error.message || 'Authentication failed',
+    //         );
+    //     }
+    // }
 }

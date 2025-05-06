@@ -9,6 +9,7 @@ import bcrypt from 'bcrypt';
 import { Strategy, VerifyCallback } from 'passport-google-oauth20';
 import { HandleIOauth } from '../services';
 import { AuthRepository } from '../repositories/Auth.repository';
+import axios from 'axios';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {

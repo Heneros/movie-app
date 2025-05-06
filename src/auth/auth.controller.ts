@@ -34,7 +34,7 @@ import { ResetPasswordDto } from './dto-input/Reset-password.dto';
 import { AuthRegister } from './entity/register.entity';
 import { EmailValidationPipe } from './pipe/EmailValidation.pipe';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { AuthRepository } from './repositories/Auth.repository';
+
 import {
     CreateUserCommand,
     LoginUserCommand,

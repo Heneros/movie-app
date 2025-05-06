@@ -96,3 +96,4 @@ everyday recieve letter to mail box about favorite movies, he subscribed
 - AES encryption 
 - Add field to table Users ban true or false. By default false
 - CQRS event if someone reply or 
+- auth resolver later passport try with next/react

@@ -426,7 +426,6 @@ export class MovieController {
             if (!files) {
                 return 'Error during upload files';
             }
-            // console.log('FILES:', files);
             return this.cloudinaryService.uploadGalleryImages(movieId, files);
         } catch (error) {
             console.log('FILES:', error);

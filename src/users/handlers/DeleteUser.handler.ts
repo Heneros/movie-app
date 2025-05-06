@@ -3,7 +3,6 @@ import { ForbiddenException, Inject, NotFoundException } from '@nestjs/common';
 import { UsersRepository } from './../repositories/users.repository';
 import { DeleteUserCommand } from '../commands';
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
-import { deleteCache } from './FindAllUsers.handler';
 
 @CommandHandler(DeleteUserCommand)
 export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand> {
