@@ -93,19 +93,32 @@ async function main() {
   });
 
 
-  await prisma.directorsOnMovie.create({
-        data: {
-      movieId: movie1.id,
-      directorId: director1.id
-    }
-  })
+  // await prisma.directorsOnMovie.create({
+  //       data: {
+  //     movieId: movie1.id,
+  //     directorId: director1.id
+  //   }
+  // })
 
-    await prisma.directorsOnMovie.create({
-        data: {
+  //   await prisma.directorsOnMovie.create({
+  //       data: {
+  //     movieId: movie2.id,
+  //     directorId: director2.id
+  //   }
+  // })
+  await prisma.directorsOnMovie.createMany({
+  data: [
+    {
+      movieId: movie1.id,
+      directorId: director1.id,
+    },
+    {
       movieId: movie2.id,
-      directorId: director2.id
-    }
-  })
+      directorId: director2.id,
+    },
+  ],
+  // skipDuplicates: true,
+});
   
   const director = await prisma.director.upsert({
     where: {id: movie1.id},
@@ -149,24 +162,33 @@ year: 1985,
       published: true,
       authorId: user1.id,
     },
+    
   });
-
-const newAvatar = await prisma.avatar.create({
-    data:{
-            url: "https://example.com/avatar.jpg",
-    publicId: "avatar_123"
-    }
-})
-
   const actor1 = await prisma.actors.upsert({
     where: { name: 'Johnny Depp' },
     update: {},
     create: {
       name: 'Johnny Depp',
-      previewId: newAvatar.id,
+    //   previewId: newAvatar.id,
       age: '12-03-1996',
     },
   });
+
+
+
+ const newAvatar = await prisma.avatar.upsert({
+    where:{
+            publicId: "avatar_123"
+    },
+    update:{},
+    create:{
+    url: "https://example.com/avatar.jpg",
+    publicId: "avatar_123",
+    actorsId: actor1.id,
+    userId: user1.id,
+ 
+    }
+})
 
   const userFav = await prisma.userFavoriteMovies.create({
     data: {

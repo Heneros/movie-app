@@ -139,7 +139,6 @@ export class UsersController {
         );
 
         return plainToInstance(UserEntity, result);
-        // return new UserEntity(result);
     }
 
     @Delete(USERS_ROUTES.DELETE_USER)

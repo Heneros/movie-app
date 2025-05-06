@@ -4,9 +4,7 @@ import {
     UploadApiErrorResponse,
     UploadApiResponse,
 } from 'cloudinary';
-import { Express } from 'express';
 import * as path from 'path';
-import { CloudinaryResponse } from './cloudinary-response';
 const streamifier = require('streamifier');
 import { PrismaService } from '@/prisma/prisma.service';
 
@@ -22,19 +20,19 @@ export class CloudinaryService {
     ) {
         // : Promise<{ url: string } | undefined>
         try {
-            const user = await this.prisma.user.findUnique({
+            const avatar = await this.prisma.avatar.findUnique({
                 where: { id: userId },
-                include: { avatar: true },
+                // include: { avatar: true },
             });
 
-            if (!user) {
+            if (!avatar) {
                 throw new NotFoundException('User not found');
             }
 
-            if (user.avatar) {
-                await this.deleteImage(user.avatar.publicId);
+            if (avatar) {
+                await this.deleteImage(avatar.publicId);
                 await this.prisma.avatar.delete({
-                    where: { id: user.avatar.id },
+                    where: { id: avatar.id },
                 });
             }
             const mainFolder = 'nestjsMoviedb';
@@ -78,19 +76,15 @@ export class CloudinaryService {
                 },
             );
 
-            const updatedUser = await this.prisma.user.update({
-                where: { id: userId },
+            const updatedUser = await this.prisma.avatar.update({
+                where: { id: userId },  
                 data: {
-                    avatar: {
-                        create: {
                             url: imageC.url,
                             publicId: filePathOnCloudinary,
-                        },
-                    },
                 },
             });
 
-            return { avatar: updatedUser.avatarId };
+            return { avatar: updatedUser.id };
         } catch (error) {
             console.error('Error in uploadToCloudinary:', error);
         }
@@ -182,6 +176,7 @@ export class CloudinaryService {
             savedImages.push(newGallery);
         }
 
+        
         return { images: savedImages };
     }
 }

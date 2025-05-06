@@ -25,7 +25,8 @@ export class DeleteMyAccountHandler
             throw new ForbiddenException('User not found');
         }
 
-        if (userIsAdmin.roles?.includes['Admin']) {
+        // if (userIsAdmin.roles?.includes['Admin']) {
+        if (userIsAdmin?.roles?.includes('Admin')) {
             throw new ForbiddenException(
                 'Admin cannot delete their own account',
             );

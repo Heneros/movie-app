@@ -1,40 +1,48 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { ForbiddenException, Inject, NotFoundException } from '@nestjs/common';
+import {
+    ForbiddenException,
+    Inject,
+    LoggerService,
+    NotFoundException,
+} from '@nestjs/common';
 import { UsersRepository } from './../repositories/users.repository';
 import { DeleteUserCommand } from '../commands';
-import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
+import { RedisPrefixEnum } from '@/data/redis-prefix-enum';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 @CommandHandler(DeleteUserCommand)
 export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand> {
     constructor(
-        @Inject(CACHE_MANAGER) private cacheManager: Cache,
+        @Inject(WINSTON_MODULE_NEST_PROVIDER)
+        private readonly logger: LoggerService,
+        @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
         private readonly usersRepository: UsersRepository,
     ) {}
 
     async execute(command: DeleteUserCommand) {
         const { id } = command;
 
-        const userIsAdmin = await this.usersRepository.findIdUser(id);
+        this.logger.log(`Delete user ${id}`);
+
+
+        const userIsAdmin = await this.usersRepository.findIdUser(+id);
         if (!userIsAdmin) {
-            throw new NotFoundException('No user found');
+            return new NotFoundException('No user found');
         }
 
-        if (userIsAdmin.roles?.includes['Admin']) {
-            throw new ForbiddenException(
+        if (userIsAdmin?.roles?.includes('Admin')) {
+            // console.log(5555);
+            return new ForbiddenException(
                 'Admin cannot delete their own account',
             );
         }
-
+        // console.log({ userIsAdmin });
         await this.usersRepository.deleteUserAccount(id);
 
-        // await deleteCache(this.cacheManager, 'users');
-        // const redisClient = (this.cacheManager.stores as any).getClient();
-        // const keys = await redisClient.keys('users:page:*');
+        await this.cacheManager.del(`${RedisPrefixEnum.USERS}:${id}`);
 
-        // await Promise.all(
-        //     keys.map((key: string) => this.cacheManager.del(key)),
-        // );
-        // await this.cacheManager.del(`user:${id}`);
 
         return `User was deleted ${userIsAdmin.name}`;
     }

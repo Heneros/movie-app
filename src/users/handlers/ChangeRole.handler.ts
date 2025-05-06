@@ -15,7 +15,7 @@ export class ChangeRoleHandler implements ICommandHandler<ChangeRoleCommand> {
             throw new NotFoundException('No user found');
         }
 
-        if (user.roles?.includes['Admin']) {
+        if (user.roles?.includes('Admin')) {
             throw new ForbiddenException('Admin cannot change their own role');
         }
 

@@ -3,14 +3,17 @@ import * as bcrypt from 'bcrypt';
 import { ResetPasswordCommand } from '../commands';
 import { AuthRepository } from '../repositories/Auth.repository';
 import { MailService } from '@/mail/mail.service';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, Inject } from '@nestjs/common';
 import { roundsOfHashing } from '@/data/defaultData';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @CommandHandler(ResetPasswordCommand)
 export class ResetPasswordHandler
     implements ICommandHandler<ResetPasswordCommand>
 {
     constructor(
+        @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
         private readonly authRepository: AuthRepository,
         private readonly mailService: MailService,
     ) {}
@@ -54,10 +57,6 @@ export class ResetPasswordHandler
                 './resetPassword',
                 payload,
             );
-
-            res.status(200).json({
-                message: 'Your password was reset successfully!',
-            });
 
             return {
                 message: 'Your password was reset successfully!',

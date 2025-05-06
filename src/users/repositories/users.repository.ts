@@ -57,6 +57,21 @@ export class UsersRepository {
             await tx.verifyResetToken.deleteMany({
                 where: { userId: id },
             });
+            await tx.reviews.deleteMany({
+                where: { id },
+            });
+
+            await tx.userFavoriteMovies.deleteMany({
+                where: { userId: id },
+            });
+
+            await tx.rating.deleteMany({
+                where: { userId: id },
+            });
+
+            await tx.avatar.deleteMany({
+                where: { id },
+            });
 
             await tx.user.delete({
                 where: { id },

@@ -82,9 +82,6 @@ export class AuthGuard implements CanActivate {
                 const hasRole = user.roles.some((role) => roles.includes(role));
                 if (!hasRole) {
                     return false;
-                    // throw new ForbiddenException(
-                    //   'You do not have permission to perform this action',
-                    // );
                 }
 
                 // console.log(payload);

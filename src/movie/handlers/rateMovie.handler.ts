@@ -6,8 +6,6 @@ import { RateMovieCommand } from '../commands/rateMovie.command';
 import { MovieRepository } from '@/movie/repositories/movie.repository';
 import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { InjectRedis } from '@nestjs-modules/ioredis';
-import Redis from 'ioredis';
 import { RedisPrefixEnum } from '@/data/redis-prefix-enum';
 import { CACHE_TTL } from '@/data/ttl';
 

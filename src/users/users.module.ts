@@ -22,12 +22,14 @@ import { UsersResolver } from './users.resolver';
     providers: [
         UsersService,
         UsersRepository,
+
         FindAllUsersHandler,
         GetIdUserHandler,
         UpdateUserHandler,
         DeleteUserHandler,
-        ChangeRoleHandler,
         DeleteMyAccountHandler,
+        ChangeRoleHandler,
+
         BanUserAccountHandler,
         GetAllBlockedUsersHandler,
 
