@@ -44,9 +44,7 @@ export class AuthResolver {
         private readonly authRepository: AuthRepository,
         private readonly commandBus: CommandBus,
         private readonly queryBus: QueryBus,
-        private readonly googleService: GoogleService,
-        private readonly githubService: GithubService,
-        private readonly discordService: DiscordService,
+
         private jwt: JwtService,
     ) {
         this.pubSub = new PubSub();
@@ -124,9 +122,7 @@ export class AuthResolver {
     async resendEmail(
         @Args('userId') userId: number,
         @Args('email') emailDto: EmailDto,
-        // @Context() context: { res: Response },
     ) {
-        // const { res } = context;
         return new AuthEntity(
             await this.commandBus.execute(
                 new ResendEmailCommand(userId, emailDto.email),

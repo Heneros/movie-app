@@ -1,11 +1,6 @@
+import { Field, InputType, registerEnumType } from '@nestjs/graphql';
 import { ApiProperty } from '@nestjs/swagger';
-import {
-    ArrayMinSize,
-    IsArray,
-    IsEnum,
-    IsNotEmpty,
-    IsString,
-} from 'class-validator';
+import { ArrayMinSize, IsArray, IsEnum, IsNotEmpty } from 'class-validator';
 
 export enum UserRole {
     Admin = 'Admin',
@@ -13,6 +8,12 @@ export enum UserRole {
     User = 'User',
 }
 
+registerEnumType(UserRole, {
+    name: 'roles',
+    description: 'Roles available for users',
+});
+
+@InputType()
 export class UpdateUserRole {
     @ApiProperty({
         example: ['Admin'],
@@ -20,6 +21,7 @@ export class UpdateUserRole {
         isArray: true,
     })
     //   @IsString()
+    @Field(() => [UserRole], { nullable: false })
     @IsArray()
     @ArrayMinSize(1)
     @IsEnum(UserRole, { each: true })

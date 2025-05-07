@@ -145,6 +145,9 @@ type Mutation {
   """Delete User by id"""
   deleteUser(id: Float!): UserEntity!
 
+  """Change Role User"""
+  changeRole(id: Int!, data: UpdateUserRole!): UserEntity!
+
   """Login in"""
   login(input: LogInDto!): AuthEntity!
 
@@ -210,6 +213,17 @@ input UpdateUserDto {
   refreshToken: [String!]
 }
 
+input UpdateUserRole {
+  roles: [roles!]!
+}
+
+"""Roles available for users"""
+enum roles {
+  Admin
+  Editor
+  User
+}
+
 input LogInDto {
   """Email"""
   email: String!
@@ -247,5 +261,6 @@ input ResetPasswordDto {
 
 type Subscription {
   movieRatingUpdated: MovieEntity!
+  userChangeRoleSubscribe: UserEntity!
   userLogInSubscribe: AuthEntity!
 }

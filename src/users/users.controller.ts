@@ -150,7 +150,6 @@ export class UsersController {
     async remove(@Param('id', ParseIntPipe) id: number) {
         const result = await this.commandBus.execute(new DeleteUserCommand(id));
         return result;
-        // return new UserEntity(await this.removeUserAccountService.remove(id));
     }
 
     @Put(USERS_ROUTES.CHANGE_ROLE)
@@ -158,7 +157,6 @@ export class UsersController {
     @UseGuards(AuthGuard)
     @ApiOperation({ summary: 'Change role for users. Only for admin user' })
     @ApiBearerAuth('access-token')
-    // @UsePipes(CheckUserExistPipe)
     @ApiCreatedResponse({ type: UserEntity })
     async changeRole(
         @Param('id', CheckUserExistPipe) id: number,

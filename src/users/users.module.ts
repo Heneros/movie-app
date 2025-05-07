@@ -16,6 +16,7 @@ import {
 } from './handlers';
 import { CloudinaryModule } from '@/cloudinary/cloudinary.module';
 import { UsersResolver } from './users.resolver';
+import { PubSub } from 'graphql-subscriptions';
 
 @Module({
     controllers: [UsersController],
@@ -29,11 +30,15 @@ import { UsersResolver } from './users.resolver';
         DeleteUserHandler,
         DeleteMyAccountHandler,
         ChangeRoleHandler,
-
         BanUserAccountHandler,
         GetAllBlockedUsersHandler,
 
         UsersResolver,
+
+        {
+            provide: 'PUB_SUB',
+            useValue: new PubSub(),
+        },
     ],
     imports: [PrismaModule, MailModule, CloudinaryModule],
     exports: [UsersService],

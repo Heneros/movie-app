@@ -56,10 +56,11 @@ import { Logger } from 'winston';
                 return {
                     throttlers: [{ ttl: 60, limit: 10000 }],
                     storage: new ThrottlerStorageRedisService(redisClient),
-                    getTracker: (req, context) => req.headers['x-device-id'],
+                    // getTracker: (req, context) => req.headers['x-device-id'],
                 };
             },
         }),
+
         GraphQLModule.forRoot<ApolloDriverConfig>({
             driver: ApolloDriver,
             autoSchemaFile: join(process.cwd(), 'src/schema.gql'),

@@ -19,13 +19,6 @@ import { WinstonModule } from 'nest-winston';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule, {
-        // logger: ['error', 'warn'],
-        // logger: new ConsoleLogger({
-        //     // json: true,
-        //     // depth: 1,
-        //     colors: true,
-        //     showHidden: true,
-        // }),
         logger: WinstonModule.createLogger(winstonLoggerOptions),
         // logger: WinstonLogger(new winstonConfig()),
         // logger: WinstonModule.createLogger(createWinstonOptions('MovieApp')),
