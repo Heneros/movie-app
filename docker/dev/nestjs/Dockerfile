@@ -4,15 +4,13 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-RUN npm ci
+RUN npm install
 
 COPY prisma/schema.prisma ./prisma/
 
 RUN npx prisma generate
 
 COPY . .
-
-RUN npx prisma migrate dev
 
 RUN npm run build
 

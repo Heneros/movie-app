@@ -5,7 +5,18 @@ const roundsOfHashing = 10;
 
 
 async function main() {
-  const passwordAdmin = await bcrypt.hash('password-admin', roundsOfHashing);
+ await prisma.directorsOnMovie.deleteMany();
+await prisma.actorsOnMovies.deleteMany();
+await prisma.userFavoriteMovies.deleteMany();
+await prisma.reviews.deleteMany();
+await prisma.rating.deleteMany();
+await prisma.movie.deleteMany();
+await prisma.director.deleteMany();
+await prisma.actors.deleteMany();
+await prisma.actorsOnMovies.deleteMany();
+
+
+ const passwordAdmin = await bcrypt.hash('password-admin', roundsOfHashing);
   const passwordUser = await bcrypt.hash('password-user', roundsOfHashing);
 
   const user1 = await prisma.user.upsert({
@@ -93,19 +104,7 @@ async function main() {
   });
 
 
-  // await prisma.directorsOnMovie.create({
-  //       data: {
-  //     movieId: movie1.id,
-  //     directorId: director1.id
-  //   }
-  // })
 
-  //   await prisma.directorsOnMovie.create({
-  //       data: {
-  //     movieId: movie2.id,
-  //     directorId: director2.id
-  //   }
-  // })
   await prisma.directorsOnMovie.createMany({
   data: [
     {
@@ -117,7 +116,7 @@ async function main() {
       directorId: director2.id,
     },
   ],
-  // skipDuplicates: true,
+  skipDuplicates: true,
 });
   
   const director = await prisma.director.upsert({
@@ -190,19 +189,21 @@ year: 1985,
     }
 })
 
-  const userFav = await prisma.userFavoriteMovies.create({
+  const userFav = await prisma.userFavoriteMovies.createMany({
     data: {
       userId: user1.id,
       movieId: movie1.id,
     },
+    skipDuplicates: true
   });
 
-  const actors = await prisma.actorsOnMovies.create({
-    data: {
-      actorId: actor1.id,
-      movieId: movie1.id,
-    },
-  });
+  const actors = await prisma.directorsOnMovie.createMany({
+  data: [
+    { movieId: movie1.id, directorId: director1.id },
+    { movieId: movie2.id, directorId: director2.id },
+  ],
+  skipDuplicates: true,
+});
 
   console.log({ userFav, actors });
 }

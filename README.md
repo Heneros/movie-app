@@ -6,7 +6,8 @@ App analogue imdb/kinopoisk about movies. Site separated on 4 modules: auth(logi
 ## Technologies implemented:
 - Prisma 
 - PostgreSQL
-- Graphql(code first) and Graphql-ws
+- Graphql(code first)
+- Graphql-ws
 - Mongodb
 - Redis
 - Nginx 

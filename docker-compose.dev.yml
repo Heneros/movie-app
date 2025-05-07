@@ -1,12 +1,11 @@
 version: '3.8'
 
 services:
- postgres-master:
+ postgres:
     restart: always
     # image: postgres:17.4
     image: postgres:14-alpine
     env_file: ./.env
-    container_name: postgres-master
     # build:
     #   context: ./docker/dev/postgresql_master
     environment:
@@ -18,7 +17,7 @@ services:
        -  movies_db_data:/var/lib/postgresql/data
     ports:
       -  '5432:5432' 
-    command: ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
+    # command: ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
@@ -38,7 +37,7 @@ services:
    ports: 
      - "5050:80"
    depends_on:  
-    - postgres-master
+    - postgres
    volumes:
       - pgadmin-data:/var/lib/pgadmin
    networks:
@@ -89,8 +88,61 @@ services:
    - '6379:6379'
   volumes:
   - redis_data:/data
+  healthcheck:
+    test: ["CMD", "redis-cli", "ping"]
+    interval: 5s
+    timeout: 3s
+    retries: 5
   networks:
     app_movie:
+
+ nestapp:
+    container_name: nestapp
+    build:
+        context: .
+        dockerfile: ./docker/dev/nestjs/Dockerfile
+    restart: always
+    depends_on:
+        postgres:
+          condition: service_healthy 
+        redis:
+          condition: service_healthy 
+    env_file: ./.env
+    ports:
+     - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
+    volumes:
+        - .:/usr/src/app
+        - /usr/src/app/node_modules
+    command: >
+      sh -c "
+        echo 'running migrations…' &&
+        npx prisma migrate deploy &&       
+        echo 'seeding DB…' &&
+        npx prisma db seed &&
+        echo 'starting dev server…' &&
+        npm run start:dev
+      "
+    networks:
+      app_movie:   
+
+ nginx:
+   container_name: nginx_nest
+   restart: always
+   build:
+    context: .
+    dockerfile: ./docker/dev/nginx/Dockerfile
+   volumes:
+    - ./logs/nginx:/var/log/nginx
+   ports:
+      - "80:80"
+      - "443:443"
+   depends_on:
+      - nestapp
+   networks:
+    app_movie:   
+
 
 volumes:
   redis_data:
