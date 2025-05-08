@@ -51,7 +51,7 @@ import { Logger } from 'winston';
                 const redisClient = new Redis({
                     host: configService.get('REDIS_HOST'),
                     port: configService.get('REDIS_PORT'),
-                    password: configService.get('REDIS_PASSWORD'),
+                    // password: configService.get('REDIS_PASSWORD'),
                 });
                 return {
                     throttlers: [{ ttl: 60, limit: 10000 }],
@@ -80,6 +80,10 @@ import { Logger } from 'winston';
     providers: [
         RedisService,
         Logger,
+        {
+            provide: APP_INTERCEPTOR,
+            useClass: CacheInterceptor,
+        },
         {
             provide: APP_GUARD,
             useClass: GqlThrottlerGuard,

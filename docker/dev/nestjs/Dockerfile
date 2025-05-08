@@ -1,4 +1,4 @@
-FROM node:20.12.2
+FROM node:22.15-alpine
 
 WORKDIR /usr/src/app  
 
@@ -15,4 +15,4 @@ COPY . .
 RUN npm run build
 
 CMD ["npm", "run", "start:dev"]
-
+# ENTRYPOINT ["/bin/sh", "-c", "npm run start:dev"]

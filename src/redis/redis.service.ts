@@ -11,9 +11,10 @@ export class RedisService implements OnModuleInit {
 
     async onModuleInit() {
         try {
-            await this.cache.set('test-key', 'hello redis', 1000);
+            await this.cache.set('test-key', 'hello redis', 6000);
             const value = await this.cache.get('test-key');
             console.log('[Redis Test]', value);
+
         } catch (err) {
             console.error(`${err} Redis`);
         }
