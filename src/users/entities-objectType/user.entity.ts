@@ -1,9 +1,10 @@
+import { MovieEntity } from '@/movie/entities-objectType/movie.entity';
 import { Field, ID, Int, ObjectType } from '@nestjs/graphql';
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from '@prisma/client';
 import { Exclude } from 'class-transformer';
 
-@ObjectType()
+@ObjectType({ description: 'User' })
 export class UserEntity implements User {
     @ApiProperty()
     @Field(() => ID, { nullable: false })
@@ -71,6 +72,9 @@ export class UserEntity implements User {
 
     @Exclude()
     password: string;
+
+    @Field(() => [MovieEntity], { nullable: true })
+    movies?: MovieEntity[];
 
     constructor(partial: Partial<UserEntity>) {
         Object.assign(this, partial);

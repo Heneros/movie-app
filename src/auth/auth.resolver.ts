@@ -6,7 +6,7 @@ import {
     Resolver,
     Subscription,
 } from '@nestjs/graphql';
-import { AuthEntity } from './entity/auth.entity';
+import { AuthEntity } from './entity-objectType/auth.entity';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { LogInDto } from './dto-input/Login.dto';
 import {

@@ -35,7 +35,7 @@ import {
     ApiResponse,
     ApiTags,
 } from '@nestjs/swagger';
-import { UserEntity } from './entities/user.entity';
+import { UserEntity } from './entities-objectType/user.entity';
 import { AuthGuard } from '@/guards/auth.guard';
 import { Roles } from '@/decorators/roles.decorator';
 
@@ -228,7 +228,4 @@ export class UsersController {
             // res.status(500).send({ message: 'Upload failed' });
         }
     }
-
-
-    
 }

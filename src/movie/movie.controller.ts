@@ -29,7 +29,7 @@ import {
     ApiQuery,
     ApiTags,
 } from '@nestjs/swagger';
-import { MovieEntity } from './entities/movie.entity';
+import { MovieEntity } from './entities-objectType/movie.entity';
 import { Roles } from '@/decorators/roles.decorator';
 import { PAGINATION_LIMIT } from '@/data/defaultData';
 import { User } from '@/decorators/user.decorator';
@@ -44,7 +44,7 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { plainToInstance } from 'class-transformer';
 import { MovieRepository } from './repositories/movie.repository';
 import { CreateMovieReviewDto } from './dto-input/create-review.dto';
-import { MovieReviewEntity } from './entities/movieReview.entity';
+import { MovieReviewEntity } from './entities-objectType/movieReview.entity';
 import { RedisService } from '../redis/redis.service';
 
 import { GqlThrottlerGuard } from '../guards/gql-throttler.guard';
@@ -107,8 +107,6 @@ export class MovieController {
 
         return movies.allMovies.map((movie: Movie) => new MovieEntity(movie));
     }
-
-
 
     @Get(MOVIE_ROUTES.FILTER)
     @ApiOperation({ summary: 'Filter movies' })

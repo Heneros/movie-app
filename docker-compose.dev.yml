@@ -1,11 +1,12 @@
 version: '3.8'
 
 services:
- postgres:
+ postgres-master:
     restart: always
     # image: postgres:17.4
     image: postgres:14-alpine
     env_file: ./.env
+    container_name: postgres-master
     # build:
     #   context: ./docker/dev/postgresql_master
     environment:
@@ -26,7 +27,6 @@ services:
     networks:
       app_movie:
 
-
  pgadmin:
    container_name: pgadmi_nest
    image: dpage/pgadmin4:8
@@ -37,7 +37,7 @@ services:
    ports: 
      - "5050:80"
    depends_on:  
-    - postgres
+    - postgres-master
    volumes:
       - pgadmin-data:/var/lib/pgadmin
    networks:
@@ -56,7 +56,7 @@ services:
 #    networks:
 #       app_movie:
 
-
+  
 #  mongo-express:
 #     image: mongo-express:1-18-alpine3.19
 #     container_name: mongo-express
@@ -88,70 +88,8 @@ services:
    - '6379:6379'
   volumes:
   - redis_data:/data
-  healthcheck:
-    test: ["CMD", "redis-cli", "ping"]
-    interval: 5s
-    timeout: 3s
-    retries: 5
   networks:
     app_movie:
-
- redisinsight:
-    container_name: re-insig
-    image: redislabs/redisinsight:latest
-    ports:
-      - "8001:8001"
-    depends_on:
-      - redis
-    volumes:
-      - ./data/redisinsight:/db
-    restart: always
-
- nestapp:
-    container_name: nestapp
-    build:
-        context: .
-        dockerfile: ./docker/dev/nestjs/Dockerfile
-        args:
-         BUILD_MODE: dev
-    restart: always
-    command: npm run start:dev
-    depends_on:
-        postgres:
-          condition: service_healthy 
-        redis:
-          condition: service_healthy 
-    env_file: ./.env
-    ports:
-     - "3000:3000"
-    #  - "9229:9229" 
-    environment:
-      # - DEBUG=* 
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
-    volumes:
-        - .:/usr/src/app
-        - /usr/src/app/node_modules
-    networks:
-      app_movie:   
-
- nginx:
-   container_name: nginx_nest
-   restart: always
-   build:
-    context: .
-    dockerfile: ./docker/dev/nginx/Dockerfile
-   volumes:
-    - ./logs/nginx:/var/log/nginx
-   ports:
-      - "80:80"
-      - "443:443"
-   depends_on:
-      - nestapp
-   networks:
-    app_movie:   
-
 
 volumes:
   redis_data:

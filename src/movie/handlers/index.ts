@@ -6,6 +6,7 @@ export * from './findDrafts.handler';
 export * from './updateMovie.handler';
 export * from './removeMovie.handler';
 export * from './filterMovies.handler';
+export * from './findAuthors.handler';
 
 export * from './rateMovie.handler';
 

@@ -32,6 +32,18 @@ export class MovieRepository {
         return movie;
     }
 
+    async findAuthorMovie(id: number) {
+        const movie = await this.prisma.movie.findMany({
+            where: {
+                authorId: id,
+            },
+            // include: {
+            //     author: true,
+            // },
+        });
+        return movie;
+    }
+
     async findMovieUniqueWithAuthor(userId: number, movieId?: number) {
         const favorite = await this.prisma.userFavoriteMovies.findUnique({
             where: {

@@ -42,7 +42,7 @@ import { RedisModule } from './redis/redis.module';
         // WinstonModule.forRoot(createWinstonOptions('Movie')),
         WinstonModule.forRoot(winstonLoggerOptions),
         Logger,
-        // RedisModule,
+
         // CacheModule.registerAsync(RedisOptions),
         ThrottlerModule.forRootAsync({
             imports: [ConfigModule],
@@ -80,10 +80,10 @@ import { RedisModule } from './redis/redis.module';
     providers: [
         // RedisService,
         Logger,
-        {
-            provide: APP_INTERCEPTOR,
-            useClass: CacheInterceptor,
-        },
+        // {
+        //     provide: APP_INTERCEPTOR,
+        //     useClass: CacheInterceptor,
+        // },
         {
             provide: APP_GUARD,
             useClass: GqlThrottlerGuard,

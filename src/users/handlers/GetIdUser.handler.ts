@@ -3,7 +3,7 @@ import { GetIdUserQuery } from '../queries';
 import { Inject, NotFoundException } from '@nestjs/common';
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 import { UsersRepository } from './../repositories/users.repository';
-import { UserEntity } from '../entities/user.entity';
+import { UserEntity } from '../entities-objectType/user.entity';
 import { plainToInstance } from 'class-transformer';
 import { CACHE_TTL } from '@/data/ttl';
 
@@ -36,7 +36,6 @@ export class GetIdUserHandler implements IQueryHandler<GetIdUserQuery> {
                 // console.log(` [User Cache] HIT for user ID: ${id}`);
                 return plainToInstance(UserEntity, cachedUser);
             }
- 
 
             const userDto = plainToInstance(UserEntity, user);
 

@@ -2,21 +2,17 @@ import {
     Args,
     Int,
     Mutation,
+    Parent,
     Query,
+    ResolveField,
     Resolver,
     Subscription,
 } from '@nestjs/graphql';
-import {
-    Inject,
-    NotFoundException,
-    ParseIntPipe,
-    UseGuards,
-    ValidationPipe,
-} from '@nestjs/common';
+import { NotFoundException, UseGuards } from '@nestjs/common';
 
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
-import { MovieEntity } from './entities/movie.entity';
+import { MovieEntity } from './entities-objectType/movie.entity';
 import { AuthGuard } from '@/guards/auth.guard';
 
 import { ProfileOwnerGuard } from '@/guards/ProfileOwner.guard';
@@ -36,10 +32,10 @@ import { RemoveMovieFavCommand } from './commands/favorite/removeMovieFavorite.c
 import { FindAllMovieQuery } from './queries/findAllMovie.query';
 import { SearchMovieQuery } from './queries/searchMovie.query';
 import { GetReviewsQuery } from './queries/reviews/getAllReviews.query';
-import { ReviewPaginationEntity } from './entities/reviewPaginationEntity.entity';
+import { ReviewPaginationEntity } from './entities-objectType/reviewPaginationEntity.entity';
 import { GetReviewsByMovieQuery } from './queries/reviews/getAllReviewsMovie.query';
 import { GetSingleReviewQuery } from './queries/reviews/getSingleReview.query';
-import { MovieReviewEntity } from './entities/movieReview.entity';
+import { MovieReviewEntity } from './entities-objectType/movieReview.entity';
 import { CreateReviewCommand } from './commands/reviews/createReview.command';
 import { CreateMovieReviewDto } from './dto-input/create-review.dto';
 import { UpdateReviewCommand } from './commands/reviews/updateReview.command';
@@ -49,6 +45,10 @@ import { CreateMovieDto } from './dto-input/create-movie.dto';
 import { CreateMovieCommand } from './commands/createMovie.command';
 import { UpdateMovieCommand } from './commands/updateMovie.command';
 import { UpdateMovieDto } from './dto-input/update-movie.dto';
+import { UserEntity } from '@/users/entities-objectType/user.entity';
+import { Movie } from '@prisma/client';
+import { FindAuthorMovieQuery } from './queries/findAuthorMovie.query';
+import { GetIdUserQuery } from '@/users/queries';
 
 @Resolver((of) => MovieEntity)
 export class MovieResolver {
@@ -63,14 +63,22 @@ export class MovieResolver {
         this.pubSub = new PubSub();
     }
 
+    // @Query(() => [MovieEntity], {
+    //     description: 'Author',
+    // })
+    // async findAuthor(@Args('id') id: number) {
+    //     console.log(id);
+    //     const result = await this.queryBus.execute(
+    //         new FindAuthorMovieQuery(id),
+    //     );
+    //     return result;
+    // }
+
     @Subscription(() => MovieEntity, {
         name: 'movieRatingUpdated',
         resolve: (payload) => {
-            // console.log('Subscription Payload:', payload);
             return payload.movieRatingUpdated;
         },
-        // resolve: (payload) => console.log(payload),
-        // filter: (payload, variables) => true,
     })
     async movieRatingUpdated() {
         // console.log('test', 333);

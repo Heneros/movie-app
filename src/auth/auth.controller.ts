@@ -25,13 +25,13 @@ import {
     ApiResponse,
     ApiTags,
 } from '@nestjs/swagger';
-import { AuthEntity } from './entity/auth.entity';
+import { AuthEntity } from './entity-objectType/auth.entity';
 import { LogInDto } from './dto-input/Login.dto';
 import { TimeoutInterceptor } from '@/interceptor/timeout.interceptor';
-import { UserEntity } from '@/users/entities/user.entity';
+import { UserEntity } from '@/users/entities-objectType/user.entity';
 import { CreateUserDto } from './dto-input/Create-user.dto';
 import { ResetPasswordDto } from './dto-input/Reset-password.dto';
-import { AuthRegister } from './entity/register.entity';
+import { AuthRegister } from './entity-objectType/register.entity';
 import { EmailValidationPipe } from './pipe/EmailValidation.pipe';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 

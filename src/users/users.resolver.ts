@@ -2,19 +2,21 @@ import {
     Args,
     Int,
     Mutation,
+    Parent,
     Query,
+    ResolveField,
     Resolver,
     Subscription,
 } from '@nestjs/graphql';
 import { ApiTags } from '@nestjs/swagger';
-import { UserEntity } from './entities/user.entity';
+import { UserEntity } from './entities-objectType/user.entity';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {
     FindAllUsersQuery,
     GetAllBlockedUsersQuery,
     GetIdUserQuery,
 } from './queries';
-import { plainToInstance } from 'class-transformer';
+import { plainToClass, plainToInstance } from 'class-transformer';
 import { Roles } from '@/decorators/roles.decorator';
 import { Inject, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@/guards/auth.guard';
@@ -28,6 +30,8 @@ import {
 } from './commands';
 import { UpdateUserRole } from './dto-input/update-user-role.dto';
 import { PubSub } from 'graphql-subscriptions';
+import { MovieEntity } from '@/movie/entities-objectType/movie.entity';
+import { FindAuthorMovieQuery } from '@/movie/queries/findAuthorMovie.query';
 
 // const pubSub = new PubSub();
 
@@ -128,7 +132,25 @@ export class UsersResolver {
         },
     })
     async userChangeRoleSubscribe() {
-        // console.log(555123);
         return this.pubSub.asyncIterableIterator('USER_ROLE_CHANGE');
+    }
+
+    @Query(() => UserEntity)
+    async findUser(@Args('id', { type: () => Int }) id: number) {
+        return this.queryBus.execute(new GetIdUserQuery(id));
+    }
+
+    @ResolveField(() => [MovieEntity])
+    async movies(@Parent() user: UserEntity) {
+        console.log('ResolveField: movies');
+        const result = await this.queryBus.execute(
+            new FindAuthorMovieQuery(user.id),
+        );
+
+        // return plainToInstance(MovieEntity, result, {
+        //     excludeExtraneousValues: true,
+        // });
+        return result.map((movie) => new MovieEntity(movie));
+        //  return plainToInstance(result, MovieEntity);
     }
 }
