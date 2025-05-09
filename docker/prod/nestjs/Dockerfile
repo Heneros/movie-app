@@ -1,10 +1,10 @@
-FROM node:20.12.2
+FROM node:22.15-alpine
 
 WORKDIR /usr/src/app  
 
 COPY package*.json ./
 
-RUN npm ci --only=production && npm cache clean --force
+RUN npm install
 
 COPY prisma/schema.prisma ./prisma/
 
@@ -12,9 +12,6 @@ RUN npx prisma generate
 
 COPY . .
 
-RUN npx prisma migrate dev
-
 RUN npm run build
 
 CMD ["npm", "run", "start:dev"]
-

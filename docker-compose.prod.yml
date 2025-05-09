@@ -1,44 +1,73 @@
 version: '3.8'
 
 services:
- 
  postgres:
-   image: postgres:13.5
-   restart: always
-   env_file: ./.env
-   environment: 
-    POSTGRES_USER: ${POSTGRES_USER}
-    POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    POSTGRES_DB: ${POSTGRES_DB}
-   volumes:
-   - postgres:/var/lib/postgresql/data
-   ports:
-     - "5432:5432"  
-   healthcheck:
+    restart: always
+    # image: postgres:17.4
+    image: postgres:14-alpine
+    env_file: ./.env
+    # build:
+    #   context: ./docker/dev/postgresql_master
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    #   - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+       -  movies_db_data:/var/lib/postgresql/data
+    ports:
+      -  '5432:5432' 
+    # command: ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
+    healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 5
-   networks:
-    app_movie:
+    networks:
+      app_movie:
+
 
  pgadmin:
    container_name: pgadmi_nest
    image: dpage/pgadmin4:8
+   restart: always
    environment: 
       - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
       - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}
    ports: 
      - "5050:80"
-   volumes:
-      - pgadmin-data:/var/lib/pgadmin
    depends_on:  
     - postgres
-   restart: always
+   volumes:
+      - pgadmin-data:/var/lib/pgadmin
    networks:
     app_movie:
 
-   
+#  mongodb:
+#    image: mongo:7.0.16
+#    restart: always
+#    ports:
+#      - "27017:27017"
+#    environment:
+#        - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
+#        - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
+#    volumes:
+#      - mongodb-data:/data/db
+#    networks:
+#       app_movie:
+
+
+#  mongo-express:
+#     image: mongo-express:1-18-alpine3.19
+#     container_name: mongo-express
+#     restart: always
+#     ports:
+#       - "8081:8081"
+#     environment:
+#     - ME_CONFIG_MONGODB_ADMINUSERNAME=${MONGO_ROOT_USERNAME}
+#     - ME_CONFIG_MONGODB_ADMINPASSWORD=${MONGO_ROOT_PASSWORD}
+#     - ME_CONFIG_MONGODB_URL=${MONGO_URL}
+ 
  maildev:
   image: maildev/maildev:2.2.1
   restart: always
@@ -51,7 +80,6 @@ services:
   networks:
     app_movie:
 
-    
  redis:
   image: redis:7.4
   container_name: 'redis-nestjs'
@@ -60,52 +88,85 @@ services:
    - '6379:6379'
   volumes:
   - redis_data:/data
+  healthcheck:
+    test: ["CMD", "redis-cli", "ping"]
+    interval: 5s
+    timeout: 3s
+    retries: 5
   networks:
     app_movie:
 
-
- nginx:
-  container_name: nginx_nest
-  restart: always
-  build:
-    context: .
-    dockerfile: ./docker/prod/nginx/Dockerfile
-  volumes:
-    - ./logs/nginx:/var/log/nginx
-  ports:
-      - "80:80"
-      - "443:443"
-  depends_on:
-    - nestapp
-  networks:
-    app_movie:
+ redisinsight:
+    container_name: re-insig
+    image: redislabs/redisinsight:latest
+    ports:
+      - "8001:8001"
+    depends_on:
+      - redis
+    volumes:
+      - ./data/redisinsight:/db
+    restart: always
 
  nestapp:
-  container_name: nestapp
-  restart: always
-  depends_on:
-    postgres:
-      condition: service_healthy
-  environment:
-      DATABASE_URL: postgres://postgres:postgres@postgres:5432/moviedb?schema=public
-  ports:
-   - '3000:3000'
-  build:
-    context: .
-    dockerfile: ./docker/prod/nestjs/Dockerfile
-  volumes:
-   - .:/app
-   - /app/node_modules
-  networks:
-    app_movie:
+    container_name: nestapp
+    build:
+        context: .
+        dockerfile: ./docker/dev/nestjs/Dockerfile
+    restart: always
+    command: npm run start:dev
+    depends_on:
+        postgres:
+          condition: service_healthy 
+        redis:
+          condition: service_healthy 
+    env_file: ./.env
+    ports:
+     - "3000:3000"
+    #  - "9229:9229" 
+    environment:
+      # - DEBUG=* 
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
+    volumes:
+        - .:/usr/src/app
+        - /usr/src/app/node_modules
+    command: >
+      sh -c "
+        echo 'running migrations…' &&
+        npx prisma migrate deploy &&       
+        echo 'seeding DB…' &&
+        npx prisma db seed &&
+        echo 'starting dev server…' &&
+        npm run start:dev
+      "
+    networks:
+      app_movie:   
 
+ nginx:
+   container_name: nginx_nest
+   restart: always
+   build:
+    context: .
+    dockerfile: ./docker/dev/nginx/Dockerfile
+   volumes:
+    - ./logs/nginx:/var/log/nginx
+   ports:
+      - "80:80"
+      - "443:443"
+   depends_on:
+      - nestapp
+   networks:
+    app_movie:   
 
 
 volumes:
-  postgres:
   redis_data:
   pgadmin-data:
+  movies_db_data:
+  mongodb-data:
+  slave_data:
 
 networks:
   app_movie:
-   driver: bridge
+    driver: bridge

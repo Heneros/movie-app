@@ -20,10 +20,10 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
 import Redis from 'ioredis';
-import { RedisService } from './redis/redis.service';
 import { WinstonModule } from 'nest-winston';
 import { winstonLoggerOptions } from './Logger';
 import { Logger } from 'winston';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
     imports: [
@@ -38,8 +38,8 @@ import { Logger } from 'winston';
             envFilePath: './.env',
             load: [RedisConfig],
         }),
+        RedisModule,
         // WinstonModule.forRoot(createWinstonOptions('Movie')),
-        CacheModule.registerAsync(RedisOptions),
         WinstonModule.forRoot(winstonLoggerOptions),
         Logger,
         // RedisModule,
@@ -78,7 +78,7 @@ import { Logger } from 'winston';
     ],
     controllers: [],
     providers: [
-        RedisService,
+        // RedisService,
         Logger,
         {
             provide: APP_INTERCEPTOR,

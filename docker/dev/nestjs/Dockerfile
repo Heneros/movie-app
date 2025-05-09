@@ -12,7 +12,8 @@ RUN npx prisma generate
 
 COPY . .
 
-RUN npm run build
+ARG BUILD_MODE=dev
+RUN if [ "$BUILD_MODE" = "prod" ]; then npm run build; fi
 
-CMD ["npm", "run", "start:dev"]
-# ENTRYPOINT ["/bin/sh", "-c", "npm run start:dev"]
+
+CMD if["$BUILD_MODE" = "prod"]; then npm run start:with-migrations; else npm run start:dev; fi ["npm", "run", "start:with-migrations"]

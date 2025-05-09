@@ -4,8 +4,8 @@
 /build
 1features.txt
 *.pem
+*-audit.json
 .*-audit.json
-
 
 1features.txt
 # Logs

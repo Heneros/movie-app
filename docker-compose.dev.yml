@@ -96,12 +96,26 @@ services:
   networks:
     app_movie:
 
+ redisinsight:
+    container_name: re-insig
+    image: redislabs/redisinsight:latest
+    ports:
+      - "8001:8001"
+    depends_on:
+      - redis
+    volumes:
+      - ./data/redisinsight:/db
+    restart: always
+
  nestapp:
     container_name: nestapp
     build:
         context: .
         dockerfile: ./docker/dev/nestjs/Dockerfile
+        args:
+         BUILD_MODE: dev
     restart: always
+    command: npm run start:dev
     depends_on:
         postgres:
           condition: service_healthy 
@@ -119,15 +133,6 @@ services:
     volumes:
         - .:/usr/src/app
         - /usr/src/app/node_modules
-    command: >
-      sh -c "
-        echo 'running migrations…' &&
-        npx prisma migrate deploy &&       
-        echo 'seeding DB…' &&
-        npx prisma db seed &&
-        echo 'starting dev server…' &&
-        npm run start:dev
-      "
     networks:
       app_movie:   
 
