@@ -159,14 +159,10 @@ export class AuthController {
         @Body()
         emailDto: EmailDto,
     ) {
-        try {
-            const result = await this.commandBus.execute(
-                new ResendEmailCommand(userId, emailDto.email),
-            );
-            return new AuthEntity(result);
-        } catch (error) {
-            console.error(error);
-        }
+        const result = await this.commandBus.execute(
+            new ResendEmailCommand(userId, emailDto.email),
+        );
+        return new AuthEntity(result);
     }
 
     @Throttle({ default: { limit: 15, ttl: 60000 } })

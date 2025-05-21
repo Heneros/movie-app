@@ -2,13 +2,22 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { randomBytes } from 'crypto';
 import { MailService } from '@/mail/mail.service';
 import { AuthRepository } from '../repositories/Auth.repository';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+    BadRequestException,
+    HttpException,
+    Inject,
+    LoggerService,
+    NotFoundException,
+} from '@nestjs/common';
 import { domain, roundsOfHashing, tempRegisterDate } from '@/data/defaultData';
 import { ResendEmailCommand } from '../commands';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 @CommandHandler(ResendEmailCommand)
 export class ResendEmailHandler implements ICommandHandler<ResendEmailCommand> {
     constructor(
+        @Inject(WINSTON_MODULE_NEST_PROVIDER)
+        private readonly logger: LoggerService,
         private readonly authRepository: AuthRepository,
         private readonly mailService: MailService,
     ) {}
@@ -18,10 +27,11 @@ export class ResendEmailHandler implements ICommandHandler<ResendEmailCommand> {
             const { userId, email } = command;
 
             // console.log(userId, email);
-            const user = await this.authRepository.findUser({
+            const user = await this.authRepository.findUserByEmail({
                 email,
             });
 
+            // console.log('useruser', user);
             if (!user) {
                 throw new NotFoundException('User not found');
             }
@@ -60,14 +70,18 @@ export class ResendEmailHandler implements ICommandHandler<ResendEmailCommand> {
                 './confirmation',
                 payload,
             );
-            //   res.status(200).json({ message: 'Email was successfully sent' });
 
             return {
                 message: 'Email was successfully sent',
                 status: 200,
             };
         } catch (error) {
-            console.error(error);
+            if (error instanceof HttpException) {
+                throw error;
+            }
+            // console.error(error);
+            this.logger.log(`Error verify user email ${command.email}`);
+
             throw new BadRequestException('Error sending email');
         }
     }

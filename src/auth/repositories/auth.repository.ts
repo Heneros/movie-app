@@ -34,6 +34,19 @@ export class AuthRepository {
         });
     }
 
+    async findUserByEmail(data) {
+        const { email } = data;
+        if (!email) {
+            throw new BadRequestException('Email not provided');
+        }
+        const user = await this.prisma.user.findUnique({
+            where: {
+                email,
+            },
+        });
+
+        return user;
+    }
     async createUser(userData) {
         const createdUser = await this.prisma.user.create({
             data: userData,
