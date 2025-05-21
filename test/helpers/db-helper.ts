@@ -6,6 +6,7 @@ export async function clearDatabase(prisma: PrismaService) {
     await prisma.userFavoriteMovies.deleteMany();
     await prisma.reviews.deleteMany();
     await prisma.actorsOnMovies.deleteMany();
+    await prisma.directorsOnMovie.deleteMany();
     await prisma.user.deleteMany();
     await prisma.movie.deleteMany();
 }

@@ -96,9 +96,9 @@ export class AuthController {
         @Param('userId') userId: number,
         @Res() res: Response,
     ) {
-        await this.queryBus.execute(new VerifyEmailQuery(token, userId));
+        return await this.queryBus.execute(new VerifyEmailQuery(token, userId));
 
-        return res.status(200).json({ message: 'Your email is verified!' });
+        // return res.status(200).json({ message: 'Your email is verified!' });
     }
 
     @Post(AUTH_ROUTES.LOGIN)

@@ -1,6 +1,5 @@
 import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { seconds, ThrottlerModule } from '@nestjs/throttler';
-import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
 
 import { join } from 'node:path';
 
@@ -54,7 +53,7 @@ import { RedisModule } from './redis/redis.module';
                     // password: configService.get('REDIS_PASSWORD'),
                 });
                 return {
-                    throttlers: [{ ttl: 60, limit: 10000 }],
+                    throttlers: [{ ttl: 6000, limit: 10000 }],
                     storage: new ThrottlerStorageRedisService(redisClient),
                     // getTracker: (req, context) => req.headers['x-device-id'],
                 };

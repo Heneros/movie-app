@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+// import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { MailService } from './mail.service';
 import { MailerModule } from '@nestjs-modules/mailer';
 import * as path from 'path';
-import { isDevelopment } from '@/data/defaultData';
+import { isDevelopment, isTest } from '@/data/defaultData';
 
 // console.log(isDevelopment);
 @Module({
@@ -23,15 +23,23 @@ import { isDevelopment } from '@/data/defaultData';
             defaults: {
                 from: `"No Replay" <noreply@example.com>`,
             },
-            template: {
-                dir: isDevelopment
-                    ? path.join(process.cwd(), '/dist/src/mail/templates')
-                    : path.join(__dirname, '/src/mail/templates'),
-                adapter: new HandlebarsAdapter(),
-                options: {
-                    strict: true,
-                },
-            },
+            ...(isTest
+                ? {}
+                : {
+                      template: {
+                          dir: isDevelopment
+                              ? path.join(
+                                    process.cwd(),
+                                    '/dist/src/mail/templates',
+                                )
+                              : path.join(__dirname, '/src/mail/templates'),
+                          adapter:
+                              new (require('@nestjs-modules/mailer/dist/adapters/handlebars.adapter').HandlebarsAdapter)(),
+                          options: {
+                              strict: true,
+                          },
+                      },
+                  }),
         }),
     ],
     providers: [MailService],

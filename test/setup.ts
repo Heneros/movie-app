@@ -3,9 +3,7 @@ import {
     INestApplication,
     ValidationPipe,
 } from '@nestjs/common';
-import * as request from 'supertest';
-import * as fs from 'fs';
-import * as path from 'path';
+
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 
 import { Test, TestingModule } from '@nestjs/testing';
@@ -16,6 +14,7 @@ import { MailModule } from '../src/mail/mail.module';
 import { MailService } from '../src/mail/mail.service';
 import { clearDatabase } from './helpers/db-helper';
 import { AuthModule } from '../src/auth/auth.module';
+import { RedisService } from '@/redis/redis.service';
 
 export let app: INestApplication;
 
@@ -55,6 +54,15 @@ beforeAll(async () => {
 
 afterAll(async () => {
     const prisma = app.get(PrismaService);
+
+    const redisService = app.get(RedisService);
+    await redisService.onModuleDestroy();
+
+    await prisma.$disconnect();
     await clearDatabase(prisma);
+
     await app.close();
+    console.log('[Test] Clean shutdown complete');
+
+    await new Promise((resolve) => setTimeout(resolve, 500));
 });

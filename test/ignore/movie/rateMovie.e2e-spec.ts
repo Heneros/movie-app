@@ -1,8 +1,8 @@
 import { PrismaService } from '@/prisma/prisma.service';
-import { app } from '../setup';
-import * as request from 'supertest';
+import { app } from '../../setup';
+import request from 'supertest';
 import * as bcrypt from 'bcrypt';
-import { clearDatabase } from '../helpers/db-helper';
+import { clearDatabase } from '../../helpers/db-helper';
 
 describe('Movies -Rate movie by user(e2e)', () => {
     let prisma: PrismaService;

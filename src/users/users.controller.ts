@@ -19,7 +19,6 @@ import {
     BadGatewayException,
 } from '@nestjs/common';
 import { Express } from 'express';
-import * as fs from 'fs';
 
 import { UpdateUserDto } from './dto-input/update-user.dto';
 import {

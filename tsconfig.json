@@ -12,6 +12,7 @@
         "sourceMap": true,
         "types": [
             "express",
+            "jest"
         ],
         "typeRoots": [
             "types",
