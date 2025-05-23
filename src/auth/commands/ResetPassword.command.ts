@@ -9,6 +9,6 @@ export class ResetPasswordCommand implements ICommand {
         public readonly emailToken: string,
 
         public readonly resetPasswordDto: ResetPasswordDto,
-        public readonly res: Response,
+        // public readonly res: Response,
     ) {}
 }

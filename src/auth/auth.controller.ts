@@ -186,7 +186,6 @@ export class AuthController {
         );
     }
 
-    @Throttle({ default: { limit: 10, ttl: 60000 } })
     @Post(AUTH_ROUTES.RESET_PASSWORD)
     @ApiOperation({
         summary: 'For users, who receive link in email. And know user id.',
@@ -204,10 +203,10 @@ export class AuthController {
         @Query('userId', ParseIntPipe) userId: number,
         @Query('emailToken') emailToken: string,
         @Body() resetPasswordDto: ResetPasswordDto,
-        @Res() res: Response,
+        // @Res() res: Response,
     ) {
         return await this.commandBus.execute(
-            new ResetPasswordCommand(userId, emailToken, resetPasswordDto, res),
+            new ResetPasswordCommand(userId, emailToken, resetPasswordDto),
         );
     }
 

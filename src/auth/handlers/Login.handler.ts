@@ -55,7 +55,7 @@ export class LoginUserHandler implements ICommandHandler<LoginUserCommand> {
             await this.authRepository.updateToken(user.id, refreshToken);
 
             await this.authRepository.updateProfile(user.id, {
-                refreshToken: [accessToken],
+                refreshToken: [refreshToken],
             });
             return {
                 accessToken,

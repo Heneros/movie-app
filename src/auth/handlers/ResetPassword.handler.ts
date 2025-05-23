@@ -19,7 +19,7 @@ export class ResetPasswordHandler
     ) {}
 
     async execute(command: ResetPasswordCommand) {
-        const { userId, emailToken, resetPasswordDto, res } = command;
+        const { userId, resetPasswordDto } = command;
         if (resetPasswordDto.password !== resetPasswordDto.passwordConfirm) {
             throw new BadRequestException('Password do not match');
         }
@@ -32,6 +32,7 @@ export class ResetPasswordHandler
             throw new BadRequestException(
                 'Your token is either invalid or expired. Try resetting your password again',
             );
+            return;
         }
         const user = await this.authRepository.findUser({
             userId,

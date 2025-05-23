@@ -1,7 +1,7 @@
 import request from 'supertest';
 import * as bcrypt from 'bcrypt';
 
-import { app, mockMailService } from '../setup';
+import { app, mockMailService } from '../../setup';
 import { PrismaService } from '@/prisma/prisma.service';
 
 describe('Auth - Resend Email Validation POST /resend_email_token/:userId/ (e2e)', () => {

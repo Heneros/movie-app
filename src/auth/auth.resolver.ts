@@ -148,13 +148,13 @@ export class AuthResolver {
     })
     async resetPassword(
         @Args('userId', ParseIntPipe) userId: number,
-        @Args('emailToken') emailToken: string,
+        @Args('emailToken', ParseIntPipe) token: string,
         @Args('input') resetPasswordDto: ResetPasswordDto,
-        @Context() context: { res: Response },
+        // @Context() context: { res: Response },
     ) {
-        const { res } = context;
+        // const { res } = context;
         return await this.commandBus.execute(
-            new ResetPasswordCommand(userId, emailToken, resetPasswordDto, res),
+            new ResetPasswordCommand(userId, token, resetPasswordDto),
         );
     }
 

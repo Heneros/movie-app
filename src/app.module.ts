@@ -41,8 +41,6 @@ import { RedisModule } from './redis/redis.module';
         // WinstonModule.forRoot(createWinstonOptions('Movie')),
         WinstonModule.forRoot(winstonLoggerOptions),
         Logger,
-
-        // CacheModule.registerAsync(RedisOptions),
         ThrottlerModule.forRootAsync({
             imports: [ConfigModule],
             inject: [ConfigService],
@@ -53,7 +51,7 @@ import { RedisModule } from './redis/redis.module';
                     // password: configService.get('REDIS_PASSWORD'),
                 });
                 return {
-                    throttlers: [{ ttl: 6000, limit: 10000 }],
+                    throttlers: [{ ttl: 60, limit: 10000 }],
                     storage: new ThrottlerStorageRedisService(redisClient),
                     // getTracker: (req, context) => req.headers['x-device-id'],
                 };
@@ -63,10 +61,12 @@ import { RedisModule } from './redis/redis.module';
         GraphQLModule.forRoot<ApolloDriverConfig>({
             driver: ApolloDriver,
             autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
-            installSubscriptionHandlers: true,
-            subscriptions: {
-                'graphql-ws': true,
-            },
+
+            installSubscriptionHandlers: process.env.NODE_ENV !== 'test',
+            subscriptions:
+                process.env.NODE_ENV === 'test'
+                    ? false
+                    : ({ 'graphql-ws': true } as any),
             context: ({ req, res }: { req: Request; res: Response }) => ({
                 req,
                 res,
@@ -90,7 +90,7 @@ import { RedisModule } from './redis/redis.module';
     ],
 })
 export class AppModule {
-    public configure(consumer: MiddlewareConsumer): void | MiddlewareConsumer {
-        // consumer.apply()
-    }
+    //     public configure(consumer: MiddlewareConsumer): void | MiddlewareConsumer {
+    //         // consumer.apply()
+    //     }
 }

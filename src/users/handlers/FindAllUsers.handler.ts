@@ -2,7 +2,7 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { FindAllUsersQuery } from '../queries';
 import { Inject, NotFoundException } from '@nestjs/common';
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Cache as Cache2 } from 'cache-manager';
+
 
 import { UsersRepository } from './../repositories/users.repository';
 import { User } from '@prisma/client';
@@ -14,14 +14,12 @@ export class FindAllUsersHandler implements IQueryHandler<FindAllUsersQuery> {
         // private readonly prisma: PrismaService,
         private readonly usersRepository: UsersRepository,
         @Inject(CACHE_MANAGER) private cacheManager: Cache,
-        @Inject(CACHE_MANAGER) private cacheManagerSec: Cache2,
     ) {}
 
     async execute(query: FindAllUsersQuery) {
         const { page } = query;
         const cacheKey = `users:${page}`;
         const cached = await this.cacheManager.get<User[]>(cacheKey);
-        const cachedTw = await this.cacheManagerSec.get<User[]>(cacheKey);
 
         const start = Date.now();
         if (cached) {
@@ -31,8 +29,6 @@ export class FindAllUsersHandler implements IQueryHandler<FindAllUsersQuery> {
             console.log(`Cache HIT for page ${page}, took ${end - start}ms`);
             return cached;
         }
-
-
 
         const allUsers = await this.usersRepository.findAllUsers(page);
 
