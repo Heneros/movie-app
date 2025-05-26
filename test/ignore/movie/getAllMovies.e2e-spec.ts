@@ -29,7 +29,7 @@ describe('Movies - Get All movies(e2e)', () => {
                 email: 'test@example.com',
                 password: 'password123',
             });
-        userToken = responseUser.body.newRefreshToken;
+        userToken = responseUser.body.refreshToken;
     });
 
     it('Should GET All Movie GET - Success', async () => {

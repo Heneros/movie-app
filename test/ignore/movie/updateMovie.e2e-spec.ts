@@ -29,7 +29,7 @@ describe('Movies - Update movies(e2e)', () => {
                 email: 'test@example.com',
                 password: 'password123',
             });
-        userToken = responseUser.body.newRefreshToken;
+        userToken = responseUser.body.refreshToken;
     });
     /////////////Success
     it('Should Update Movie  - Success', async () => {

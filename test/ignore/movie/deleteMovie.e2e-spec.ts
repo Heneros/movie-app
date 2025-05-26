@@ -32,7 +32,7 @@ describe('Movies - Delete movies(e2e)', () => {
                 email: 'test@example.com',
                 password: 'password123',
             });
-        userToken = responseUser.body.newRefreshToken;
+        userToken = responseUser.body.refreshToken;
 
         testUserNotAdmin = await prisma.user.create({
             data: {
@@ -50,7 +50,7 @@ describe('Movies - Delete movies(e2e)', () => {
                 password: 'password123',
             });
 
-        userTokenNotAdmin = responseUserNotAdmin.body.newRefreshToken;
+        userTokenNotAdmin = responseUserNotAdmin.body.refreshToken;
     });
 
     /////////////Success

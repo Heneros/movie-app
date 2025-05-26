@@ -180,9 +180,6 @@ input CreateMovieDto {
   """Movie category"""
   category: String!
 
-  """Author ID"""
-  authorId: Int
-
   """Year"""
   year: Int
 

@@ -52,8 +52,8 @@ describe('Users - Change role to user(e2e)', () => {
                 email: 'test2@example.com',
                 password: 'password123',
             });
-        adminToken = responseAdmin.body.newRefreshToken;
-        userToken = responseUser.body.newRefreshToken;
+        adminToken = responseAdmin.body.refreshToken;
+        userToken = responseUser.body.refreshToken;
 
         // console.log(userToken);
     });

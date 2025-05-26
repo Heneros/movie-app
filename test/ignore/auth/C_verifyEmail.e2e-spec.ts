@@ -4,7 +4,7 @@ import * as path from 'path';
 
 // dir: path.join(__dirname, 'templates'),
 
-import { app } from '../setup';
+import { app } from '../../setup';
 import { PrismaService } from '@/prisma/prisma.service';
 import { tempRegisterDate } from '@/data/defaultData';
 

@@ -54,12 +54,12 @@ export class CreateMovieDto {
     })
     public readonly category: string;
 
-    @Field(() => Int, { nullable: true, description: 'Author ID' })
-    @IsNumber()
-    @IsOptional()
-    @Type(() => Number)
-    @ApiProperty({ required: false })
-    authorId: number;
+    // @Field(() => Int, { nullable: true, description: 'Author ID' })
+    // @IsNumber()
+    // @IsOptional()
+    // @Type(() => Number)
+    // @ApiProperty({ required: false })
+    // authorId?: number;
 
     @Field(() => Int, { nullable: true, description: 'Year' })
     @IsNumber()

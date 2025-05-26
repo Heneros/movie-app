@@ -209,10 +209,10 @@ export class MovieController {
         if (!user || !user.id) {
             throw new Error('User not found or unauthorized');
         }
-        createMovieDto.authorId = user.id;
-
+        // createMovieDto.authorId = user.id;
+        const userId = user.id;
         const movie = await this.commandBus.execute(
-            new CreateMovieCommand(createMovieDto),
+            new CreateMovieCommand(userId, createMovieDto),
         );
         return new MovieEntity(movie);
     }

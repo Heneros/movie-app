@@ -35,7 +35,7 @@ describe('Movies -Rate movie by user(e2e)', () => {
                 email: 'test@example.com',
                 password: 'password123',
             });
-        userToken = responseUser.body.newRefreshToken;
+        userToken = responseUser.body.refreshToken;
 
         testUserNotAdmin = await prisma.user.create({
             data: {
@@ -54,7 +54,7 @@ describe('Movies -Rate movie by user(e2e)', () => {
                 email: 'testNotAdmin@example.com',
                 password: 'password123',
             });
-        userTokenNotAdmin = responseUserNotAdmin.body.newRefreshToken;
+        userTokenNotAdmin = responseUserNotAdmin.body.refreshToken;
 
         const response = await request(app.getHttpServer())
             .post(`/movie`)

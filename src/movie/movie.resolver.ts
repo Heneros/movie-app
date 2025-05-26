@@ -96,10 +96,11 @@ export class MovieResolver {
         await this.pubSub.publish('NEW_MESSAGE', {
             newMessage: createMovieDto,
         });
-        createMovieDto.authorId = user.id;
+        const userId = user.id;
+        // createMovieDto.authorId = user.id;
 
         const movie = await this.commandBus.execute(
-            new CreateMovieCommand(createMovieDto),
+            new CreateMovieCommand(userId, createMovieDto),
         );
         return new MovieEntity(movie);
     }

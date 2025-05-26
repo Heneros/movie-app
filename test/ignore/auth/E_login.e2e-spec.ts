@@ -1,6 +1,6 @@
 import { PrismaService } from '@/prisma/prisma.service';
 
-import { app } from '../setup';
+import { app } from '../../setup';
 import * as bcrypt from 'bcrypt';
 import request from 'supertest';
 
@@ -47,7 +47,7 @@ describe('Auth - Login (e2e)', () => {
             .expect(201);
 
         // expect(response.body).toHaveProperty('message', 'Login successful');
-        // expect(response.body).toHaveProperty('newRefreshToken');
+        // expect(response.body).toHaveProperty('refreshToken');
         expect(response.headers['set-cookie']).toBeDefined();
         const raw = response.headers['set-cookie'];
 

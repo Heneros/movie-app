@@ -35,7 +35,7 @@ describe('Movies - Remove from favorite movies(e2e)', () => {
                 email: 'test@example.com',
                 password: 'password123',
             });
-        userToken = responseUser.body.newRefreshToken;
+        userToken = responseUser.body.refreshToken;
     });
 
     /////////////Success

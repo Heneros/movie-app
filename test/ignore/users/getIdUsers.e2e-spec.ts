@@ -37,7 +37,7 @@ describe('Users - Get Id user(e2e)', () => {
                 email: 'testuser@example.com',
                 password: 'password123',
             });
-        userToken = responseUser.body.newRefreshToken;
+        userToken = responseUser.body.refreshToken;
         // console.log(userToken);
     });
 

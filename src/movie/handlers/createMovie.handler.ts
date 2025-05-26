@@ -16,7 +16,7 @@ export class CreateMovieHandler implements ICommandHandler<CreateMovieCommand> {
     ) {}
 
     async execute(command: CreateMovieCommand) {
-        const { createMovieDto } = command;
+        const { userId, createMovieDto } = command;
 
         const movieTitle = await this.movieRepository.findUniqueMovie({
             title: createMovieDto.title,
@@ -28,6 +28,7 @@ export class CreateMovieHandler implements ICommandHandler<CreateMovieCommand> {
             );
         }
         const movie = await this.movieRepository.createMovie(
+            userId,
             command.createMovieDto,
         );
         const listCacheKey = RedisPrefixEnum.MOVIE_LIST;

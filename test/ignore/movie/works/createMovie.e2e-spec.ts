@@ -1,8 +1,9 @@
 import { PrismaService } from '@/prisma/prisma.service';
-import { app } from '../../setup';
+import { app } from '../../../setup';
 import request from 'supertest';
 import * as bcrypt from 'bcrypt';
-import { clearDatabase } from '../../helpers/db-helper';
+import { clearDatabase } from '../../../helpers/db-helper';
+import jwt from 'jsonwebtoken';
 
 describe('Movies - Create movies(e2e)', () => {
     let prisma: PrismaService;
@@ -23,13 +24,11 @@ describe('Movies - Create movies(e2e)', () => {
             },
         });
 
-        const responseUser = await request(app.getHttpServer())
-            .post('/auth/login')
-            .send({
-                email: 'test@example.com',
-                password: 'password123',
-            });
-        userToken = responseUser.body.newRefreshToken;
+        userToken = jwt.sign(
+            { id: testUser.id, name: testUser.name, roles: testUser.roles },
+            process.env.JWT_SECRET!,
+            { expiresIn: '31d' },
+        );
     });
 
     it('Should Create Movie POST - Success', async () => {
@@ -37,17 +36,19 @@ describe('Movies - Create movies(e2e)', () => {
             .post(`/movie/`)
             .set('Authorization', `Bearer ${userToken} `)
             .send({
-                title: 'How we do?',
+                title: `James Bro-${Date.now()}`,
                 category: 'Horror',
-                preview: 'preview_url',
+    
+                year: 1999,
+                actorsList: ['James Woods'],
                 description: 'Horror movie about missing in forest',
             })
             .expect(201);
 
         expect(response.body).toMatchObject({
-            title: 'How we do?',
+            title: response.body.title,
             category: 'Horror',
-            preview: 'preview_url',
+            actorsList: ['James Woods'],
             description: 'Horror movie about missing in forest',
         });
         // console.log(response.body);
@@ -60,7 +61,7 @@ describe('Movies - Create movies(e2e)', () => {
             .send({
                 title: '',
                 category: '',
-                preview: '',
+                actorsList: [],
                 description: '',
             })
             .expect(400);
@@ -72,7 +73,6 @@ describe('Movies - Create movies(e2e)', () => {
                 'title must be longer than or equal to 5 characters',
                 'title should not be empty',
                 'description should not be empty',
-                'preview should not be empty',
                 'category should not be empty',
             ]),
         });

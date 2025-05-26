@@ -52,8 +52,8 @@ describe('Users - Get All users(e2e)', () => {
                 email: 'test56@example.com',
                 password: 'password123',
             });
-        adminToken = response.body.newRefreshToken;
-        userToken = responseUser.body.newRefreshToken;
+        adminToken = response.body.refreshToken;
+        userToken = responseUser.body.refreshToken;
         // console.log(userToken);
     });
 

@@ -10,10 +10,16 @@ import { FilterMovieDto } from '../dto-input/filter-movie.dto';
 export class MovieRepository {
     constructor(private prisma: PrismaService) {}
 
-    async createMovie(createMovieDto: CreateMovieDto): Promise<Movie> {
+    async createMovie(
+        authorId,
+        createMovieDto: CreateMovieDto,
+    ): Promise<Movie> {
         return this.prisma.movie.create({
             data: {
                 ...createMovieDto,
+                author: {
+                    connect: { id: authorId },
+                },
             },
         });
     }
