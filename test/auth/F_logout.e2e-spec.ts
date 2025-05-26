@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express';
 import session from 'express-session';
 import { PrismaService } from '@/prisma/prisma.service';
 
-import { app } from '../../setup';
+import { app } from '../setup';
 import { LogoutAuthService } from '@/auth/services/logout.service';
 import * as bcrypt from 'bcrypt';
 import request from 'supertest';

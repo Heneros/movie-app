@@ -2,7 +2,7 @@ import request from 'supertest';
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { app } from '../../setup';
+import { app } from '../setup';
 import { PrismaService } from '@/prisma/prisma.service';
 
 const testUserFile = path.join(__dirname, './data/testUser.json');
@@ -22,7 +22,7 @@ describe('Auth - Register (e2e)', () => {
             passwordConfirm: 'password123',
         };
 
-        const test = await request(app.getHttpServer())
+        await request(app.getHttpServer())
             .post('/auth')
             .send(userData)
             .expect(201);

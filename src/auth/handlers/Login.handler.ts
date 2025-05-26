@@ -13,9 +13,8 @@ export class LoginUserHandler implements ICommandHandler<LoginUserCommand> {
     ) {}
 
     async execute(command: LoginUserCommand) {
+        const { logInDto } = command;
         try {
-            const { logInDto } = command;
-
             const user = await this.authRepository.findUser({
                 email: logInDto.email,
             });
@@ -69,7 +68,8 @@ export class LoginUserHandler implements ICommandHandler<LoginUserCommand> {
                 },
             };
         } catch (error) {
-            console.error('Error setting cookie or sending response:', error);
+            // console.error('Error setting cookie or sending response:', error);
+            throw error;
         }
         // return isPasswordValid;
     }

@@ -1,7 +1,7 @@
 import request from 'supertest';
 import * as bcrypt from 'bcrypt';
 
-import { app, mockMailService } from '../../setup';
+import { app, mockMailService } from '../setup';
 import { PrismaService } from '@/prisma/prisma.service';
 
 describe('Auth - Resend Email Validation POST /resend_email_token/:userId/ (e2e)', () => {
@@ -69,10 +69,11 @@ describe('Auth - Resend Email Validation POST /resend_email_token/:userId/ (e2e)
         // console.log(testUser.id);
         const response = await request(app.getHttpServer())
             .post(`/auth/resend_email_token/${obj.id}`)
-            .send({ email: obj.email });
-        console.log(response.body);
+            .send({ email: obj.email })
+            .expect(404);
+        // console.log(response.body);
         // expect(response.status).toBe(404);
-        // expect(response.body).toHaveProperty('message', 'User not found');
+        expect(response.body).toHaveProperty('message', 'User not found');
     });
 
     it('should throw BadRequestException if user already verified', async () => {

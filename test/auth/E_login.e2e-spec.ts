@@ -43,7 +43,8 @@ describe('Auth - Login (e2e)', () => {
 
         const response = await request(app.getHttpServer())
             .post('/auth/login')
-            .send(loginUserDto);
+            .send(loginUserDto)
+            .expect(201);
 
         // expect(response.body).toHaveProperty('message', 'Login successful');
         // expect(response.body).toHaveProperty('newRefreshToken');
@@ -86,11 +87,15 @@ describe('Auth - Login (e2e)', () => {
         };
         const response = await request(app.getHttpServer())
             .post('/auth/login')
-            .send(loginUserDto);
-        // .expect(400);
+            .send(loginUserDto)
+            .expect(400);
 
         console.log(response.body);
 
-        // expect(response.body).toHaveProperty('message', 'Invalid password');
+        expect(response.body).toMatchObject({
+            message: 'Invalid password',
+            error: 'Bad Request',
+            statusCode: 400,
+        });
     });
 });

@@ -67,7 +67,6 @@ export class AuthController {
         private jwt: JwtService,
     ) {}
 
-    @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Post(AUTH_ROUTES.REGISTER)
     @ApiOperation({ summary: 'Create user' })
     @ApiCreatedResponse({
@@ -94,7 +93,7 @@ export class AuthController {
     async verifyEmail(
         @Param('emailToken') token: string,
         @Param('userId') userId: number,
-        @Res() res: Response,
+        // @Res({ passthrough: true }) res: Response,
     ) {
         return await this.queryBus.execute(new VerifyEmailQuery(token, userId));
 
