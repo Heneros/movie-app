@@ -33,9 +33,9 @@ export const createMovie = async () => {
     );
 
     const response = await request(app.getHttpServer())
-        .post('movie')
+        .post('/movie')
         .set('Authorization', `Bearer ${userToken} `)
-        .send({ defaultMovie })
+        .send(defaultMovie)
         .expect(201);
 
     expect(response.body).toMatchObject({
@@ -45,12 +45,12 @@ export const createMovie = async () => {
         description: 'Horror movie about missing in forest',
     });
 
-    const movie = prisma.movie.findUnique({
+    const movie = await prisma.movie.findUnique({
         where: {
-            id: response.body,
+            id: response.body.id,
         },
     });
 
-    console.log({ movie });
+
     return movie;
 };
