@@ -307,7 +307,6 @@ export class MovieController {
             new GetAllFavoritesQuery(userId, skip),
         );
 
-        // return favoriteMovies;
         const movieIds = favoriteMovies.map((fav) => fav.movieId);
 
         const movies = await this.movieRepository.findManyMovieIn(

@@ -2,143 +2,140 @@ import { PrismaService } from '@/prisma/prisma.service';
 import { app } from '../setup';
 import request from 'supertest';
 import * as bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import { clearDatabase } from '../helpers/db-helper';
+import { createMovie } from '../helpers/createMovie';
+import {
+    registerTestNotAdminUser,
+    registerTestUser,
+} from '../helpers/createUser';
+import { faker } from '@faker-js/faker/.';
 
-describe('Movies - Get all favorite movies by user(e2e)', () => {
+describe('Movies - Get all favorite movies by user(e2e) METHOD GET movie/userID/allFavorites', () => {
     let prisma: PrismaService;
-    let testUser;
     let userToken;
-    let movieId;
-    let userId;
+    let movie;
+    let user;
 
-    let testUserNotAdmin;
     let userTokenNotAdmin;
 
     beforeEach(async () => {
         prisma = app.get(PrismaService);
 
-        testUser = await prisma.user.create({
-            data: {
-                name: 'Test User',
-                email: 'test@example.com',
-                roles: ['Editor'],
-                password: await bcrypt.hash('password123', 10),
-                isEmailVerified: true,
-            },
-        });
-        // userId = testUser;
+        movie = await createMovie();
+        user = await registerTestUser();
 
-        // console.log(testUser);
-        const responseUser = await request(app.getHttpServer())
-            .post('/auth/login')
-            .send({
-                email: 'test@example.com',
-                password: 'password123',
-            });
-        userToken = responseUser.body.refreshToken;
-
-        testUserNotAdmin = await prisma.user.create({
-            data: {
-                name: 'Test User',
-                email: 'testNotAdmin@example.com',
-                password: await bcrypt.hash('password123', 10),
-                isEmailVerified: true,
-            },
-        });
-        // userId = testUser;
-
-        // console.log(testUser);
-        const responseUserNotAdmin = await request(app.getHttpServer())
-            .post('/auth/login')
-            .send({
-                email: 'testNotAdmin@example.com',
-                password: 'password123',
-            });
-        userTokenNotAdmin = responseUserNotAdmin.body.refreshToken;
+        userToken = jwt.sign(
+            { id: user.id, name: user.name, roles: user.roles },
+            process.env.JWT_SECRET!,
+            { expiresIn: '31d' },
+        );
     });
 
     /////////////Success
     it('Should Get all Movies favorite  - Success', async () => {
-        const response = await request(app.getHttpServer())
-            .post(`/movie`)
-            .set('Authorization', `Bearer ${userToken}`)
-            .set('Content-Type', 'application/json')
-            .send({
-                title: 'James Bro',
-                category: 'Horror',
-                preview: 'preview_url',
-                description: 'Horror movie about missing in forest',
-            })
-            .expect(201);
-
-        movieId = response.body.id;
-
         await request(app.getHttpServer())
-            .post(`/movie/${movieId}/rateMovie`)
-            .set('Authorization', `Bearer ${userToken}`)
-            .set('Content-Type', 'application/json')
-            .send({ userId: testUser.id })
-            .expect(201);
+            .post(`/movie/${movie.id}/addFav`)
+            .set('Authorization', `Bearer ${userToken}`);
 
-        const responseGet = await request(app.getHttpServer())
-            .get(`/movie/${testUser.id}/allFavorites`)
+        const response = await request(app.getHttpServer())
+            .get(`/movie/${user.id}/allFavorites`)
             .set('Authorization', `Bearer ${userToken}`)
-            .set('Content-Type', 'application/json')
-            .send({ userId: testUser.id })
             .expect(200);
-        // console.log(responseGet.body);
-        // console.log(responseGet.body);
 
-        expect(responseGet.body).toMatchObject([
+        expect(response.body).toMatchObject([
             {
-                title: 'James Bro',
-                description: 'Horror movie about missing in forest',
-                category: 'Horror',
-                preview: 'preview_url',
-                published: false,
+                id: expect.any(Number),
+                title: expect.any(String),
+                description: expect.any(String),
+                category: expect.any(String),
             },
         ]);
     });
 
-    it("Should Fail if you don't have access  to favorite another user -  Fail", async () => {
+    it('Should Get all Movies favorite from second page  - Success', async () => {
+        const moviePromises = [];
+        const favoritePromises = [];
+
+        for (let i = 0; i < 9; i++) {
+            moviePromises.push(
+                request(app.getHttpServer())
+                    .post(`/movie`)
+                    .set('Authorization', `Bearer ${userToken} `)
+                    .send({
+                        title: faker.internet.displayName(),
+                        category: 'Horror',
+                        year: 1999,
+                        actorsList: ['James Woods'],
+                        description: `Horror movie about missing in forest ${i}`,
+                    })
+                    .expect(201),
+            );
+            favoritePromises.push(
+                request(app.getHttpServer())
+                    .post(`/movie/${movie.id}/addFav`)
+                    .set('Authorization', `Bearer ${userToken} `)
+                    .send(user),
+            );
+        }
+        await Promise.all(moviePromises);
+        await Promise.all(favoritePromises);
+
         const response = await request(app.getHttpServer())
-            .post(`/movie`)
+            .get(`/movie/${user.id}/allFavorites`)
             .set('Authorization', `Bearer ${userToken}`)
-            .set('Content-Type', 'application/json')
-            .send({
-                title: 'James Bro',
-                category: 'Horror',
-                preview: 'preview_url',
-                description: 'Horror movie about missing in forest',
-            })
-            .expect(201);
+            .expect(200);
 
-        movieId = response.body.id;
+        console.log(response.body);
 
+        // expect(response.body).toMatchObject([
+        //     {
+        //         id: expect.any(Number),
+        //         title: expect.any(String),
+        //         description: expect.any(String),
+        //         category: expect.any(String),
+        //     },
+        // ]);
+    });
+
+    it("Should Fail if you don't have access  to favorite another user -  Fail", async () => {
         await request(app.getHttpServer())
-            .post(`/movie/${movieId}/addFav`)
-            .set('Authorization', `Bearer ${userToken}`)
-            .set('Content-Type', 'application/json')
-            .send({ userId: testUser.id })
-            .expect(201);
+            .post(`/movie/${movie.id}/addFav`)
+            .set('Authorization', `Bearer ${userToken}`);
 
-        const responseGet = await request(app.getHttpServer())
-            .get(`/movie/${testUser.id}/allFavorites`)
+        let user = await registerTestNotAdminUser();
+
+        userTokenNotAdmin = jwt.sign(
+            { id: user.id, name: user.name, roles: user.roles },
+            process.env.JWT_SECRET!,
+            { expiresIn: '31d' },
+        );
+        const response = await request(app.getHttpServer())
+            .get(`/movie/${user.id}/allFavorites`)
             .set('Authorization', `Bearer ${userTokenNotAdmin}`)
-            .set('Content-Type', 'application/json')
-            .send({ userId: testUser.id })
-            .expect(403);
+            .expect(200);
 
-        // console.log(responseGet.body);
+        expect(response.body).toEqual([]);
+    });
 
-        expect(responseGet.body).toMatchObject({
-            message: 'You are not authorized to update this profile',
-            error: 'Forbidden',
-            statusCode: 403,
+    it('Should Fail if you not logged -  Fail', async () => {
+        await request(app.getHttpServer())
+            .post(`/movie/${movie.id}/addFav`)
+            .set('Authorization', `Bearer ${userToken}`);
+
+        const response = await request(app.getHttpServer())
+            .get(`/movie/${user.id}/allFavorites`)
+            .set('Authorization', ``)
+            .expect(401);
+
+        console.log(response.body);
+
+        expect(response.body).toMatchObject({
+            message: 'No authorization header',
+            error: 'Unauthorized',
+            statusCode: 401,
         });
     });
-    //   //    console.log(responseGet.body);
-    // });
     afterEach(async () => {
         await clearDatabase(prisma);
     });

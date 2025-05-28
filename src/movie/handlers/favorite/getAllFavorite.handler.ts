@@ -1,7 +1,6 @@
 import { PAGINATION_LIMIT } from '@/data/defaultData';
 import { GetAllFavoritesQuery } from '@/movie/queries/favorite/getAllFavorite.query';
 import { MovieRepository } from '@/movie/repositories/movie.repository';
-import { PrismaService } from '@/prisma/prisma.service';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
 @QueryHandler(GetAllFavoritesQuery)

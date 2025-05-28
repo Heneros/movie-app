@@ -185,7 +185,7 @@ export class UsersController {
     @ApiBearerAuth('access-token')
     async banUser(@Param('id', CheckUserExistPipe) id: number) {
         return await this.commandBus.execute(new BanUserAccountCommand(id));
-        // return new UserEntity(await this.deactivateUserService.deactivate(id));
+
     }
 
     @Post(USERS_ROUTES.UPLOAD_AVATAR_USER)
