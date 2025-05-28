@@ -1,9 +1,9 @@
 import { PrismaService } from '@/prisma/prisma.service';
-import { app } from '../../../setup';
+import { app } from '../setup';
 import request from 'supertest';
 import jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
-import { clearDatabase } from '../../../helpers/db-helper';
+import { clearDatabase } from '../helpers/db-helper';
 
 describe('Movies - Add to favorite movies(e2e)', () => {
     let prisma: PrismaService;
@@ -75,8 +75,7 @@ describe('Movies - Add to favorite movies(e2e)', () => {
                 category: 'Horror',
                 year: 1999,
                 actorsList: ['James Woods'],
-                // authorId: testUser.id,
-                // preview: 'preview_url',
+    
                 description: 'Horror movie about missing in forest',
             })
             .expect(201);

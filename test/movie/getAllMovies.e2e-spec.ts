@@ -1,8 +1,11 @@
 import { PrismaService } from '@/prisma/prisma.service';
-import { app } from '../../setup';
+import { app } from '../setup';
 import request from 'supertest';
 import * as bcrypt from 'bcrypt';
-import { clearDatabase } from '../../helpers/db-helper';
+import { clearDatabase } from '../helpers/db-helper';
+import { faker } from '@faker-js/faker/.';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { RedisPrefixEnum } from '@/data/redis-prefix-enum';
 
 describe('Movies - Get All movies(e2e)', () => {
     let prisma: PrismaService;
@@ -32,6 +35,9 @@ describe('Movies - Get All movies(e2e)', () => {
         userToken = responseUser.body.refreshToken;
     });
 
+    afterEach(async () => {
+        await clearDatabase(prisma);
+    });
     it('Should GET All Movie GET - Success', async () => {
         const moviePromises = [];
         for (let i = 0; i < 9; i++) {
@@ -40,9 +46,10 @@ describe('Movies - Get All movies(e2e)', () => {
                     .post(`/movie`)
                     .set('Authorization', `Bearer ${userToken} `)
                     .send({
-                        title: `Test-${i + 1}`,
+                        title: faker.internet.displayName(),
                         category: 'Horror',
-                        preview: 'preview_url',
+                        year: faker.number.int({ min: 1950, max: 2025 }),
+                        actorsList: [faker.person.fullName()],
                         description: 'Horror movie about missing in forest',
                     }),
             );
@@ -61,9 +68,10 @@ describe('Movies - Get All movies(e2e)', () => {
                     .post(`/movie`)
                     .set('Authorization', `Bearer ${userToken} `)
                     .send({
-                        title: `Test-${i + 1}`,
+                        title: faker.internet.displayName(),
                         category: 'Horror',
-                        preview: 'preview_url',
+                        year: faker.number.int({ min: 1950, max: 2025 }),
+                        actorsList: [faker.person.fullName()],
                         description: 'Horror movie about missing in forest',
                     }),
             );
@@ -77,12 +85,12 @@ describe('Movies - Get All movies(e2e)', () => {
     });
 
     it('Should Movie GET ALL - Fail', async () => {
-        const response = await request(app.getHttpServer()).get(`/movie`);
-        console.log(response.body);
-        expect(response.body).toMatchObject({ error: 'Not Found' });
-    });
-
-    afterEach(async () => {
         await clearDatabase(prisma);
+
+        await app.get(CACHE_MANAGER).del(`${RedisPrefixEnum.MOVIE}:0`);
+
+        const response = await request(app.getHttpServer()).get(`/movie`);
+        // console.log(response.body);
+        expect(response.body).toMatchObject({ error: 'Not Found' });
     });
 });

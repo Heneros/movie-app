@@ -1,18 +1,18 @@
 import { PrismaService } from '@/prisma/prisma.service';
-import { app } from '../../setup';
+import { app } from '../setup';
 import request from 'supertest';
 import * as bcrypt from 'bcrypt';
-import { clearDatabase } from '../../helpers/db-helper';
+import { clearDatabase } from '../helpers/db-helper';
+import { faker } from '@faker-js/faker/.';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { RedisPrefixEnum } from '@/data/redis-prefix-enum';
 
-describe('Movies - Remove from favorite movies(e2e)', () => {
+describe('Movies - Remove from favorite movies(e2e) METHOD POST /movie/:userId/removeFav/:movieId ', () => {
     let prisma: PrismaService;
     let testUser;
     let userToken;
     let movieId;
     let userId;
-
-    let testUserNotAdmin;
-    let userTokenNotAdmin;
 
     beforeEach(async () => {
         prisma = app.get(PrismaService);
@@ -21,12 +21,12 @@ describe('Movies - Remove from favorite movies(e2e)', () => {
             data: {
                 name: 'Test User',
                 email: 'test@example.com',
-                roles: ['Editor'],
+                roles: ['Admin', 'Editor', 'User'],
                 password: await bcrypt.hash('password123', 10),
                 isEmailVerified: true,
             },
         });
-        // userId = testUser;
+        userId = testUser.id;
 
         // console.log(testUser);
         const responseUser = await request(app.getHttpServer())
@@ -45,34 +45,41 @@ describe('Movies - Remove from favorite movies(e2e)', () => {
             .set('Authorization', `Bearer ${userToken}`)
             .set('Content-Type', 'application/json')
             .send({
-                title: 'James Bro',
+                title: faker.internet.displayName(),
                 category: 'Horror',
-                preview: 'preview_url',
+                year: faker.number.int({ min: 1950, max: 2025 }),
+                actorsList: [faker.person.fullName()],
                 description: 'Horror movie about missing in forest',
             })
             .expect(201);
 
         movieId = response.body.id;
 
-        const responseGet = await request(app.getHttpServer())
+        await request(app.getHttpServer())
             .post(`/movie/${movieId}/addFav`)
             .set('Authorization', `Bearer ${userToken}`)
             .set('Content-Type', 'application/json')
+            // .send({ movieId: movieId })
             .send({ userId: testUser.id })
             .expect(201);
 
+        // console.log(qewe.body);
+
         const responseGetSecond = await request(app.getHttpServer())
-            .delete(`/movie/${movieId}/removeFav`)
+            .delete(`/movie/${userId}/removeFav/${movieId}`)
             .set('Authorization', `Bearer ${userToken}`)
             .set('Content-Type', 'application/json')
-            .send({ userId: testUser.id })
+            .send({ movieId })
             .expect(200);
 
-        console.log(responseGetSecond.body);
-        // expect(responseGet.body).toMatchObject({
-        //   userId: testUser.id,
-        //   movieId: movieId,
-        // });
+        //   console.log(responseGetSecond.body);
+
+        // console.log(`/movie/${userId}/removeFav/${movieId}`);
+
+        expect(responseGetSecond.body).toMatchObject({
+            userId: testUser.id,
+            movieId: movieId,
+        });
     });
 
     /////////////Fail
@@ -82,9 +89,10 @@ describe('Movies - Remove from favorite movies(e2e)', () => {
             .set('Authorization', `Bearer ${userToken}`)
             .set('Content-Type', 'application/json')
             .send({
-                title: 'James Bro',
+                title: faker.internet.displayName(),
                 category: 'Horror',
-                preview: 'preview_url',
+                year: faker.number.int({ min: 1950, max: 2025 }),
+                actorsList: [faker.person.fullName()],
                 description: 'Horror movie about missing in forest',
             })
             .expect(201);
@@ -107,7 +115,7 @@ describe('Movies - Remove from favorite movies(e2e)', () => {
         // console.log(responseGet.body);
 
         expect(responseGet.body).toMatchObject({
-            message: 'Movie Exist in Favorites list',
+            message: 'Movie already exists in favorites',
             error: 'Bad Request',
             statusCode: 400,
         });
@@ -117,5 +125,8 @@ describe('Movies - Remove from favorite movies(e2e)', () => {
 
     afterEach(async () => {
         await clearDatabase(prisma);
+
+        const cache = app.get(CACHE_MANAGER);
+        await cache.del(`${RedisPrefixEnum.MOVIE}:0`);
     });
 });

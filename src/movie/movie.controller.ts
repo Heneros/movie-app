@@ -281,7 +281,8 @@ export class MovieController {
     @ApiBearerAuth('access-token')
     async removeMovieFavorite(
         @Param('userId', ParseIntPipe) userId: number,
-        @Body('movieId', ParseIntPipe, CheckMovieExistPipe) movieId: number,
+        @Param('movieId', ParseIntPipe, CheckMovieExistPipe) movieId: number,
+        // @Body('movieId', ParseIntPipe, CheckMovieExistPipe) movieId: number,
     ): Promise<MovieEntity> {
         return new MovieEntity(
             await this.commandBus.execute(

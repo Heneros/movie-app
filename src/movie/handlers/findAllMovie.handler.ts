@@ -24,7 +24,7 @@ export class FindAllMovieHandler implements IQueryHandler<FindAllMovieQuery> {
         const cachedData = await this.cacheManager.get<Movie[]>(cacheKey);
         const start = Date.now();
         if (cachedData) {
-            console.log('Cash Data', Date.now() - start, 'ms');
+            // console.log('Cash Data', Date.now() - start, 'ms');
             return { allMovies: cachedData };
         }
 

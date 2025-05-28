@@ -11,7 +11,7 @@ export const createMovie = async () => {
     const defaultMovie = {
         title: faker.internet.displayName(),
         category: 'Horror',
-        year: 1999,
+        year: 1233,
         actorsList: ['James Woods'],
         description: 'Horror movie about missing in forest',
     };
@@ -50,7 +50,6 @@ export const createMovie = async () => {
             id: response.body.id,
         },
     });
-
 
     return movie;
 };

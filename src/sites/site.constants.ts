@@ -46,7 +46,7 @@ export const MOVIE_ROUTES = {
     UPDATE_MOVIE: ':id',
     DELETE_MOVIE: ':id',
     ADD_FAVORITE: ':id/addFav',
-    REMOVE_FAVORITE: ':id/removeFav',
+    REMOVE_FAVORITE: ':userId/removeFav/:movieId',
     ALL_FAVORITE: ':id/allFavorites',
     RATE_MOVIE: ':id/rateMovie',
     GET_All_REVIEW_FROM_MOVIE: ':id/review',

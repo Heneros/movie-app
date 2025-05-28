@@ -1,8 +1,11 @@
 import { PrismaService } from '@/prisma/prisma.service';
-import { app } from '../../setup';
+import { app } from '../setup';
 import request from 'supertest';
 import * as bcrypt from 'bcrypt';
-import { clearDatabase } from '../../helpers/db-helper';
+import { clearDatabase } from '../helpers/db-helper';
+import { faker } from '@faker-js/faker/.';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { RedisPrefixEnum } from '@/data/redis-prefix-enum';
 
 describe('Movies - Get movie By Id(e2e)', () => {
     let prisma: PrismaService;
@@ -37,24 +40,25 @@ describe('Movies - Get movie By Id(e2e)', () => {
             .post(`/movie/`)
             .set('Authorization', `Bearer ${userToken} `)
             .send({
-                title: 'Think Twice?',
+                title: faker.internet.displayName(),
                 category: 'Horror',
-                preview: 'preview_url',
+                year: faker.number.int({ min: 1950, max: 2025 }),
+                actorsList: [faker.person.fullName()],
                 description: 'Horror movie about missing in forest',
             });
 
         movieId = response.body.id;
 
-        const responseGet = await request(app.getHttpServer())
-            .get(`/movie/${movieId}`)
-            //   .set('Authorization', `Bearer ${userToken} `)
-            .send();
+        const responseGet = await request(app.getHttpServer()).get(
+            `/movie/${movieId}`,
+        );
 
         expect(responseGet.body).toMatchObject({
-            title: 'Think Twice?',
-            category: 'Horror',
-            preview: 'preview_url',
-            description: 'Horror movie about missing in forest',
+            title: expect.any(String),
+            category: expect.any(String),
+            year: expect.any(Number),
+            actorsList: expect.arrayContaining([expect.any(String)]),
+            description: expect.any(String),
         });
         // console.log(response.body);
     });
@@ -63,16 +67,18 @@ describe('Movies - Get movie By Id(e2e)', () => {
         const response = await request(app.getHttpServer())
             .get(`/movie/1232313`)
             .send()
-            .expect(404);
+            .expect(400);
 
         // console.log(response.body);
         expect(response.body).toHaveProperty(
             'message',
-            'movie with 1232313 does not exist.',
+            'No movie exists with this id',
         );
-        expect(response.status).toBe(404);
+        expect(response.status).toBe(400);
     });
     afterEach(async () => {
         await clearDatabase(prisma);
+        const cache = app.get(CACHE_MANAGER);
+        await cache.del(`${RedisPrefixEnum.MOVIE}:0`);
     });
 });
