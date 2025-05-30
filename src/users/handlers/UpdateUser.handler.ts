@@ -27,6 +27,8 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand> {
                 roundsOfHashing,
             );
         }
+
+        console.log(updateUserDto);
         const updatedUser = await this.usersRepository.updateUser(
             id,
             updateUserDto,
@@ -36,5 +38,4 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand> {
         return updatedUser;
         // return user;
     }
-    
 }

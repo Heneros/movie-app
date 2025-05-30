@@ -295,13 +295,13 @@ export class MovieController {
     @ApiOperation({ summary: 'All favorite list user.' })
     @ApiOkResponse({ type: [MovieEntity] })
     async allFavorites(
-        @User('userId') user: User,
+        @Param('userId') userId: number,
         @Query('page') pageString?: string,
     ): Promise<MovieEntity[]> {
         const page = pageString ? parseInt(pageString, 10) : 1;
         const skip = (page - 1) * PAGINATION_LIMIT;
 
-        const userId = user.id;
+        // const userId = user.id;
         const favoriteMovies = await this.queryBus.execute(
             new GetAllFavoritesQuery(userId, skip),
         );

@@ -23,7 +23,7 @@ export const USERS_CONTROLLER = 'users' as const;
 export const USERS_ROUTES = {
     GET_ALL: '',
     GET_ID_USER: ':id',
-    UPDATE_USER: ':id',
+    UPDATE_USER: ':userId',
     DELETE_USER: ':id',
     CHANGE_ROLE: ':id/role',
     DELETE_MY_ACCOUNT: ':id/myaccount',
@@ -47,7 +47,7 @@ export const MOVIE_ROUTES = {
     DELETE_MOVIE: ':id',
     ADD_FAVORITE: ':id/addFav',
     REMOVE_FAVORITE: ':userId/removeFav/:movieId',
-    ALL_FAVORITE: ':id/allFavorites',
+    ALL_FAVORITE: ':userId/allFavorites',
     RATE_MOVIE: ':id/rateMovie',
 
     GET_All_REVIEW_FROM_MOVIE: ':id/review',

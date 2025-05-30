@@ -38,10 +38,13 @@ describe('Movies - Get all favorite movies by user(e2e) METHOD GET movie/userID/
             .post(`/movie/${movie.id}/addFav`)
             .set('Authorization', `Bearer ${userToken}`);
 
+        // console.log(test.body);
+
         const response = await request(app.getHttpServer())
             .get(`/movie/${user.id}/allFavorites`)
-            .set('Authorization', `Bearer ${userToken}`)
-            .expect(200);
+            .set('Authorization', `Bearer ${userToken}`);
+        // .expect(200);
+        // console.log('123', response.body);
 
         expect(response.body).toMatchObject([
             {

@@ -20,14 +20,16 @@ export class ChangeRoleHandler implements ICommandHandler<ChangeRoleCommand> {
         }
 
         // user.roles = updateUserRoleDto.roles;
-        // const updatedRoles = Array.from(
-        //     new Set([...user.roles, ...updateUserDto.roles]),
-        // );
+        const updatedRoles = Array.from(
+            new Set([...updateUserRoleDto.roles, 'User']),
+        );
         // const updatedRoles = Array.from(new Set([...updateUserRoleDto.roles]));
 
-        return await this.usersRepository.updateUserRole(
+        const role = await this.usersRepository.updateUserRole(
             id,
-            updateUserRoleDto.roles,
+            updatedRoles,
         );
+        
+        return role;
     }
 }

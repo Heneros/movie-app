@@ -207,10 +207,8 @@ input CreateMovieReviewDto {
 }
 
 input UpdateUserDto {
-  id: ID
   name: String
   email: String
-  refreshToken: [String!]
 }
 
 input UpdateUserRole {

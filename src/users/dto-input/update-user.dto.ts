@@ -7,7 +7,9 @@ import {
     IsArray,
     IsEnum,
     IsNotEmpty,
+    IsOptional,
     IsString,
+    MinLength,
 } from 'class-validator';
 
 export enum UserRole {
@@ -18,9 +20,9 @@ export enum UserRole {
 
 @InputType()
 export class UpdateUserDto extends PartialType(CreateUserDto) {
-    @ApiProperty()
-    @Field(() => ID, { nullable: true })
-    id: number;
+    // @ApiProperty()
+    // @Field(() => ID, { nullable: true })
+    // id: number;
 
     // @ApiProperty()
     // @Field(() => Date, { nullable: true })
@@ -49,18 +51,23 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
     @ApiProperty()
     @IsNotEmpty()
     @IsString()
+    @IsOptional()
     @Field(() => String, { nullable: true })
     email: string;
 
-    @ApiProperty()
-    // @IsNotEmpty()
-    // @IsString()
-    @Field(() => [String], { nullable: true })
-    refreshToken: string[];
+    // @ApiProperty()
+    // // @IsNotEmpty()
+    // // @IsString()
+    // @Exclude()
+    // @Field(() => [String], { nullable: true })
+    // refreshToken: string[];
 
-    @Exclude()
+    // @Exclude()
+    @IsString()
+    @IsOptional()
+    @MinLength(6)
     password: string;
 
-    @Exclude()
-    isEmailVerified: boolean;
+    // @Exclude()
+    // isEmailVerified: boolean;
 }

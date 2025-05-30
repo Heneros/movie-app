@@ -58,7 +58,7 @@ export class UserEntity implements User {
     @Field(() => String, { nullable: true })
     discordId: string;
 
-    @Exclude()
+    @ApiProperty()
     @Field((type) => [String], { nullable: true })
     roles: string[];
 

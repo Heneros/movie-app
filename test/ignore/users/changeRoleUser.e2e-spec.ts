@@ -7,12 +7,12 @@ interface Userid {
     id: number;
 }
 
-describe('Users - Change role to user(e2e)', () => {
+describe('Users - Change role to user(e2e) METHOD Put user/:id/role', () => {
     let prisma: PrismaService;
     let adminToken: string;
     let userToken: string;
     let userId: number;
-    const wrongId = 9999999;
+    const wrongId = 1;
 
     beforeEach(async () => {
         prisma = new PrismaService();
@@ -65,12 +65,12 @@ describe('Users - Change role to user(e2e)', () => {
             .send({ roles: ['Editor'] })
             .expect(200);
 
-        // console.log(response.body);
+        //   console.log(response.body);
         expect(response.body).toMatchObject({
             id: userId,
             name: 'Test QWerty',
             email: 'test2@example.com',
-            roles: ['User', 'Editor'],
+            roles: ['Editor', 'User'],
             isEmailVerified: true,
         });
         // expect(Array.isArray(response.body.refreshToken)).toBe(true);

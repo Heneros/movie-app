@@ -103,7 +103,13 @@ export class UsersController {
     @ApiOperation({ summary: 'Get all accounts users blocked' })
     @ApiBearerAuth('access-token')
     async allBlocked(@Query('page') page: number) {
-        return await this.queryBus.execute(new GetAllBlockedUsersQuery(page));
+        // return await new UserEntity(
+        //     this.queryBus.execute(new GetAllBlockedUsersQuery(page)),
+        // );
+        const users = await this.queryBus.execute(
+            new GetAllBlockedUsersQuery(page),
+        );
+        return plainToInstance(UserEntity, users);
     }
 
     @Get(USERS_ROUTES.GET_ID_USER)
@@ -130,11 +136,11 @@ export class UsersController {
     @ApiBearerAuth('access-token')
     @ApiCreatedResponse({ type: UserEntity })
     async update(
-        @Param('id', CheckUserExistPipe) id: number,
+        @Param('userId', CheckUserExistPipe) userId: number,
         @Body() updateUserDto: UpdateUserDto,
     ) {
         const result = await this.commandBus.execute(
-            new UpdateUserCommand(id, updateUserDto),
+            new UpdateUserCommand(userId, updateUserDto),
         );
 
         return plainToInstance(UserEntity, result);
@@ -185,7 +191,6 @@ export class UsersController {
     @ApiBearerAuth('access-token')
     async banUser(@Param('id', CheckUserExistPipe) id: number) {
         return await this.commandBus.execute(new BanUserAccountCommand(id));
-
     }
 
     @Post(USERS_ROUTES.UPLOAD_AVATAR_USER)
