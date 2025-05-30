@@ -1,12 +1,12 @@
 import { PrismaService } from '@/prisma/prisma.service';
-import { app } from '../setup';
+import { app } from '../../setup';
 import request from 'supertest';
 import * as bcrypt from 'bcrypt';
-import { clearDatabase } from '../helpers/db-helper';
+import { clearDatabase } from '../../helpers/db-helper';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { RedisPrefixEnum } from '@/data/redis-prefix-enum';
 import { faker } from '@faker-js/faker/.';
-import { registerTestNotAdminUser } from '../helpers/createUser';
+import { registerTestNotAdminUser } from '../../helpers/createUser';
 import jwt from 'jsonwebtoken';
 
 describe('Movies -Rate movie by user(e2e) PATCH /movie/:movieID/rateMovie', () => {

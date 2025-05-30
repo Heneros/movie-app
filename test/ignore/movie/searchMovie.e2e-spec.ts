@@ -1,10 +1,10 @@
 import { PrismaService } from '@/prisma/prisma.service';
-import { app } from '../setup';
+import { app } from '../../setup';
 import request from 'supertest';
 import * as bcrypt from 'bcrypt';
-import { clearDatabase } from '../helpers/db-helper';
+import { clearDatabase } from '../../helpers/db-helper';
 import jwt from 'jsonwebtoken';
-import { createMovie } from '../helpers/createMovie';
+import { createMovie } from '../../helpers/createMovie';
 
 describe('Movies  Search -METHOD  Get  /movie/search?title= movies(e2e)', () => {
     let prisma: PrismaService;

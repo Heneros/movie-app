@@ -1,18 +1,15 @@
 import { PrismaService } from '@/prisma/prisma.service';
-import { app } from '../setup';
+import { app } from '../../setup';
 import request from 'supertest';
 import * as bcrypt from 'bcrypt';
-import { clearDatabase } from '../helpers/db-helper';
+import { clearDatabase } from '../../helpers/db-helper';
 import { faker } from '@faker-js/faker/.';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { RedisPrefixEnum } from '@/data/redis-prefix-enum';
 
-describe('Movies - Remove from favorite movies(e2e) METHOD POST /movie/:userId/removeFav/:movieId ', () => {
+describe('Movies - Update movies(e2e)', () => {
     let prisma: PrismaService;
     let testUser;
     let userToken;
     let movieId;
-    let userId;
 
     beforeEach(async () => {
         prisma = app.get(PrismaService);
@@ -21,14 +18,12 @@ describe('Movies - Remove from favorite movies(e2e) METHOD POST /movie/:userId/r
             data: {
                 name: 'Test User',
                 email: 'test@example.com',
-                roles: ['Admin', 'Editor', 'User'],
+                roles: ['Admin', 'Editor'],
                 password: await bcrypt.hash('password123', 10),
                 isEmailVerified: true,
             },
         });
-        userId = testUser.id;
 
-        // console.log(testUser);
         const responseUser = await request(app.getHttpServer())
             .post('/auth/login')
             .send({
@@ -37,16 +32,15 @@ describe('Movies - Remove from favorite movies(e2e) METHOD POST /movie/:userId/r
             });
         userToken = responseUser.body.refreshToken;
     });
-
     /////////////Success
-    it('Should method Delete. Delete  Movie from favorite  - Success', async () => {
+    it('Should Update Movie  - Success', async () => {
         const response = await request(app.getHttpServer())
             .post(`/movie`)
             .set('Authorization', `Bearer ${userToken}`)
             .set('Content-Type', 'application/json')
             .send({
                 title: faker.internet.displayName(),
-                category: 'Horror',
+                category: faker.lorem.word(),
                 year: faker.number.int({ min: 1950, max: 2025 }),
                 actorsList: [faker.person.fullName()],
                 description: 'Horror movie about missing in forest',
@@ -55,42 +49,35 @@ describe('Movies - Remove from favorite movies(e2e) METHOD POST /movie/:userId/r
 
         movieId = response.body.id;
 
-        await request(app.getHttpServer())
-            .post(`/movie/${movieId}/addFav`)
+        const responseGet = await request(app.getHttpServer())
+            .patch(`/movie/${movieId}`)
             .set('Authorization', `Bearer ${userToken}`)
             .set('Content-Type', 'application/json')
-            // .send({ movieId: movieId })
-            .send({ userId: testUser.id })
-            .expect(201);
+            .send({
+                title: 'Updated',
+                published: true,
+                description: 'not wrong test er we rwer test',
+                actorsList: ['Keanu'],
+            });
+        // .expect(200);
 
-        // console.log(qewe.body);
-
-        const responseGetSecond = await request(app.getHttpServer())
-            .delete(`/movie/${userId}/removeFav/${movieId}`)
-            .set('Authorization', `Bearer ${userToken}`)
-            .set('Content-Type', 'application/json')
-            .send({ movieId })
-            .expect(200);
-
-        //   console.log(responseGetSecond.body);
-
-        // console.log(`/movie/${userId}/removeFav/${movieId}`);
-
-        expect(responseGetSecond.body).toMatchObject({
-            userId: testUser.id,
-            movieId: movieId,
+        expect(responseGet.body).toMatchObject({
+            title: 'Updated',
+            published: true,
+            description: 'not wrong test er we rwer test',
+            actorsList: ['Keanu'],
         });
     });
 
     /////////////Fail
-    it('Should Fail add Same Movie to favorite -  Fail', async () => {
+    it('Should Update Movie -  Fail', async () => {
         const response = await request(app.getHttpServer())
             .post(`/movie`)
             .set('Authorization', `Bearer ${userToken}`)
             .set('Content-Type', 'application/json')
             .send({
                 title: faker.internet.displayName(),
-                category: 'Horror',
+                category: faker.lorem.word(),
                 year: faker.number.int({ min: 1950, max: 2025 }),
                 actorsList: [faker.person.fullName()],
                 description: 'Horror movie about missing in forest',
@@ -98,35 +85,32 @@ describe('Movies - Remove from favorite movies(e2e) METHOD POST /movie/:userId/r
             .expect(201);
 
         movieId = response.body.id;
-
-        await request(app.getHttpServer())
-            .post(`/movie/${movieId}/addFav`)
+        const res = await request(app.getHttpServer())
+            .patch(`/movie/${movieId}`)
             .set('Authorization', `Bearer ${userToken}`)
             .set('Content-Type', 'application/json')
-            .send({ userId: testUser.id })
-            .expect(201);
-
-        const responseGet = await request(app.getHttpServer())
-            .post(`/movie/${movieId}/addFav`)
-            .set('Authorization', `Bearer ${userToken}`)
-            .set('Content-Type', 'application/json')
-            .send({ userId: testUser.id });
-
-        // console.log(responseGet.body);
-
-        expect(responseGet.body).toMatchObject({
-            message: 'Movie already exists in favorites',
-            error: 'Bad Request',
-            statusCode: 400,
-        });
-
-        //    console.log(responseGet.body);
+            .send({
+                title: '',
+                preview: '',
+                description: '',
+                actorsList: ['Keanu', true, 123],
+            })
+            .expect({
+                message: [
+                    'property preview should not exist',
+                    'Name must be between 2 and 30 characters',
+                    'title must be longer than or equal to 5 characters',
+                    'title should not be empty',
+                    'Description must be between 10 and 350 characters',
+                    'description should not be empty',
+                    'each value in actorsList must be a string',
+                ],
+                error: 'Bad Request',
+                statusCode: 400,
+            });
     });
 
     afterEach(async () => {
         await clearDatabase(prisma);
-
-        const cache = app.get(CACHE_MANAGER);
-        await cache.del(`${RedisPrefixEnum.MOVIE}:0`);
     });
 });

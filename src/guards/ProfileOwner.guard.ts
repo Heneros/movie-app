@@ -20,8 +20,8 @@ export class ProfileOwnerGuard implements CanActivate {
 
         if (context.getType().toString() === 'http') {
             request = context.switchToHttp().getRequest();
-            idFromParams = +request.params.id || +request.params.userId;
-            // console.log(idFromParams);
+            idFromParams = +request.params.userId;
+            //    console.log(request.params);
         } else {
             const gqlContext = GqlExecutionContext.create(context);
             request = gqlContext.getContext().req;

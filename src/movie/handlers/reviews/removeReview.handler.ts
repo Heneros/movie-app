@@ -1,6 +1,6 @@
 import { RemoveReviewCommand } from '@/movie/commands/reviews/removeReview.command';
 import { ReviewRepository } from '@/movie/repositories/review.repository';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 
 @CommandHandler(RemoveReviewCommand)
@@ -13,25 +13,29 @@ export class RemoveMReviewHandler
     ) {}
 
     async execute(command: RemoveReviewCommand) {
-        const { reviewId, auId } = command;
+        const { reviewId, userId } = command;
 
         try {
             const review = await this.reviewRepository.findByIdAndAuthor(
                 reviewId,
-                auId,
+                userId,
             );
+            // console.log(review);
 
             if (!review) {
-                throw new BadRequestException('Review not exist');
+                throw new NotFoundException('Review not exist');
             }
 
-            // const reviewDelete = await this.reviewRepository.removeReview(
-            //     reviewId,
-            //     auId,
-            // );
-            // console.log(review);
-            // return reviewDelete;
-            return await this.reviewRepository.removeReview(reviewId, auId);
-        } catch (error) {}
+            const res = await this.reviewRepository.removeReview(
+                reviewId,
+                userId,
+            );
+
+            return `Review was deleted ${res.id}`;
+        } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
+        }
     }
 }

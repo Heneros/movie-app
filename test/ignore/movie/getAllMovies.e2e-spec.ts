@@ -1,13 +1,11 @@
 import { PrismaService } from '@/prisma/prisma.service';
-import { app } from '../setup';
+import { app } from '../../setup';
 import request from 'supertest';
 import * as bcrypt from 'bcrypt';
-import { clearDatabase } from '../helpers/db-helper';
+import { clearDatabase } from '../../helpers/db-helper';
 import { faker } from '@faker-js/faker/.';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { RedisPrefixEnum } from '@/data/redis-prefix-enum';
-import { registerTestNotAdminUser } from '../helpers/createUser';
-import jwt from 'jsonwebtoken';
 
 describe('Movies - Get All movies(e2e)', () => {
     let prisma: PrismaService;
@@ -22,7 +20,7 @@ describe('Movies - Get All movies(e2e)', () => {
             data: {
                 name: 'Test User',
                 email: 'test@example.com',
-                roles: ['Editor', 'User'],
+                roles: ['Admin', 'User'],
                 password: await bcrypt.hash('password123', 10),
                 isEmailVerified: true,
             },
@@ -37,39 +35,16 @@ describe('Movies - Get All movies(e2e)', () => {
         userToken = responseUser.body.refreshToken;
     });
 
-    it('Method GET All Drafts Movie  - Success', async () => {
-        const moviePromises = [];
-        for (let i = 0; i < 9; i++) {
-            moviePromises.push(
-                request(app.getHttpServer())
-                    .post(`/movie`)
-                    .set('Authorization', `Bearer ${userToken}`)
-                    .send({
-                        title: faker.internet.displayName(),
-                        category: 'Horror',
-                        year: faker.number.int({ min: 1950, max: 2025 }),
-                        actorsList: [faker.person.fullName()],
-                        description: 'Horror movie about missing in forest',
-                    })
-                    .expect(201),
-            );
-        }
-        await Promise.all(moviePromises);
-        const responseGet = await request(app.getHttpServer())
-            .get(`/movie/drafts`)
-            .set('Authorization', `Bearer ${userToken}`);
-        // console.log(responseGet.body);
-
-        expect(responseGet.body.length).toBeGreaterThanOrEqual(5);
+    afterEach(async () => {
+        await clearDatabase(prisma);
     });
-
-    it('Method GET All Drafts Movie.Should return empty array if you not admin.  -  Fail', async () => {
+    it('Should GET All Movie GET - Success', async () => {
         const moviePromises = [];
         for (let i = 0; i < 9; i++) {
             moviePromises.push(
                 request(app.getHttpServer())
                     .post(`/movie`)
-                    .set('Authorization', `Bearer ${userToken}`)
+                    .set('Authorization', `Bearer ${userToken} `)
                     .send({
                         title: faker.internet.displayName(),
                         category: 'Horror',
@@ -79,31 +54,43 @@ describe('Movies - Get All movies(e2e)', () => {
                     }),
             );
         }
-        // console.log(moviePromises);
         await Promise.all(moviePromises);
-        let user = await registerTestNotAdminUser();
+        const responseGet = await request(app.getHttpServer()).get(`/movie`);
 
-        let userTokenNotAdmin = jwt.sign(
-            { id: user.id, name: user.name, roles: user.roles },
-            process.env.JWT_SECRET!,
-            { expiresIn: '31d' },
-        );
-        const responseGet = await request(app.getHttpServer())
-            .get(`/movie/drafts`)
-            .set('Authorization', `Bearer ${userTokenNotAdmin}`);
-
-        expect(responseGet.body).toMatchObject({
-            message: 'Forbidden resource',
-            error: 'Forbidden',
-            statusCode: 403,
-        });
-        //   console.log(responseGet.body);
-        //   expect(responseGet.body.length).toBe(0);
+        expect(responseGet.body.length).toBe(5);
     });
 
-    afterEach(async () => {
-        const cache = app.get(CACHE_MANAGER);
-        await cache.del(`${RedisPrefixEnum.MOVIE}:0`);
+    it('Should GET All Movie Not Enough Movies -  Fail', async () => {
+        const moviePromises = [];
+        for (let i = 0; i < 9; i++) {
+            moviePromises.push(
+                request(app.getHttpServer())
+                    .post(`/movie`)
+                    .set('Authorization', `Bearer ${userToken} `)
+                    .send({
+                        title: faker.internet.displayName(),
+                        category: 'Horror',
+                        year: faker.number.int({ min: 1950, max: 2025 }),
+                        actorsList: [faker.person.fullName()],
+                        description: 'Horror movie about missing in forest',
+                    }),
+            );
+        }
+        await Promise.all(moviePromises);
+        const responseGet = await request(app.getHttpServer()).get(
+            `/movie?page=2`,
+        );
+        // console.log(responseGet.body);
+        expect(responseGet.body.length).toBe(4);
+    });
+
+    it('Should Movie GET ALL - Fail', async () => {
         await clearDatabase(prisma);
+
+        await app.get(CACHE_MANAGER).del(`${RedisPrefixEnum.MOVIE}:0`);
+
+        const response = await request(app.getHttpServer()).get(`/movie`);
+        // console.log(response.body);
+        expect(response.body).toMatchObject({ error: 'Not Found' });
     });
 });

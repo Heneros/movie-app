@@ -80,7 +80,6 @@ import { FilterMovieDto } from './dto-input/filter-movie.dto';
 @ApiTags('Movie')
 // @UseInterceptors(CacheInterceptor)
 @UseGuards(GqlThrottlerGuard)
-// @UseInterceptors(TimeoutInterceptor)
 export class MovieController {
     constructor(
         private readonly redisService: RedisService,
@@ -156,15 +155,14 @@ export class MovieController {
     }
 
     @Get(MOVIE_ROUTES.REVIEWS_ALL)
+    @UseGuards(AuthGuard)
+    @Roles('Admin', 'Editor')
     @ApiOperation({ summary: 'Get all reviews from site' })
     @ApiOkResponse({ type: [MovieReviewEntity] })
     async getAllReviews(@Query('page') pageString?: string) {
         // const nameNum = Number(page);
         const page = pageString ? parseInt(pageString, 10) : 1;
 
-        if (isNaN(page)) {
-            throw new BadRequestException('Page must be a number.');
-        }
         if (page < 1) {
             throw new BadRequestException('Page must be greater than 0.');
         }
@@ -366,7 +364,7 @@ export class MovieController {
         @Param('id', ParseIntPipe, CheckMovieExistPipe) movieId: number,
         @User('id') user: User,
         @Body() createMovieReviewDto: CreateMovieReviewDto,
-    ): Promise<CreateMovieReviewDto | void> {
+    ): Promise<CreateMovieReviewDto> {
         const newReview = await this.commandBus.execute(
             new CreateReviewCommand(movieId, user.id, createMovieReviewDto),
         );
@@ -375,6 +373,7 @@ export class MovieController {
 
     @Put(MOVIE_ROUTES.UPDATE_REVIEW)
     @UseGuards(AuthGuard, ProfileOwnerGuard)
+    // @Roles('Admin', 'Editor')
     @ApiOperation({
         summary: 'Update review movie. You can edit during 15 minutes',
     })
@@ -382,11 +381,12 @@ export class MovieController {
     @ApiBearerAuth('access-token')
     async updateReview(
         @Param('id', ParseIntPipe) reviewId: number,
-        @User('id') user: User,
+        @Param('userId', ParseIntPipe) userId: number,
+        // @User('id') user: User,
         @Body() createMovieReviewDto: CreateMovieReviewDto,
     ): Promise<CreateMovieReviewDto | null> {
         const newReview = await this.commandBus.execute(
-            new UpdateReviewCommand(reviewId, user.id, createMovieReviewDto),
+            new UpdateReviewCommand(reviewId, userId, createMovieReviewDto),
         );
         return newReview;
     }
@@ -399,10 +399,11 @@ export class MovieController {
     @ApiBearerAuth('access-token')
     async removeReview(
         @Param('id', ParseIntPipe) reviewId: number,
-        @User('id') user: User,
+        @Param('userId', ParseIntPipe) userId: number,
+        // @User('id') user: User,
     ): Promise<CreateMovieReviewDto | null> {
         const newReview = await this.commandBus.execute(
-            new RemoveReviewCommand(reviewId, user.id),
+            new RemoveReviewCommand(reviewId, userId),
         );
         return newReview;
     }

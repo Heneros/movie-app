@@ -92,11 +92,11 @@ export class ReviewRepository {
         });
     }
 
-    async removeReview(reviewId: number, auId: number) {
+    async removeReview(reviewId: number, userId: number) {
         const review = await this.prisma.reviews.delete({
             where: {
                 id: reviewId,
-                auId: auId,
+                auId: userId,
             },
         });
         return review;

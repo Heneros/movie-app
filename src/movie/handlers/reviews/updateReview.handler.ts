@@ -15,11 +15,11 @@ export class UpdateReviewHandler
     constructor(private readonly reviewRepository: ReviewRepository) {}
 
     async execute(command: UpdateReviewCommand): Promise<Reviews | null> {
-        const { reviewId, auId, createMovieReviewDto } = command;
+        const { reviewId, userId, createMovieReviewDto } = command;
 
         const review = await this.reviewRepository.findByIdAndAuthor(
             reviewId,
-            auId,
+            userId,
         );
 
         if (!review) {
@@ -35,7 +35,7 @@ export class UpdateReviewHandler
             );
         }
 
-        return await this.reviewRepository.updateReview(reviewId, auId, {
+        return await this.reviewRepository.updateReview(reviewId, userId, {
             review: createMovieReviewDto.review,
             positive: createMovieReviewDto.positive,
         });

@@ -1,15 +1,15 @@
 import { PrismaService } from '@/prisma/prisma.service';
-import { app } from '../setup';
+import { app } from '../../setup';
 import request from 'supertest';
 import * as bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
-import { clearDatabase } from '../helpers/db-helper';
-import { createMovie } from '../helpers/createMovie';
+import { clearDatabase } from '../../helpers/db-helper';
+import { createMovie } from '../../helpers/createMovie';
 import {
     registerTestNotAdminUser,
     registerTestUser,
-} from '../helpers/createUser';
+} from '../../helpers/createUser';
 
 describe('Movies - Delete movies(e2e)', () => {
     let prisma: PrismaService;

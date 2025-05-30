@@ -13,6 +13,8 @@ export * from './rateMovie.handler';
 export * from './favorite/addMovieFavorite.handler';
 export * from './favorite/getAllFavorite.handler';
 export * from './favorite/removeMovieFavorite.handler';
+
+export * from './reviews/getSingleReview.handler';
 export * from './reviews/createReview.handler';
 export * from './reviews/getAllReviews.handler';
 export * from './reviews/getAllReviewsByMovie.handler';

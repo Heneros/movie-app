@@ -49,11 +49,14 @@ export const MOVIE_ROUTES = {
     REMOVE_FAVORITE: ':userId/removeFav/:movieId',
     ALL_FAVORITE: ':id/allFavorites',
     RATE_MOVIE: ':id/rateMovie',
+
     GET_All_REVIEW_FROM_MOVIE: ':id/review',
     GET_SINGLE_REVIEW_FROM_MOVIE: ':id/singleReview',
     CREATE_REVIEW: ':id/review',
-    UPDATE_REVIEW: ':id/review',
-    DELETE_REVIEW: ':id/review',
+
+    UPDATE_REVIEW: ':id/review/user/:userId',
+    DELETE_REVIEW: ':id/review/:userId',
+
     UPLOAD_IMAGES: 'gallery/:id',
     FILTER: 'filter',
 };

@@ -1,8 +1,8 @@
 import { PrismaService } from '@/prisma/prisma.service';
-import { app } from '../setup';
+import { app } from '../../setup';
 import request from 'supertest';
 import * as bcrypt from 'bcrypt';
-import { clearDatabase } from '../helpers/db-helper';
+import { clearDatabase } from '../../helpers/db-helper';
 import { faker } from '@faker-js/faker/.';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { RedisPrefixEnum } from '@/data/redis-prefix-enum';

@@ -1,14 +1,14 @@
 import { PrismaService } from '@/prisma/prisma.service';
-import { app } from '../setup';
+import { app } from '../../setup';
 import request from 'supertest';
 import * as bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { clearDatabase } from '../helpers/db-helper';
-import { createMovie } from '../helpers/createMovie';
+import { clearDatabase } from '../../helpers/db-helper';
+import { createMovie } from '../../helpers/createMovie';
 import {
     registerTestNotAdminUser,
     registerTestUser,
-} from '../helpers/createUser';
+} from '../../helpers/createUser';
 import { faker } from '@faker-js/faker/.';
 
 describe('Movies - Get all favorite movies by user(e2e) METHOD GET movie/userID/allFavorites', () => {
@@ -91,7 +91,6 @@ describe('Movies - Get all favorite movies by user(e2e) METHOD GET movie/userID/
             published: expect.any(Boolean),
         });
         expect(response.body.length).toBeGreaterThanOrEqual(5);
-
     });
 
     it("Should Fail if you don't have access  to favorite another user -  Fail", async () => {
