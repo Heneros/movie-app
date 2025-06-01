@@ -179,8 +179,10 @@ export class UsersController {
     @ApiOperation({ summary: 'Delete my account. Only for User' })
     @ApiBearerAuth('access-token')
     @ApiOkResponse({ type: UserEntity })
-    async removeMyAccount(@Param('id', ParseIntPipe) id: number) {
-        return await this.commandBus.execute(new DeleteMyAccountCommand(id));
+    async removeMyAccount(@Param('userId', ParseIntPipe) userId: number) {
+        return await this.commandBus.execute(
+            new DeleteMyAccountCommand(userId),
+        );
         // return await this.removeMyAccountService.remove(id);
     }
 

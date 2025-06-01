@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ForbiddenException, Inject, NotFoundException } from '@nestjs/common';
 import { UsersRepository } from './../repositories/users.repository';
-import { DeleteMyAccountCommand, DeleteUserCommand } from '../commands';
+import { DeleteMyAccountCommand } from '../commands';
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @CommandHandler(DeleteMyAccountCommand)
@@ -14,9 +14,9 @@ export class DeleteMyAccountHandler
     ) {}
 
     async execute(command: DeleteMyAccountCommand) {
-        const { id } = command;
+        const { userId } = command;
 
-        const userIsAdmin = await this.usersRepository.findIdUser(id);
+        const userIsAdmin = await this.usersRepository.findIdUser(userId);
         if (!userIsAdmin) {
             throw new NotFoundException('No user found');
         }
@@ -32,7 +32,7 @@ export class DeleteMyAccountHandler
             );
         }
 
-        await this.usersRepository.deleteUserAccount(id);
+        await this.usersRepository.deleteUserAccount(userId);
 
         return `${userIsAdmin.name} was deleted `;
     }

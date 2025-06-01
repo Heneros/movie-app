@@ -16,7 +16,7 @@ describe('Users - Get All users(e2e) GET user/blocked-list/', () => {
 
     beforeEach(async () => {
         await clearDatabase(prisma);
-        
+
         prisma = new PrismaService();
 
         await prisma.user.create({
@@ -91,7 +91,7 @@ describe('Users - Get All users(e2e) GET user/blocked-list/', () => {
         // console.log(response.body);
     });
 
-    it('Should Fail GET all blocked users if you not admin', async () => {
+    it('Should Fail GET all blocked users if you not admin ,if user have role admin', async () => {
         const response = await request(app.getHttpServer())
             .get('/users/blocked-list')
             .set('Authorization', `Bearer ${userToken}`);

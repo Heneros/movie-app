@@ -2,7 +2,9 @@ import {
     CanActivate,
     ExecutionContext,
     ForbiddenException,
+    Inject,
     Injectable,
+    LoggerService,
     UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
@@ -10,6 +12,7 @@ import { PrismaService } from '@/prisma/prisma.service';
 import * as jwt from 'jsonwebtoken';
 import { IS_PUBLIC_KEY } from '@/decorators/public.decorator';
 import { GqlExecutionContext } from '@nestjs/graphql';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 interface JwtPayload {
     name: string;
@@ -22,6 +25,8 @@ interface JwtPayload {
 @Injectable()
 export class AuthGuard implements CanActivate {
     constructor(
+        @Inject(WINSTON_MODULE_NEST_PROVIDER)
+        private readonly logger: LoggerService,
         private readonly reflector: Reflector,
         private readonly prismaService: PrismaService,
     ) {}
@@ -93,7 +98,8 @@ export class AuthGuard implements CanActivate {
                 }
                 return false;
             } catch (error) {
-                console.log('error', error);
+                this.logger.debug('error authguard', error);
+                //    console.error('error', error);
                 return false;
             }
         }

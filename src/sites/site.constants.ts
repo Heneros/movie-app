@@ -26,7 +26,7 @@ export const USERS_ROUTES = {
     UPDATE_USER: ':userId',
     DELETE_USER: ':id',
     CHANGE_ROLE: ':id/role',
-    DELETE_MY_ACCOUNT: ':id/myaccount',
+    DELETE_MY_ACCOUNT: ':userId/myaccount',
     BAN_USER_ACCOUNT: ':id/ban',
     LIST_BLOCKED_USERS: 'blocked-list',
     UPLOAD_AVATAR_USER: 'upload/:userId',
