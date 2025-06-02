@@ -17,10 +17,8 @@ export class BanUserAccountHandler
             throw new NotFoundException('No user found');
         }
 
-        if (userIsAdmin.roles?.includes['Admin']) {
-            throw new ForbiddenException(
-                'Admin cannot deactivate their own account',
-            );
+        if (userIsAdmin.roles?.includes('Admin')) {
+            throw new ForbiddenException('Admin cannot ban their own account');
         }
 
         await this.usersRepository.banUserAccount(id);

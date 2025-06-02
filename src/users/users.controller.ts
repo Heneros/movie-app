@@ -196,6 +196,7 @@ export class UsersController {
     }
 
     @Post(USERS_ROUTES.UPLOAD_AVATAR_USER)
+    @UseGuards(AuthGuard, ProfileOwnerGuard)
     @UseInterceptors(
         FileInterceptor('file', {
             storage: memoryStorage(),
@@ -231,7 +232,6 @@ export class UsersController {
             throw new BadGatewayException(
                 error.message || 'Authentication failed',
             );
-            // res.status(500).send({ message: 'Upload failed' });
         }
     }
 }

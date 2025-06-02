@@ -2,15 +2,15 @@ import { PrismaService } from '@/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import request from 'supertest';
 
-import { app } from '../setup';
-import { clearDatabase } from '../helpers/db-helper';
+import { app } from '../../setup';
+import { clearDatabase } from '../../helpers/db-helper';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { RedisPrefixEnum } from '@/data/redis-prefix-enum';
-import { rawUserData } from '../helpers/createUser';
+import { rawUserData } from '../../helpers/createUser';
 import { faker } from '@faker-js/faker/.';
 import { roundsOfHashing } from '@/data/defaultData';
 
-describe('Users - DELETE my account (e2e) DELETE user/:userId/myaccount', () => {
+describe('Users - BAN user account (e2e) POST user/:userId/ban', () => {
     let prisma: PrismaService;
     let adminToken: string;
     let userToken: string;
@@ -61,57 +61,53 @@ describe('Users - DELETE my account (e2e) DELETE user/:userId/myaccount', () => 
         userToken = responseUser.body.refreshToken;
     });
 
-    it('Should Delete accint ', async () => {
-        // console.log(userTest);
+    it('Should Ban user account ', async () => {
+        const testRes = await request(app.getHttpServer())
+            .put(`/users/${userTest.id}/ban`)
+            .set('Authorization', `Bearer ${adminToken}`)
+            //  .set('Content-Type', 'application/json');
+            .expect(200);
 
-        // const userId = responseUser._body.id;
-
-        await request(app.getHttpServer())
-            .delete(`/users/${userTest.id}/myaccount`)
-            .set('Authorization', `Bearer ${userToken}`);
-        //  .set('Content-Type', 'application/json');
-        // .expect(200);
-
-        //   console.log(testRes.body);
+        expect(testRes.text).toBe(`User was banned ${userTest.name}`);
 
         const user = await prisma.user.findUnique({
             where: {
                 id: userTest.id,
             },
         });
+        //    console.log(user);
 
-        expect(user).toBeNull();
+        expect(user.blocked).toBe(true);
     });
 
-    it('Should Fail DELETE if try delete admin account ', async () => {
+    it('Should Fail if try ban admin account ', async () => {
         const response = await request(app.getHttpServer())
-            .delete(`/users/${adminUser.id}/myaccount`)
+            .put(`/users/${adminUser.id}/ban`)
             .set('Authorization', `Bearer ${adminToken}`)
-            .set('Content-Type', 'application/json')
-            .expect(403);
+            .set('Content-Type', 'application/json');
+        // .expect(403);
 
         //   console.log(response.body);
 
         expect(response.body).toMatchObject({
-            message: 'Admin cannot delete their own account',
-            // error: 'Forbidden',
-            // statusCode: 403,
+            message: 'Admin cannot ban their own account',
         });
     });
 
-    it('Should Fail DELETE if try delete user account if you not owner', async () => {
+    it('Should Fail  if try ban user account if you not exist', async () => {
         const response = await request(app.getHttpServer())
-            .delete(`/users/${userTest.id}/myaccount`)
+            .put(`/users/1/ban`)
             .set('Authorization', `Bearer ${adminToken}`)
             .set('Content-Type', 'application/json')
-            .expect(403);
+            .expect(400);
 
         // console.log(response.body);
 
+        //expect(response.text).toBe(`User was banned ${userTest.name}`);
         expect(response.body).toMatchObject({
-            message: 'You are not authorized to have access to this profile',
-            error: 'Forbidden',
-            statusCode: 403,
+            message: 'No user exists with this email',
+            error: 'Bad Request',
+            statusCode: 400,
         });
     });
 

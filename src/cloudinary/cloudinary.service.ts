@@ -1,4 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+    BadRequestException,
+    Inject,
+    Injectable,
+    LoggerService,
+    NotFoundException,
+} from '@nestjs/common';
 import {
     v2 as cloudinary,
     UploadApiErrorResponse,
@@ -7,10 +13,15 @@ import {
 import * as path from 'path';
 const streamifier = require('streamifier');
 import { PrismaService } from '@/prisma/prisma.service';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 @Injectable()
 export class CloudinaryService {
-    constructor(private prisma: PrismaService) {}
+    constructor(
+        @Inject(WINSTON_MODULE_NEST_PROVIDER)
+        private readonly logger: LoggerService,
+        private prisma: PrismaService,
+    ) {}
 
     async uploadFileAvatarUser(
         userId: number,
@@ -20,13 +31,21 @@ export class CloudinaryService {
     ) {
         // : Promise<{ url: string } | undefined>
         try {
+            if (!file.mimetype.startsWith('image/')) {
+                throw new BadRequestException({
+                    message: 'Invalid image file',
+                    name: 'Error',
+                    http_code: 400,
+                });
+            }
+
             const avatar = await this.prisma.avatar.findUnique({
-                where: { id: userId },
+                where: { userId },
                 // include: { avatar: true },
             });
 
             if (!avatar) {
-                throw new NotFoundException('User not found');
+                throw new NotFoundException('Avatar not found');
             }
 
             if (avatar) {
@@ -35,6 +54,7 @@ export class CloudinaryService {
                     where: { id: avatar.id },
                 });
             }
+
             const mainFolder = 'nestjsMoviedb';
             const fileName = path.parse(originalName).name;
             const uniqueFileName = `${fileName}_${Date.now()}`;
@@ -57,7 +77,8 @@ export class CloudinaryService {
                             result: UploadApiResponse | undefined,
                         ) => {
                             if (err) {
-                                console.error('Cloudinary upload error:', err);
+                                this.logger.error(`Cloudinary:  ${err}`);
+
                                 reject(err);
                             } else if (result && result.secure_url) {
                                 resolve({ url: result.secure_url });
@@ -76,17 +97,31 @@ export class CloudinaryService {
                 },
             );
 
-            const updatedUser = await this.prisma.avatar.update({
-                where: { id: userId },  
+            const newAvatar = await this.prisma.avatar.create({
                 data: {
-                            url: imageC.url,
-                            publicId: filePathOnCloudinary,
+                    url: imageC.url,
+                    publicId: filePathOnCloudinary,
+                    userId: userId,
                 },
             });
 
-            return { avatar: updatedUser.id };
+            return { avatar: newAvatar.id };
+            // const updatedUser = await this.prisma.avatar.update({
+            //     where: { id: userId },
+            //     data: {
+            //         url: imageC.url,
+            //         publicId: filePathOnCloudinary,
+            //     },
+            // });
+
+            // return { avatar: updatedUser.id };
         } catch (error) {
-            console.error('Error in uploadToCloudinary:', error);
+            // console.error('Error in uploadToCloudinary:', error);
+            if (error instanceof BadRequestException) {
+                throw error;
+            }
+
+            this.logger.error(`Error in uploadToCloudinary::  ${error}`);
         }
     }
 
@@ -104,7 +139,8 @@ export class CloudinaryService {
                 (error, result) => {
                     // console.log(publicId, imageUrl);
                     if (error) {
-                        console.error('Cloudinary upload error:', error);
+                        // console.error('Cloudinary upload error:', error);
+
                         return reject(error);
                     }
                     if (!result?.secure_url) {
@@ -176,7 +212,6 @@ export class CloudinaryService {
             savedImages.push(newGallery);
         }
 
-        
         return { images: savedImages };
     }
 }
