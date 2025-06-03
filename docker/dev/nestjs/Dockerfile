@@ -1,4 +1,4 @@
-FROM node:22.15-alpine
+FROM node:22.15-alpine as development
 
 WORKDIR /usr/src/app  
 
@@ -12,8 +12,3 @@ RUN npx prisma generate
 
 COPY . .
 
-ARG BUILD_MODE=dev
-RUN if [ "$BUILD_MODE" = "prod" ]; then npm run build; fi
-
-
-CMD if["$BUILD_MODE" = "prod"]; then npm run start:with-migrations; else npm run start:dev; fi ["npm", "run", "start:with-migrations"]

@@ -1,7 +1,11 @@
 import { PrismaService } from '@/prisma/prisma.service';
 import { BadRequestException, Injectable } from '@nestjs/common';
 
-import { roundsOfHashing, tempLoginDate } from '@/data/defaultData';
+import {
+    roundsOfHashing,
+    tempLoginDate,
+    tempTokenDate,
+} from '@/data/defaultData';
 import { LogInDto } from '../dto-input/Login.dto';
 import { EmailDto } from '../dto-input/Resend-email.dto';
 
@@ -159,12 +163,12 @@ export class AuthRepository {
             update: {
                 userId: userId,
                 token: emailToken,
-                expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+                expiresAt: tempTokenDate,
             },
             create: {
                 userId,
                 token: emailToken,
-                expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+                expiresAt: tempTokenDate,
             },
         });
     }

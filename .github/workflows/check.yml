@@ -8,12 +8,11 @@ on:
 
 
 jobs:
-
     basic:
         runs-on: ubuntu-latest
         services:
             postgres:
-              image: postgres:17.4
+              image: postgres:14-alpine
               env:
                 POSTGRES_USER: postgres
                 POSTGRES_PASSWORD: postgres
@@ -26,7 +25,6 @@ jobs:
               ports:
                 - 5432:5432
         steps:
-
 
             - name: Checkout
               uses: actions/checkout@v3  

@@ -111,14 +111,13 @@ export class AuthController {
         @Res({ passthrough: true }) res: Response,
         @Body(EmailValidationPipe) logInDto: LogInDto,
     ) {
-        // return this.commandBus.execute(new LoginUserCommand(logInDto));
+
         try {
             const result = await this.commandBus.execute(
                 new LoginUserCommand(logInDto),
             );
 
-            // console.log('refreshToken', result.refreshToken);
-
+   
             res.cookie('jwtMovie', result.refreshToken, {
                 httpOnly: !isDevelopment,
                 sameSite: isDevelopment ? 'none' : 'strict',

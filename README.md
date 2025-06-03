@@ -8,11 +8,10 @@ App analogue imdb/kinopoisk about movies. Site separated on 4 modules: auth(logi
 - PostgreSQL
 - Graphql(code first)
 - Graphql-ws
-- Mongodb
+
 - Redis
 - Nginx 
 - Passport(Google, Github, Discord)
-- Socket io
 - Nodemailer
 - Github Actions
 - Jest (e2e)
@@ -29,7 +28,7 @@ App analogue imdb/kinopoisk about movies. Site separated on 4 modules: auth(logi
 - TensorFlow.js
 - Github Actions
 - Kubernetes
-
+- Mongodb
 
 ## Features app have:
 - CQRS architecture.
@@ -49,7 +48,7 @@ App analogue imdb/kinopoisk about movies. Site separated on 4 modules: auth(logi
 - Reviews movie. positive or negative. 
 - Edit review during 15 minutes. Latter gonna be edit without limitless for premium users. 
 - ApiLimiter  
-- ProfileOwner, restricted content to only owners can perform actions
+- Custom guards like ProfileOwner, where restricted content to only owners account or check Profile exist
 - You can upload for your profile
 
 

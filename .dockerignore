@@ -4,3 +4,6 @@ dist
 build
 *.pem
 *-audit.json
+*.log
+*.md
+.git
