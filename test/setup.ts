@@ -1,7 +1,7 @@
 import {
     ClassSerializerInterceptor,
     INestApplication,
-    ValidationPipe,ц
+    ValidationPipe,
 } from '@nestjs/common';
 import * as request from 'supertest';
 import * as fs from 'fs';
