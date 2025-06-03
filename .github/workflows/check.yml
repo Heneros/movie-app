@@ -33,6 +33,7 @@ jobs:
               uses: actions/setup-node@v4
               with:
                 node-version: 20.12.2
+                cache: 'npm'
 
             - name: Install dependencies
               run: npm ci
@@ -60,8 +61,12 @@ jobs:
               run: |
                    npm install @prisma/client@6.4.0 
                    npm install prisma --save-dev
-                   npx prisma migrate dev
+                   npx prisma generate
+                   npx prisma migrate dev --name init
 
+            - name: Build Typescript
+              run: npm run build  
+            
             - name: Lint
               run: npm run lint
 

@@ -24,7 +24,7 @@ import { AuthRepository } from './repositories/Auth.repository';
 import { GoogleStrategy } from './passport/GoogleStrategy';
 import { CloudinaryService } from '@/cloudinary/cloudinary.service';
 import { DiscordService, GithubService, GoogleService } from './services';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { GithubStrategy } from './passport/GithubStrategy';
 import { HandleIOauth } from './services/HandleIOauth.service';
 import { DiscordStrategy } from './passport/DiscordStrategy';

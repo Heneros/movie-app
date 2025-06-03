@@ -7,7 +7,6 @@ import {
     tempTokenDate,
 } from '@/data/defaultData';
 import { LogInDto } from '../dto-input/Login.dto';
-import { EmailDto } from '../dto-input/Resend-email.dto';
 
 @Injectable()
 export class AuthRepository {
