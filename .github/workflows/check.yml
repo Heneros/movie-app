@@ -24,6 +24,23 @@ jobs:
                    --health-retries 5
               ports:
                 - 5432:5432
+            redis:
+               image: redis:7.4 
+               ports:
+                - 6379:6379
+               options: >-
+                --health-cmd "redis-cli ping"
+                --health-interval 10s
+                --health-timeout 5s
+                --health-retries 5
+                
+            maildev:
+              image: maildev/maildev
+              ports:
+               - 1080:1080 
+               - 1025:1025 
+    
+
         steps:
 
             - name: Checkout
@@ -37,7 +54,14 @@ jobs:
 
             - name: Install dependencies
               run: npm ci
-            
+
+            - name: verify project structure
+              run: |
+                 echo "Checking project structure..."
+                 ls -la src/auth/repositories/
+                 cat tsconfig.json
+
+
             - name:  Wait for PostgreSQL to be ready
               run: |
                 echo "Waiting for PostgreSQL to start..."
@@ -52,7 +76,18 @@ jobs:
                 done
 
             - name: Set up env variables
-              run: echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> $GITHUB_ENV
+              run: echo "JWT_SECRET=${{ secrets.JWT_SECRET }} >>
+                 $GITHUB_ENV
+                 echo "REDIS_HOST=localhost" >> $GITHUB_ENV
+                 echo "REDIS_PORT=6379" >> $GITHUB_ENV
+                 echo "REDIS_PASSWORD=testpass" >> $GITHUB_ENV
+                 echo "JWT_ACCESS_SECRET=testjwtaccess" >> $GITHUB_ENV
+                 echo "JWT_REFRESH_SECRET=testjwtaccess" >> $GITHUB_ENV
+                 echo "SECRET_SESSION=testjwtacsesion" >> $GITHUB_ENV
+                 echo "PAGINATION=5" >> $GITHUB_ENV
+                 echo "SMTP_HOST=localhost" >> $GITHUB_ENV
+                 echo "SMTP_PORT=1025" >> $GITHUB_ENV
+                 echo "MAILDEV_WEB=http://localhost:1080" >>   $GITHUB_ENV
 
         
             - name: Install prisma packages 
