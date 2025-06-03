@@ -76,8 +76,8 @@ jobs:
                 done
 
             - name: Set up env variables
-              run: echo "JWT_SECRET=${{ secrets.JWT_SECRET }} >>
-                 $GITHUB_ENV
+              run:  |
+                 echo "JWT_SECRET=${{ secrets.JWT_SECRET }} >>$GITHUB_ENV
                  echo "REDIS_HOST=localhost" >> $GITHUB_ENV
                  echo "REDIS_PORT=6379" >> $GITHUB_ENV
                  echo "REDIS_PASSWORD=testpass" >> $GITHUB_ENV
@@ -87,7 +87,7 @@ jobs:
                  echo "PAGINATION=5" >> $GITHUB_ENV
                  echo "SMTP_HOST=localhost" >> $GITHUB_ENV
                  echo "SMTP_PORT=1025" >> $GITHUB_ENV
-                 echo "MAILDEV_WEB=http://localhost:1080" >>   $GITHUB_ENV
+          
 
         
             - name: Install prisma packages 
