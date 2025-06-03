@@ -49,7 +49,7 @@ App analogue imdb/kinopoisk about movies. Site separated on 4 modules: auth(logi
 - Edit review during 15 minutes. Latter gonna be edit without limitless for premium users. 
 - ApiLimiter  
 - Custom guards like ProfileOwner, where restricted content to only owners account or check Profile exist
-- You can upload for your profile
+- You can upload avatar for your profile
 
 
 ## In future. Features and functionality app should be:
@@ -60,7 +60,6 @@ animated avatar,
 show list all reviews/comments without button  "open more"
 everyday recieve letter to mail box about favorite movies, he subscribed
 
-- Review, editor and admin.
 - Live chat with users through ws
 - Temp link for 20 minutes and after expire link deleted himself
 - Create token on  only 31 day to access to data, you can share with other user token(only 3 times) after this token gonna be invalid
