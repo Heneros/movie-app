@@ -16,6 +16,8 @@ import { MailModule } from '../src/mail/mail.module';
 import { MailService } from '../src/mail/mail.service';
 import { clearDatabase } from './helpers/db-helper';
 import { AuthModule } from '../src/auth/auth.module';
+import { GoogleService } from '@/auth/services';
+import { GoogleStrategy } from '@/auth/passport/GoogleStrategy';
 
 export let app: INestApplication;
 
@@ -34,8 +36,15 @@ beforeAll(async () => {
             },
         ],
     })
+
         .overrideProvider(MailService)
+
         .useValue(mockMailService)
+
+        .overrideProvider(GoogleStrategy)
+        .useValue({ validate: jest.fn() })
+
+
         .compile();
 
     app = moduleFixture.createNestApplication();
@@ -57,7 +66,6 @@ afterAll(async () => {
     const prisma = app.get(PrismaService);
     await clearDatabase(prisma);
     await app.close();
-
 
     // setTimeout(() => process.exit(0), 100);
 });

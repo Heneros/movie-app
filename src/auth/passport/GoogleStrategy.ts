@@ -18,17 +18,19 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
         private readonly handleIOauth: HandleIOauth,
         private readonly authRepository: AuthRepository,
     ) {
-        super({
-            clientID: config.get('GOOGLE_CLIENT_ID'),
-            clientSecret: config.get('GOOGLE_CLIENT_SECRET'),
-            callbackURL: config.get('GOOGLE_CALLBACK_URL'),
-            // clientID: process.env.GOOGLE_CLIENT_ID,
-            // clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-            // callbackURL: 'http://localhost:3000/auth/google/callback',
-            // passReqToCallback: true,
-            proxy: true,
-            scope: ['email', 'profile'],
-        });
+        if (process.env.NODE_ENV !== 'test') {
+            super({
+                clientID: config.get('GOOGLE_CLIENT_ID'),
+                clientSecret: config.get('GOOGLE_CLIENT_SECRET'),
+                callbackURL: config.get('GOOGLE_CALLBACK_URL'),
+                // clientID: process.env.GOOGLE_CLIENT_ID,
+                // clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+                // callbackURL: 'http://localhost:3000/auth/google/callback',
+                // passReqToCallback: true,
+                proxy: true,
+                scope: ['email', 'profile'],
+            });
+        }
     }
 
     async validate(
