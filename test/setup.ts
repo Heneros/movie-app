@@ -57,4 +57,7 @@ afterAll(async () => {
     const prisma = app.get(PrismaService);
     await clearDatabase(prisma);
     await app.close();
+
+
+    // setTimeout(() => process.exit(0), 100);
 });

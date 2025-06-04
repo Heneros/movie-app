@@ -78,6 +78,7 @@ jobs:
             - name: Set up env variables
               run:  |
                  echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> $GITHUB_ENV
+                 echo "NODE_ENV=test" >>  $GITHUB_ENV
                  echo "REDIS_HOST=localhost" >> $GITHUB_ENV
                  echo "REDIS_PORT=6379" >> $GITHUB_ENV
                  echo "REDIS_PASSWORD=testpass" >> $GITHUB_ENV
