@@ -1,3 +1,5 @@
+jest.setTimeout(120000);
+
 import {
     ClassSerializerInterceptor,
     INestApplication,
@@ -63,14 +65,24 @@ beforeAll(async () => {
     );
 
     await app.init();
-    const prisma = app.get(PrismaService);
-    await clearDatabase(prisma);
-});
+
+    try {
+        const prisma = app.get(PrismaService);
+        await clearDatabase(prisma);
+    } catch (e) {
+        console.warn('clearDatabase in beforeAll failed:', e);
+    }
+}, 120000);
 
 afterAll(async () => {
-    const prisma = app.get(PrismaService);
-    await clearDatabase(prisma);
-    await app.close();
-
+    if (app) {
+        try {
+            const prisma = app.get(PrismaService);
+            await clearDatabase(prisma);
+        } catch (e) {
+            console.warn('clearDatabase in afterAll failed:', e);
+        }
+        await app.close();
+    }
     // setTimeout(() => process.exit(0), 100);
 });

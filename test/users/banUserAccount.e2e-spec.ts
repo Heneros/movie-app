@@ -6,9 +6,7 @@ import { app } from '../setup';
 import { clearDatabase } from '../helpers/db-helper';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { RedisPrefixEnum } from '@/data/redis-prefix-enum';
-import { rawUserData } from '../helpers/createUser';
-import { faker } from '@faker-js/faker/.';
-import { roundsOfHashing } from '@/data/defaultData';
+
 
 describe('Users - BAN user account (e2e) POST user/:userId/ban', () => {
     let prisma: PrismaService;
