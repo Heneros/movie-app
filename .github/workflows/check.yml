@@ -88,6 +88,9 @@ jobs:
                  echo "PAGINATION=5" >> $GITHUB_ENV
                  echo "SMTP_HOST=localhost" >> $GITHUB_ENV
                  echo "SMTP_PORT=1025" >> $GITHUB_ENV
+                 echo "CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_CLOUD_NAME }}" >> $GITHUB_ENV
+                 echo "CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API_KEY }}" >> $GITHUB_ENV
+                 echo "CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}" >> $GITHUB_ENV
           
 
         
