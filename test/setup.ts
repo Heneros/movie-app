@@ -36,14 +36,11 @@ beforeAll(async () => {
             },
         ],
     })
-
         .overrideProvider(MailService)
-
         .useValue(mockMailService)
 
         .overrideProvider(GoogleStrategy)
         .useValue({ validate: jest.fn() })
-
 
         .compile();
 
