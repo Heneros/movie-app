@@ -21,10 +21,7 @@
     },
     "testPathIgnorePatterns": [
         "/node_modules/",
- 
-        "auth",
-        "users",
-        "movie",
-        "reviews"
+        "ignore/",
+        "upload"
     ]
 }
