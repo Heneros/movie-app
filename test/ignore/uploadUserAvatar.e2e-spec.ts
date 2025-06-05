@@ -12,6 +12,7 @@ import { faker } from '@faker-js/faker/.';
 import { roundsOfHashing } from '@/data/defaultData';
 import path, { join } from 'node:path';
 
+
 jest.mock('cloudinary', () => ({
     v2: {
         config: jest.fn(),
@@ -20,6 +21,19 @@ jest.mock('cloudinary', () => ({
                 secure_url:
                     'https://res.cloudinary.com/demo/image/upload/v12345/sample.jpg',
                 public_id: 'demo/sample',
+            }),
+            upload_stream: jest.fn().mockImplementation((options, callback) => {
+                const fakeResult = {
+                    secure_url:
+                        'https://res.cloudinary.com/demo/image/upload/v12345/sample.jpg',
+                    public_id: 'demo/sample',
+                };
+                return {
+                    write: (_chunk) => {},
+                    end: () => {
+                        process.nextTick(() => callback(null, fakeResult));
+                    },
+                };
             }),
             destroy: jest.fn().mockResolvedValue({ result: 'ok' }),
         },

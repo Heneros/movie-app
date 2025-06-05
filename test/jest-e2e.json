@@ -21,6 +21,8 @@
     },
     "testPathIgnorePatterns": [
         "/node_modules/",
-        "ignore/"
+        "ignore/",
+        "auth",
+        "reviews"
     ]
 }

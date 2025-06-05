@@ -1,5 +1,5 @@
 import { PrismaService } from '@/prisma/prisma.service';
-import { app } from '../setup';
+import { app, prisma } from '../setup';
 import request from 'supertest';
 import jwt from 'jsonwebtoken';
 import { clearDatabase } from '../helpers/db-helper';
@@ -14,7 +14,6 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { RedisPrefixEnum } from '@/data/redis-prefix-enum';
 
 describe('Movies - Get reviews from movie METHOD GET movie/:id/singleReview', () => {
-    let prisma: PrismaService;
     let userToken;
     let movie;
     let user;
@@ -22,8 +21,6 @@ describe('Movies - Get reviews from movie METHOD GET movie/:id/singleReview', ()
     let review;
 
     beforeEach(async () => {
-        prisma = app.get(PrismaService);
-
         movie = await createMovie();
         user = await registerTestUser();
 

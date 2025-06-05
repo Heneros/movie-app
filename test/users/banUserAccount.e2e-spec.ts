@@ -2,14 +2,12 @@ import { PrismaService } from '@/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import request from 'supertest';
 
-import { app } from '../setup';
+import { app, prisma } from '../setup';
 import { clearDatabase } from '../helpers/db-helper';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { RedisPrefixEnum } from '@/data/redis-prefix-enum';
 
-
 describe('Users - BAN user account (e2e) POST user/:userId/ban', () => {
-    let prisma: PrismaService;
     let adminToken: string;
     let userToken: string;
     let responseUser;
@@ -18,8 +16,6 @@ describe('Users - BAN user account (e2e) POST user/:userId/ban', () => {
     let adminUser;
 
     beforeEach(async () => {
-        prisma = new PrismaService();
-
         adminUser = await prisma.user.create({
             data: {
                 name: 'Test User',

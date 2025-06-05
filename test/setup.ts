@@ -23,12 +23,13 @@ import { GoogleStrategy } from '@/auth/passport/GoogleStrategy';
 import { GithubStrategy } from '@/auth/passport/GithubStrategy';
 import { DiscordStrategy } from '@/auth/passport/DiscordStrategy';
 
-export let app: INestApplication;
-
 export const mockMailService = {
     sendEmail: jest.fn().mockImplementation(() => Promise.resolve(true)),
     resendEmail: jest.fn().mockImplementation(() => Promise.resolve(true)),
 };
+
+export let app: INestApplication;
+export let prisma: PrismaService;
 
 beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -67,7 +68,7 @@ beforeAll(async () => {
     await app.init();
 
     try {
-        const prisma = app.get(PrismaService);
+        prisma = app.get(PrismaService);
         await clearDatabase(prisma);
     } catch (e) {
         console.warn('clearDatabase in beforeAll failed:', e);
@@ -77,7 +78,7 @@ beforeAll(async () => {
 afterAll(async () => {
     if (app) {
         try {
-            const prisma = app.get(PrismaService);
+            prisma = app.get(PrismaService);
             await clearDatabase(prisma);
         } catch (e) {
             console.warn('clearDatabase in afterAll failed:', e);
