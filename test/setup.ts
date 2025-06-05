@@ -18,6 +18,8 @@ import { clearDatabase } from './helpers/db-helper';
 import { AuthModule } from '../src/auth/auth.module';
 import { GoogleService } from '@/auth/services';
 import { GoogleStrategy } from '@/auth/passport/GoogleStrategy';
+import { GithubStrategy } from '@/auth/passport/GithubStrategy';
+import { DiscordStrategy } from '@/auth/passport/DiscordStrategy';
 
 export let app: INestApplication;
 
@@ -42,6 +44,12 @@ beforeAll(async () => {
         .overrideProvider(GoogleStrategy)
         .useValue({ validate: jest.fn() })
 
+        .overrideProvider(GithubStrategy)
+        .useValue({ validate: jest.fn() })
+
+        .overrideProvider(DiscordStrategy)
+        .useValue({ validate: jest.fn() })
+        
         .compile();
 
     app = moduleFixture.createNestApplication();
