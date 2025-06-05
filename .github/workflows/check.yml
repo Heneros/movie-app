@@ -95,8 +95,7 @@ jobs:
               env:
                 DATABASE_URL: "postgres://postgres:postgres@localhost:5432/moviedb"
               run: |
-                   npm install @nestjs/common@10 @nestjs/core@10
-                   npm install @prisma/client@6.4.0  --legacy-peer-deps
+                   npm install @prisma/client  --legacy-peer-deps
                    npm install prisma --save-dev
                    npx prisma init
                    npx prisma generate
