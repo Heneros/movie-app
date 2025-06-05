@@ -49,7 +49,7 @@ beforeAll(async () => {
 
         .overrideProvider(DiscordStrategy)
         .useValue({ validate: jest.fn() })
-        
+
         .compile();
 
     app = moduleFixture.createNestApplication();

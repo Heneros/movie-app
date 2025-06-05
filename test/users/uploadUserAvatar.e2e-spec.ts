@@ -12,6 +12,19 @@ import { faker } from '@faker-js/faker/.';
 import { roundsOfHashing } from '@/data/defaultData';
 import path, { join } from 'node:path';
 
+jest.mock('cloudinary', () => ({
+    v2: {
+        config: jest.fn(),
+        uploader: {
+            upload: jest.fn().mockResolvedValue({
+                secure_url:
+                    'https://res.cloudinary.com/demo/image/upload/v12345/sample.jpg',
+                public_id: 'demo/sample',
+            }),
+        },
+    },
+}));
+
 describe('Users - upload user avatar (e2e) POST user/upload/:userId', () => {
     let prisma: PrismaService;
     let adminToken: string;
@@ -98,7 +111,8 @@ describe('Users - upload user avatar (e2e) POST user/upload/:userId', () => {
         // console.log('avatar response:', avatar);
 
         expect(avatar).not.toBeNull();
-        expect(avatar.publicId).not.toMatch(/undefined/);
+        expect(avatar.publicId).toBe('demo/fake-avatar');
+        //     expect(avatar.publicId).not.toMatch(/undefined/);
         expect(avatar.userId).toBe(userTest.id);
         expect(avatar.url).toMatch(/^https:\/\/res\.cloudinary\.com\/.+/);
     });
