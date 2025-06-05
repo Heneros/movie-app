@@ -21,6 +21,7 @@ jest.mock('cloudinary', () => ({
                     'https://res.cloudinary.com/demo/image/upload/v12345/sample.jpg',
                 public_id: 'demo/sample',
             }),
+            destroy: jest.fn().mockResolvedValue({ result: 'ok' }),
         },
     },
 }));
@@ -111,7 +112,8 @@ describe('Users - upload user avatar (e2e) POST user/upload/:userId', () => {
         // console.log('avatar response:', avatar);
 
         expect(avatar).not.toBeNull();
-        expect(avatar.publicId).toBe('demo/fake-avatar');
+
+        expect(avatar.publicId).toBe('demo/sample');
         //     expect(avatar.publicId).not.toMatch(/undefined/);
         expect(avatar.userId).toBe(userTest.id);
         expect(avatar.url).toMatch(/^https:\/\/res\.cloudinary\.com\/.+/);
