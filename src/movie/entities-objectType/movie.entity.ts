@@ -2,7 +2,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Movie } from '@prisma/client';
 import { UserEntity } from '@/users/entities-objectType/user.entity';
 import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
-import { Exclude } from 'class-transformer';
 import { UpdateUserDto } from '@/users/dto-input/update-user.dto';
 
 @ObjectType({ description: 'Movie' })

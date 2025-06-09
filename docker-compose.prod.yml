@@ -1,11 +1,13 @@
 version: '3.8'
 
 services:
- postgres:
+
+ postgres-master:
     restart: always
     # image: postgres:17.4
     image: postgres:14-alpine
     env_file: ./.env
+    container_name: postgres-master
     # build:
     #   context: ./docker/dev/postgresql_master
     environment:
@@ -26,7 +28,6 @@ services:
     networks:
       app_movie:
 
-
  pgadmin:
    container_name: pgadmi_nest
    image: dpage/pgadmin4:8
@@ -37,7 +38,7 @@ services:
    ports: 
      - "5050:80"
    depends_on:  
-    - postgres
+    - postgres-master
    volumes:
       - pgadmin-data:/var/lib/pgadmin
    networks:
@@ -107,39 +108,43 @@ services:
       - ./data/redisinsight:/db
     restart: always
 
- nestapp:
+ nestjs:
     container_name: nestapp
     build:
         context: .
-        dockerfile: ./docker/dev/nestjs/Dockerfile
-    restart: always
-    command: npm run start:dev
+        dockerfile: ./docker/prod/nestjs/Dockerfile
+        target: production  
+    restart: unless-stopped 
+    command: |
+      sh -c "npx prisma migrate deploy && npm run start:prod"
     depends_on:
-        postgres:
+         postgres-master:
+          condition: service_healthy
+         redis:
           condition: service_healthy 
-        redis:
-          condition: service_healthy 
+    
     env_file: ./.env
-    ports:
-     - "3000:3000"
-    #  - "9229:9229" 
     environment:
-      # - DEBUG=* 
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
+     - DATABASE_URL="postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public"
+    ports:
+     - 3000:3000
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/healthcheck"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
     volumes:
-        - .:/usr/src/app
-        - /usr/src/app/node_modules
-    command: >
-      sh -c "
-        echo 'running migrations…' &&
-        npx prisma migrate deploy &&       
-        echo 'seeding DB…' &&
-        npx prisma db seed &&
-        echo 'starting dev server…' &&
-        npm run start:dev
-      "
+      - .:/app:ro
+      - /app/node_modules
     networks:
       app_movie:   
 
@@ -155,7 +160,7 @@ services:
       - "80:80"
       - "443:443"
    depends_on:
-      - nestapp
+      - nestjs
    networks:
     app_movie:   
 
@@ -165,6 +170,7 @@ volumes:
   pgadmin-data:
   movies_db_data:
   mongodb-data:
+  nestjs:
   slave_data:
 
 networks:

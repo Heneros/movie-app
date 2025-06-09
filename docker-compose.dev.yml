@@ -27,6 +27,8 @@ services:
     networks:
       app_movie:
 
+
+
  pgadmin:
    container_name: pgadmi_nest
    image: dpage/pgadmin4:8
