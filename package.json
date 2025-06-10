@@ -12,7 +12,7 @@
         "start": "nest start",
         "start:dev": "nest start --watch",
         "start:debug": "nest start --debug --watch",
-        "start:prod": "node dist/main",
+        "start:prod": "node dist/src/main",
         "migrate": "prisma migrate deploy",
         "seed": "ts-node prisma/seed.ts",
         "start:with-migrations": "npm run migrate && npm run seed && npm run start:dev",
@@ -20,7 +20,7 @@
         "docker:dev:build": "docker compose -f docker-compose.dev.yml up -d --build ",
         "docker:dev:down": "docker compose -f docker-compose.dev.yml down -v",
         "docker:prod": "docker compose -f docker-compose.prod.yml up -d ",
-        "docker:prod:build": "docker compose -f docker-compose.prod.yml up -d --build ",
+        "docker:prod:build": "docker-compose -f docker-compose.prod.yml up -d --build",
         "docker:prod:down": "docker compose -f  docker-compose.prod.yml down",
         "prisma:dev": "cross-env DATABASE_URL=postgres://postgres:postgres@localhost:5432/moviedb?schema=public npx prisma migrate dev ",
         "prisma:docker": "cross-env DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public npx prisma migrate dev ",
@@ -31,6 +31,10 @@
         "test:cov": "jest --coverage",
         "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
         "test:e2e": "jest --config ./test/jest-e2e.json  --forceExit --detectOpenHandles"
+    },
+    "optionalDependencies": {
+        "@css-inline/css-inline-linux-arm64-musl": "0.14.1",
+        "@css-inline/css-inline-linux-x64-musl": "0.14.3"
     },
     "dependencies": {
         "@apollo/server": "^4.11.3",
@@ -46,6 +50,7 @@
         "@nestjs/cqrs": "^11.0.2",
         "@nestjs/graphql": "^13.0.3",
         "@nestjs/jwt": "^11.0.0",
+        "@nestjs/microservices": "^11.1.3",
         "@nestjs/passport": "^11.0.5",
         "@nestjs/platform-express": "^11.0.11",
         "@nestjs/swagger": "^11.0.6",

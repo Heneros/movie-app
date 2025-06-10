@@ -7,7 +7,7 @@
 *-audit.json
 .*-audit.json
 
-1features.txt
+*.txt
 # Logs
 logs
 *.log

@@ -12,26 +12,27 @@ import {
     ConsoleLogger,
     ValidationPipe,
 } from '@nestjs/common';
-import { PrismaClientExceptionFilter } from './prisma-client-exception/prisma-client-exception.filter';
+//import { PrismaClientExceptionFilter } from './prisma-client-exception/prisma-client-exception.filter';
 import { domain } from './data/defaultData';
 import { winstonLoggerOptions } from './Logger';
 import { WinstonModule } from 'nest-winston';
 
 async function bootstrap() {
+    console.log('App sTART -1');
     const app = await NestFactory.create(AppModule, {
-        logger: WinstonModule.createLogger(winstonLoggerOptions),
+        //    logger: WinstonModule.createLogger(winstonLoggerOptions),
         // logger: WinstonLogger(new winstonConfig()),
         // logger: WinstonModule.createLogger(createWinstonOptions('MovieApp')),
-        bufferLogs: true,
+        //     bufferLogs: true,
     });
-
+    console.log('App sTART 0');
     // const httpServer = createServer(app.getHttpAdapter().getInstance());
-    // app.enableShutdownHooks();
+    app.enableShutdownHooks();
     app.enableCors({
         origin: domain,
         credentials: true,
     });
-
+    console.log('App sTART 1');
     app.use(cookieParser());
     app.use(
         session({
@@ -68,7 +69,7 @@ async function bootstrap() {
             },
         }),
     );
-
+    console.log('App sTART 2');
     // app.useGlobalInterceptors(
     //     new ClassSerializerInterceptor(app.get(Reflector)),
     // );
@@ -119,7 +120,7 @@ async function bootstrap() {
             ],
         },
     });
-
+    console.log('App created 3 ');
     // app.useWebSocketAdapter(new WsAdapter(app, config, redis, jwt));
     // const { httpAdapter } = app.get(HttpAdapterHost);
     // app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));

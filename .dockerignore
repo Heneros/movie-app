@@ -1,6 +1,5 @@
 node_modules
 logs
-dist 
 build
 *.pem
 *-audit.json
