@@ -6,7 +6,8 @@
 *.pem
 *-audit.json
 .*-audit.json
-
+*.env
+*.env.prod
 *.txt
 # Logs
 logs
