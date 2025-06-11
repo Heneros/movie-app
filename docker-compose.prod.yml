@@ -1,12 +1,11 @@
 
 services:
 
- postgres-master:
+ postgres:
     restart: always
     # image: postgres:17.4
     image: postgres:14-alpine
-    env_file: ./.env
-    container_name: postgres-master
+    env_file: ./.env.prod
     # build:
     #   context: ./docker/dev/postgresql_master
     environment:
@@ -37,7 +36,7 @@ services:
    ports: 
      - "5050:80"
    depends_on:  
-    - postgres-master
+    - postgres
    volumes:
       - pgadmin-data:/var/lib/pgadmin
    networks:
@@ -108,22 +107,21 @@ services:
     restart: always
 
  nestjs:
-    container_name: nestapp
     build:
         context: .
         dockerfile: ./docker/prod/nestjs/Dockerfile
         target: production  
     restart: unless-stopped
     depends_on:
-         postgres-master:
+         postgres:
           condition: service_healthy
          redis:
           condition: service_healthy 
-    env_file: ./.env
-    environment:
-      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
-      - REDIS_HOST=redis
-      - NODE_ENV=production
+    env_file: ./.env.prod
+    # environment:
+    # - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
+    #   - REDIS_HOST=redis
+    #   - NODE_ENV=production
     #  - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres-master:5432/${POSTGRES_DB}?schema=public
     ports:
      - 3000:3000
@@ -151,7 +149,7 @@ services:
    restart: always
    build:
     context: .
-    dockerfile: ./docker/dev/nginx/Dockerfile
+    dockerfile: ./docker/prod/nginx/Dockerfile
    volumes:
     - ./logs/nginx:/var/log/nginx
    ports:

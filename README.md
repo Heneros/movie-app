@@ -1,5 +1,6 @@
 # Movies API
-App analogue imdb/kinopoisk about movies. Site separated on 4 modules: auth(login, registration etc), users(for actions for admin and user), movie()
+
+App analogue imdb/kinopoisk about movies. Site have modules: auth, users(for actions for admin and user), movie included reviews and favorites. App have custom guards, pipes and decorators.
 
 
 
@@ -8,15 +9,61 @@ App analogue imdb/kinopoisk about movies. Site separated on 4 modules: auth(logi
 - PostgreSQL
 - Graphql(code first)
 - Graphql-ws
-
 - Redis
 - Nginx 
 - Passport(Google, Github, Discord)
-- Nodemailer
+- Nodemailer with custom templates
+- Cloudinary
 - Github Actions
-- Jest (e2e)
-- Docker-Compose
+- Jest and Supertest (e2e)
+- Docker Compose (dev and build version)
 - JWT
+- Winston
+- fakerjs
+- Throttler
+
+
+## Installation with docker-compose
+
+Rename file .env.example to .env 
+
+```bash
+mv .env.example .env
+```
+
+
+Build project
+
+```bash
+  npm run docker:prod:build
+```
+
+Install prisma into docker container
+
+```bash  
+  docker compose -f docker-compose.dev.yaml exec nestapp   npm run prisma:docker
+```
+
+DB seed
+
+```bash  
+  npm run prisma:seed
+```
+##  Swagger Documentation
+
+To explore the available API endpoints, open Swagger in your browse
+
+[To to read swagger](http://localhost:3000/api)
+
+## ▶ Start Using the API
+
+A sample endpoint to get started:
+
+```bash
+curl -X GET http://localhost:3000/movie
+```
+
+[localhost:3000/movie](http://localhost:3000/movie/)
 
 
 ## Technologies should be
@@ -26,9 +73,9 @@ App analogue imdb/kinopoisk about movies. Site separated on 4 modules: auth(logi
 - RabbitMQ
 - Prometheus
 - TensorFlow.js
-- Github Actions
 - Kubernetes
 - Mongodb
+
 
 ## Features app have:
 - CQRS architecture.
@@ -66,13 +113,10 @@ everyday recieve letter to mail box about favorite movies, he subscribed
 - If you admin or editor, authorization through code. You should receive in mail box code and enter to proceed authorization
 - You can't change password on same. check prev password before update on new
 - WS online user or not. add functionality
-- Passport google/outlook/discord/github.
 - Bash write script
 - Mailing to user about new movies, comments,
-- Redis(search movie result) should be
 - Export and import data(csv and pdf). should send to user mailbox to download data
 - Load Balancer to db and redis
-- filter movies. By year/category/key actors/rating
 - 2FA authentication
 - TMDb API, Quotable API 
 - Moderation reviews with moderation
@@ -96,3 +140,10 @@ everyday recieve letter to mail box about favorite movies, he subscribed
 - Add field to table Users ban true or false. By default false
 - CQRS event if someone reply or 
 - auth resolver later passport try with next/react
+
+
+## Links on author or feedback
+[![GitHub](https://img.shields.io/badge/GitHub-heneros-181717?style=flat-square&logo=github)](https://github.com/heneros)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-%D0%A0%D1%83%D1%81%D1%82%D0%B0%D0%BC%20%D0%90%D1%85%D0%BC%D0%B5%D1%82%D0%B7%D1%8F%D0%BD%D0%BE%D0%B2-blue?style=flat-square&logo=linkedin)](https://www.linkedin.com/in/%D1%80%D1%83%D1%81%D1%82%D0%B0%D0%BC-%D0%B0%D1%85%D0%BC%D0%B5%D1%82%D0%B7%D1%8F%D0%BD%D0%BE%D0%B2-1320181ba/)
+
+- Email rustam-dev@outlook.com

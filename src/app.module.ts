@@ -3,8 +3,6 @@ import { seconds, ThrottlerModule } from '@nestjs/throttler';
 
 import { join } from 'node:path';
 
-
-
 import { UsersModule } from './users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { MovieModule } from './movie/movie.module';
@@ -53,7 +51,7 @@ import { RedisModule } from './redis/redis.module';
                     // password: configService.get('REDIS_PASSWORD'),
                 });
                 return {
-                    throttlers: [{ ttl: 60, limit: 10000 }],
+                    throttlers: [{ ttl: 60, limit: 700 }],
                     storage: new ThrottlerStorageRedisService(redisClient),
                     // getTracker: (req, context) => req.headers['x-device-id'],
                 };
