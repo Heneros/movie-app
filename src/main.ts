@@ -12,30 +12,57 @@ import {
     ConsoleLogger,
     ValidationPipe,
 } from '@nestjs/common';
+
+import RedisStore from 'connect-redis';
 //import { PrismaClientExceptionFilter } from './prisma-client-exception/prisma-client-exception.filter';
 import { domain } from './data/defaultData';
 import { winstonLoggerOptions } from './Logger';
 import { WinstonModule } from 'nest-winston';
 
+import { createClient } from 'redis';
+import { redisStore } from 'cache-manager-redis-store';
+
 async function bootstrap() {
-    console.log('App sTART -1');
     const app = await NestFactory.create(AppModule, {
-        //    logger: WinstonModule.createLogger(winstonLoggerOptions),
-        // logger: WinstonLogger(new winstonConfig()),
-        // logger: WinstonModule.createLogger(createWinstonOptions('MovieApp')),
-        //     bufferLogs: true,
+        logger: WinstonModule.createLogger(winstonLoggerOptions),
+        bufferLogs: true,
     });
-    console.log('App sTART 0');
+
+    const redisClient = createClient({
+        url: 'redis://localhost:6379',
+        socket: {
+            reconnectStrategy: (retries) => Math.min(retries * 50, 500),
+        },
+    });
+
+    redisClient.on('error', (err) =>
+        console.error('Redis connection error:', err),
+    );
+
+    redisClient.on('connect', () =>
+        console.log('Redis connected successfully'),
+    );
+
+    const redisStore = new this.redisStore({
+        client: redisClient,
+        prefix: 'sess:',
+        ttl: 31 * 24 * 60 * 60,
+    });
     // const httpServer = createServer(app.getHttpAdapter().getInstance());
     app.enableShutdownHooks();
     app.enableCors({
         origin: domain,
         credentials: true,
     });
-    console.log('App sTART 1');
     app.use(cookieParser());
+
     app.use(
         session({
+            store: redisStore,
+            // store: new (redisStore(session))({
+            //     client: this.redis,
+            //     logErrors: true,
+            // }),
             secret: process.env.SECRET_SESSION,
             resave: false,
             saveUninitialized: false,
@@ -69,7 +96,7 @@ async function bootstrap() {
             },
         }),
     );
-    console.log('App sTART 2');
+    // console.log('App sTART 2');
     // app.useGlobalInterceptors(
     //     new ClassSerializerInterceptor(app.get(Reflector)),
     // );
@@ -120,7 +147,7 @@ async function bootstrap() {
             ],
         },
     });
-    console.log('App created 3 ');
+    // console.log('App created 3 ');
     // app.useWebSocketAdapter(new WsAdapter(app, config, redis, jwt));
     // const { httpAdapter } = app.get(HttpAdapterHost);
     // app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));

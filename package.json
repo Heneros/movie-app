@@ -13,6 +13,7 @@
         "start:dev": "nest start --watch",
         "start:debug": "nest start --debug --watch",
         "start:prod": "node dist/src/main",
+        "install:prod": "npm install && npx prisma generate  && npx prisma migrate dev",
         "migrate": "prisma migrate deploy",
         "seed": "ts-node prisma/seed.ts",
         "start:with-migrations": "npm run migrate && npm run seed && npm run start:dev",
@@ -32,10 +33,6 @@
         "test:cov": "jest --coverage",
         "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
         "test:e2e": "jest --config ./test/jest-e2e.json  --forceExit --detectOpenHandles"
-    },
-    "optionalDependencies": {
-        "@css-inline/css-inline-linux-arm64-musl": "0.14.1",
-        "@css-inline/css-inline-linux-x64-musl": "0.14.3"
     },
     "dependencies": {
         "@apollo/server": "^4.11.3",
@@ -68,6 +65,7 @@
         "class-transformer": "^0.5.1",
         "class-validator": "^0.14.1",
         "cloudinary": "^2.6.0",
+        "connect-redis": "^9.0.0",
         "cookie-parser": "^1.4.7",
         "date-fns": "^4.1.0",
         "express-rate-limit": "^7.5.0",
@@ -83,6 +81,7 @@
         "passport-google-oauth2": "^0.2.0",
         "passport-google-oauth20": "^2.0.0",
         "passport-jwt": "^4.0.1",
+        "redis": "^5.5.6",
         "reflect-metadata": "^0.2.2",
         "rxjs": "^7.8.1",
         "streamifier": "^0.1.1",
@@ -100,6 +99,7 @@
         "@swc/core": "^1.10.7",
         "@types/amqplib": "^0.10.7",
         "@types/bcrypt": "^5.0.2",
+        "@types/connect-redis": "^0.0.23",
         "@types/cookie-parser": "^1.4.8",
         "@types/express": "^5.0.1",
         "@types/express-session": "^1.18.1",

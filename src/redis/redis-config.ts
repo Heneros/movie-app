@@ -22,11 +22,8 @@ export const RedisOptions: CacheModuleAsyncOptions = {
             store: await redisStore({
                 socket: {
                     host: config.host,
-
-                    // host: 'host.docker.internal',
                     port: config.port,
                 },
-                // password: config.password,
             }),
             ttl: config.ttl,
         };

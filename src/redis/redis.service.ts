@@ -1,4 +1,4 @@
-import { RedisClientType } from 'redis';
+import { createClient, RedisClientType } from 'redis';
 import { Injectable, Inject, OnModuleInit } from '@nestjs/common';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 
@@ -21,4 +21,8 @@ export class RedisService implements OnModuleInit {
         if (this.client) await this.client.quit();
         // console.log('[Redis Test] connection closed');
     }
+
+    redisClient = createClient({
+        url: process.env.REDIS_URL,
+    });
 }

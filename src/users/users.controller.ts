@@ -103,9 +103,6 @@ export class UsersController {
     @ApiOperation({ summary: 'Get all accounts users blocked' })
     @ApiBearerAuth('access-token')
     async allBlocked(@Query('page') page: number) {
-        // return await new UserEntity(
-        //     this.queryBus.execute(new GetAllBlockedUsersQuery(page)),
-        // );
         const users = await this.queryBus.execute(
             new GetAllBlockedUsersQuery(page),
         );

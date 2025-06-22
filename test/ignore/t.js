@@ -1,15 +1,18 @@
-var Example = /** @class */ (function () {
-    function Example() {
-        Example.count++;
-    }
-    Example.prototype.getCount = function () {
-        return Example.count;
-    };
-    Example.count = 0;
-    return Example;
-}());
-console.log(Example.count); // 0
-var ex1 = new Example();
-console.log(Example.count); // 1
-var ex2 = new Example();
-console.log(Example.count); // 2
+var users = [
+    { id: 1, name: 'Alice', role: 'admin' },
+    { id: 2, name: 'Bob', role: 'user' },
+    { id: 3, name: 'Charlie', role: 'admin' },
+    { id: 4, name: 'David', role: 'user' },
+];
+function groupBy(array, key) {
+    return array.reduce(function (result, item) {
+        var groupKey = String(item[key]);
+        if (!result[groupKey]) {
+            result[groupKey] = [];
+        }
+        result[groupKey].push(item);
+        return result;
+    }, {});
+}
+var grouped = groupBy(users, 'role');
+console.log(grouped);

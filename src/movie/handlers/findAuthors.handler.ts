@@ -22,9 +22,9 @@ export class FindAuthorHandler implements IQueryHandler<FindAuthorMovieQuery> {
         const cacheKey = `${RedisPrefixEnum.MOVIE_LIST}:author:${id}`;
         const moviesCache = await this.cacheManager.get<Movie[]>(cacheKey);
 
-        console.log('test');
+        // console.log('test');
         if (moviesCache) {
-            console.log('moviesCache 444', moviesCache);
+         //   console.log('moviesCache 444', moviesCache);
             return moviesCache;
         }
 
