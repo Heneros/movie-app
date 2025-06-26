@@ -6,6 +6,9 @@ import cookieParser from 'cookie-parser';
 
 import session from 'express-session';
 import passport from 'passport';
+
+import MemoryStore from 'memorystore';
+
 import {
     BadRequestException,
     ClassSerializerInterceptor,
@@ -19,8 +22,9 @@ import { domain } from './data/defaultData';
 import { winstonLoggerOptions } from './Logger';
 import { WinstonModule } from 'nest-winston';
 
-import { createClient } from 'redis';
-import { redisStore } from 'cache-manager-redis-store';
+import Redis from 'ioredis';
+import { ConfigService } from '@nestjs/config';
+import createMemoryStore from 'memorystore';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule, {
@@ -28,26 +32,18 @@ async function bootstrap() {
         bufferLogs: true,
     });
 
-    const redisClient = createClient({
-        url: 'redis://localhost:6379',
-        socket: {
-            reconnectStrategy: (retries) => Math.min(retries * 50, 500),
-        },
+    const configService = app.get(ConfigService);
+
+    const redisClient = new Redis({
+        host: configService.get('REDIS_HOST'),
+        port: configService.get('REDIS_PORT'),
     });
 
-    redisClient.on('error', (err) =>
-        console.error('Redis connection error:', err),
-    );
-
-    redisClient.on('connect', () =>
-        console.log('Redis connected successfully'),
-    );
-
-    const redisStore = new this.redisStore({
+    const redisStore = new RedisStore({
         client: redisClient,
         prefix: 'sess:',
-        ttl: 31 * 24 * 60 * 60,
     });
+
     // const httpServer = createServer(app.getHttpAdapter().getInstance());
     app.enableShutdownHooks();
     app.enableCors({
@@ -55,14 +51,14 @@ async function bootstrap() {
         credentials: true,
     });
     app.use(cookieParser());
+    
+    const MemoryStore = createMemoryStore(session);
 
     app.use(
         session({
-            store: redisStore,
-            // store: new (redisStore(session))({
-            //     client: this.redis,
-            //     logErrors: true,
-            // }),
+            store: new MemoryStore({
+                checkPeriod: 86400000,
+            }),
             secret: process.env.SECRET_SESSION,
             resave: false,
             saveUninitialized: false,

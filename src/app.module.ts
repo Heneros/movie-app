@@ -1,8 +1,8 @@
-import { MiddlewareConsumer, Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { seconds, ThrottlerModule } from '@nestjs/throttler';
 
 import { join } from 'node:path';
-
+import RedisStore, * as connectRedis from 'connect-redis';
 import { UsersModule } from './users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { MovieModule } from './movie/movie.module';
@@ -23,6 +23,8 @@ import { WinstonModule } from 'nest-winston';
 import { winstonLoggerOptions } from './Logger';
 import { Logger } from 'winston';
 import { RedisModule } from './redis/redis.module';
+import session from 'express-session';
+import { SessionMiddleware } from './middleware/session.middleware';
 
 @Module({
     imports: [
@@ -79,18 +81,15 @@ import { RedisModule } from './redis/redis.module';
     providers: [
         // RedisService,
         Logger,
-        // {
-        //     provide: APP_INTERCEPTOR,
-        //     useClass: CacheInterceptor,
-        // },
+        SessionMiddleware,
         {
             provide: APP_GUARD,
             useClass: GqlThrottlerGuard,
         },
     ],
 })
-export class AppModule {
-    //     public configure(consumer: MiddlewareConsumer): void | MiddlewareConsumer {
-    //         // consumer.apply()
-    //     }
+export class AppModule implements NestModule {
+    configure(consumer: MiddlewareConsumer) {
+        consumer.apply(SessionMiddleware).forRoutes('*');
+    }
 }

@@ -1,32 +1,25 @@
-type User = {
+interface User {
     id: number;
     name: string;
     role: 'admin' | 'user';
-};
+    isActive: boolean;
+}
 
 const users: User[] = [
-    { id: 1, name: 'Alice', role: 'admin' },
-    { id: 2, name: 'Bob', role: 'user' },
-    { id: 3, name: 'Charlie', role: 'admin' },
-    { id: 4, name: 'David', role: 'user' },
+    { id: 1, name: 'Alice', role: 'admin', isActive: true },
+    { id: 2, name: 'Bob', role: 'user', isActive: false },
+    { id: 3, name: 'Charlie', role: 'user', isActive: true },
 ];
 
-function groupBy<T, K extends keyof T>(
-    array: T[],
-    key: K,
-): Record<string, T[]> {
-    return array.reduce(
-        (result, item) => {
-            const groupKey = String(item[key]);
-            if (!result[groupKey]) {
-                result[groupKey] = [];
-            }
-            result[groupKey].push(item);
-            return result;
-        },
-        {} as Record<string, T[]>,
+function filterObjects<T>(items: T[], conditions: Partial<T>): T[] {
+    return items.filter((item) =>
+        Object.entries(conditions).every(([key, value]) => {
+            return item[key as keyof T] === value;
+        }),
     );
 }
 
-const grouped = groupBy(users, 'role');
-console.log(grouped);
+// Хочется получить только активных пользователей
+const activeUsers = filterObjects(users, { isActive: true });
+
+console.log(activeUsers);

@@ -1,0 +1,1 @@
+{"version":3,"file":"createMovie.command.js","sourceRoot":"","sources":["../../../../src/movie/commands/createMovie.command.ts"],"names":[],"mappings":";;;AAGA,MAAa,kBAAkB;IAEP;IACA;IAFpB,YACoB,MAAc,EACd,cAA8B;QAD9B,WAAM,GAAN,MAAM,CAAQ;QACd,mBAAc,GAAd,cAAc,CAAgB;IAC/C,CAAC;CACP;AALD,gDAKC"}

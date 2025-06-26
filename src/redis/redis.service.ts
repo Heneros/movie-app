@@ -21,8 +21,4 @@ export class RedisService implements OnModuleInit {
         if (this.client) await this.client.quit();
         // console.log('[Redis Test] connection closed');
     }
-
-    redisClient = createClient({
-        url: process.env.REDIS_URL,
-    });
 }
