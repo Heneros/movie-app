@@ -19,6 +19,7 @@ import {
     ResetPasswordRequestHandler,
     VerifyEmailHandler,
 } from './handlers/index';
+import { CacheModule } from '@nestjs/cache-manager';
 import { CqrsModule } from '@nestjs/cqrs';
 import { AuthRepository } from './repositories/Auth.repository';
 import { GoogleStrategy } from './passport/GoogleStrategy';
@@ -59,6 +60,7 @@ import { DiscordStrategy } from './passport/DiscordStrategy';
         PrismaModule,
         CqrsModule,
         PassportModule,
+        CacheModule.register(),
         JwtModule.register({
             global: true,
             secret: jwtConstants.secret,

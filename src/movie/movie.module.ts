@@ -5,7 +5,6 @@ import { PrismaModule } from '@/prisma/prisma.module';
 import { MovieResolver } from './movie.resolver';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { CqrsModule } from '@nestjs/cqrs';
-import { RedisService } from '@/redis/redis.service';
 import { CloudinaryModule } from '@/cloudinary/cloudinary.module';
 
 import * as Handlers from './handlers';
@@ -13,6 +12,7 @@ import { MovieRepository } from './repositories/movie.repository';
 import { ReviewRepository } from './repositories/review.repository';
 import { RedisModule } from '@/redis/redis.module';
 import { Logger } from 'winston';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
     controllers: [MovieController],
@@ -28,6 +28,7 @@ import { Logger } from 'winston';
         CloudinaryModule,
         RedisModule,
         Logger,
+        CacheModule.register(),
         // CacheModule.register({
         //     isGlobal: true,
         // }),

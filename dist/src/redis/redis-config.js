@@ -6,6 +6,8 @@ const cache_manager_redis_store_1 = require("cache-manager-redis-store");
 exports.RedisConfig = (0, config_1.registerAs)('redis', () => ({
     host: process.env.REDIS_HOST || 'redis',
     port: parseInt(process.env.REDIS_PORT || '6379', 10),
+    username: process.env.REDIS_USERNAME || 'default',
+    password: process.env.REDIS_PASSWORD || '',
     ttl: parseInt(process.env.REDIS_TTL || '60000', 10),
 }));
 exports.RedisOptions = {
@@ -16,6 +18,8 @@ exports.RedisOptions = {
         const config = configService.get('redis');
         return {
             store: await (0, cache_manager_redis_store_1.redisStore)({
+                username: config.username,
+                password: config.password,
                 socket: {
                     host: config.host,
                     port: config.port,

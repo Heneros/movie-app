@@ -9,16 +9,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RedisModule = void 0;
 const common_1 = require("@nestjs/common");
 const redis_service_1 = require("./redis.service");
-const cache_manager_1 = require("@nestjs/cache-manager");
-const redis_config_1 = require("./redis-config");
+const config_1 = require("@nestjs/config");
 let RedisModule = class RedisModule {
 };
 exports.RedisModule = RedisModule;
 exports.RedisModule = RedisModule = __decorate([
     (0, common_1.Module)({
-        imports: [cache_manager_1.CacheModule.registerAsync(redis_config_1.RedisOptions)],
-        exports: [redis_service_1.RedisService],
+        imports: [config_1.ConfigModule.forRoot({ isGlobal: true })],
         providers: [redis_service_1.RedisService],
+        exports: [redis_service_1.RedisService],
     })
 ], RedisModule);
 //# sourceMappingURL=redis.module.js.map

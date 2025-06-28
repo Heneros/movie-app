@@ -17,6 +17,7 @@ import {
 import { CloudinaryModule } from '@/cloudinary/cloudinary.module';
 import { UsersResolver } from './users.resolver';
 import { PubSub } from 'graphql-subscriptions';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
     controllers: [UsersController],
@@ -40,7 +41,12 @@ import { PubSub } from 'graphql-subscriptions';
             useValue: new PubSub(),
         },
     ],
-    imports: [PrismaModule, MailModule, CloudinaryModule],
+    imports: [
+        PrismaModule,
+        MailModule,
+        CloudinaryModule,
+        CacheModule.register(),
+    ],
     exports: [UsersService],
 })
 export class UsersModule {}

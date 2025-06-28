@@ -1,5 +1,4 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { FindDraftsMovieQuery } from '../queries/findDrafts.query';
 import { MovieRepository } from '@/movie/repositories/movie.repository';
 import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
@@ -24,7 +23,7 @@ export class FindAuthorHandler implements IQueryHandler<FindAuthorMovieQuery> {
 
         // console.log('test');
         if (moviesCache) {
-         //   console.log('moviesCache 444', moviesCache);
+            //   console.log('moviesCache 444', moviesCache);
             return moviesCache;
         }
 

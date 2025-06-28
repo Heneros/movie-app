@@ -95,16 +95,6 @@ services:
   networks:
     app_movie:
 
- redisinsight:
-    container_name: re-insig
-    image: redislabs/redisinsight:latest
-    ports:
-      - "8001:8001"
-    depends_on:
-      - redis
-    volumes:
-      - ./data/redisinsight:/db
-    restart: always
 
  nestjs:
     build:
@@ -118,10 +108,9 @@ services:
          redis:
           condition: service_healthy 
     env_file: ./.env.prod
-    # environment:
-    # - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
-    #   - REDIS_HOST=redis
-    #   - NODE_ENV=production
+    environment:
+      REDIS_HOST: nest-projectfour-redis
+      REDIS_PORT: 6379
     #  - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres-master:5432/${POSTGRES_DB}?schema=public
     ports:
      - 3000:3000

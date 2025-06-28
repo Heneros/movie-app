@@ -1,9 +1,9 @@
-import { OnModuleInit } from '@nestjs/common';
-import { Cache } from '@nestjs/cache-manager';
-export declare class RedisService implements OnModuleInit {
-    private readonly cache;
+import { OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+export declare class RedisService implements OnModuleInit, OnModuleDestroy {
+    private readonly configService;
     private client;
-    constructor(cache: Cache);
+    constructor(configService: ConfigService);
     onModuleInit(): Promise<void>;
     onModuleDestroy(): Promise<void>;
 }

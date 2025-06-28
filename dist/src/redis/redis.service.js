@@ -8,37 +8,40 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RedisService = void 0;
+const redis_1 = require("redis");
 const common_1 = require("@nestjs/common");
-const cache_manager_1 = require("@nestjs/cache-manager");
+const config_1 = require("@nestjs/config");
 let RedisService = class RedisService {
-    cache;
+    configService;
     client;
-    constructor(cache) {
-        this.cache = cache;
+    constructor(configService) {
+        this.configService = configService;
+        this.client = (0, redis_1.createClient)({
+            socket: {
+                host: this.configService.get('REDIS_HOST'),
+                port: this.configService.get('REDIS_PORT'),
+            },
+            password: this.configService.get('REDIS_PASSWORD') || undefined,
+        });
+        this.client.on('error', (err) => {
+            console.error('Redis Client Error:', err);
+        });
+        this.client.on('connect', () => {
+            console.log('Connected to Redis');
+        });
     }
     async onModuleInit() {
-        try {
-            await this.cache.set('test-key', 'hello redis', 60000);
-            const value = await this.cache.get('test-key');
-        }
-        catch (err) {
-            console.error(`${err} Redis`);
-        }
+        await this.client.connect();
     }
     async onModuleDestroy() {
-        if (this.client)
-            await this.client.quit();
+        await this.client.disconnect();
     }
 };
 exports.RedisService = RedisService;
 exports.RedisService = RedisService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, common_1.Inject)(cache_manager_1.CACHE_MANAGER)),
-    __metadata("design:paramtypes", [cache_manager_1.Cache])
+    __metadata("design:paramtypes", [config_1.ConfigService])
 ], RedisService);
 //# sourceMappingURL=redis.service.js.map

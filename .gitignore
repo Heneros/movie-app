@@ -2,8 +2,12 @@
 
 /node_modules
 /build
-1features.txt
+/dist 
+
+
+*.txt
 *.pem
+
 *-audit.json
 .*-audit.json
 *.env
