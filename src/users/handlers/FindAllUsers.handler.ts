@@ -24,7 +24,6 @@ export class FindAllUsersHandler implements IQueryHandler<FindAllUsersQuery> {
         const start = Date.now();
         if (cached) {
             const end = Date.now();
-            console.log(`1234567123`);
 
             console.log(`Cache HIT for page ${page}, took ${end - start}ms`);
             return cached;

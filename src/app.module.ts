@@ -13,7 +13,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { CqrsModule } from '@nestjs/cqrs';
-import { RedisConfig, RedisOptions } from './redis/redis-config';
+// import { RedisConfig, RedisOptions } from './redis/redis-config';
 import { GqlThrottlerGuard } from './guards/gql-throttler.guard';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
@@ -37,7 +37,7 @@ import { SessionMiddleware } from './middleware/session.middleware';
             isGlobal: true,
             expandVariables: true,
             envFilePath: './.env',
-            load: [RedisConfig],
+            // load: [RedisConfig],
         }),
         RedisModule,
         // WinstonModule.forRoot(createWinstonOptions('Movie')),

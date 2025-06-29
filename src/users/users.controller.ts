@@ -41,7 +41,6 @@ import { Roles } from '@/decorators/roles.decorator';
 import { CheckUserExistPipe } from './pipe/CheckUserExist.pipe';
 import { ProfileOwnerGuard } from '../guards/ProfileOwner.guard';
 import { UpdateUserRole } from './dto-input/update-user-role.dto';
-// import { UserUpdatedProfileEntity } from './entities/updated-profile.entity';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {
     FindAllUsersQuery,

@@ -13,7 +13,12 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     private client: RedisClientType;
 
     //  constructor(@Inject(CACHE_MANAGER) private readonly cache: Cache) {}
-    constructor(private readonly configService: ConfigService) {
+    constructor(
+        private readonly configService: ConfigService,
+
+        @Inject(RedisRepository)
+        private readonly redisRepository: RedisRepository,
+    ) {
         this.client = createClient({
             socket: {
                 host: this.configService.get<string>('REDIS_HOST'),
@@ -39,4 +44,20 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     async onModuleDestroy() {
         await this.client.disconnect();
     }
+
+    getClient(): RedisClientType {
+        return this.client;
+    }
+
+    // async get(prefix: string, key: string): Promise<string | null> {
+    //     return this.client.get(`${prefix}:${key}`);
+    // }
+
+    // async set(prefix: string, key: string, value: string): Promise<void> {
+    //     await this.client.set(`${prefix}:${key}`, value);
+    // }
+
+    // async delete(prefix: string, key: string): Promise<void> {
+    //     await this.client.del(`${prefix}:${key}`);
+    // }
 }

@@ -13,6 +13,7 @@ import { ReviewRepository } from './repositories/review.repository';
 import { RedisModule } from '@/redis/redis.module';
 import { Logger } from 'winston';
 import { CacheModule } from '@nestjs/cache-manager';
+import { RedisService } from '@/redis/redis.service';
 
 @Module({
     controllers: [MovieController],
@@ -21,9 +22,11 @@ import { CacheModule } from '@nestjs/cache-manager';
         MovieRepository,
         ReviewRepository,
         MovieResolver,
+        RedisService,
     ],
     imports: [
         PrismaModule,
+
         CqrsModule,
         CloudinaryModule,
         RedisModule,
