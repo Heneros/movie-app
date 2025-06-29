@@ -7,6 +7,10 @@ import {
 } from '@nestjs/common';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { ConfigService } from '@nestjs/config';
+import { RedisRepository } from './redis.repository';
+import { Movie } from '@prisma/client';
+import { RedisPrefixEnum } from '@/data/redis-prefix-enum';
+import { CACHE_TTL } from '@/data/ttl';
 
 @Injectable()
 export class RedisService implements OnModuleInit, OnModuleDestroy {
@@ -49,15 +53,25 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
         return this.client;
     }
 
-    // async get(prefix: string, key: string): Promise<string | null> {
-    //     return this.client.get(`${prefix}:${key}`);
-    // }
+    async saveMovies(page: string, data: any): Promise<void> {
+        await this.redisRepository.setWithExpiry(
+            RedisPrefixEnum.MOVIE_LIST,
+            page,
+            JSON.stringify(data),
+            CACHE_TTL.ONE_HOUR,
+        );
+    }
 
-    // async set(prefix: string, key: string, value: string): Promise<void> {
-    //     await this.client.set(`${prefix}:${key}`, value);
-    // }
+    async getMovies(moviePage: string) {
+        const movie = await this.redisRepository.get(
+            RedisPrefixEnum.MOVIE_LIST,
+            moviePage,
+        );
 
-    // async delete(prefix: string, key: string): Promise<void> {
-    //     await this.client.del(`${prefix}:${key}`);
-    // }
+        try {
+            return JSON.parse(movie);
+        } catch {
+            return null;
+        }
+    }
 }
