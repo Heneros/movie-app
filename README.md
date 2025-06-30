@@ -55,7 +55,7 @@ To explore the available API endpoints, open Swagger in your browse
 
 [To to read swagger](http://localhost:3000/api)
 
-## ▶ Start Using the API
+## Start Using the API
 
 A sample endpoint to get started:
 
