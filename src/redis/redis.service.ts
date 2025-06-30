@@ -31,13 +31,13 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
             //// password:   this.configService.get<string>('REDIS_PASSWORD') || undefined,
         });
 
-        this.client.on('error', (err) => {
-            console.error('Redis Client Error:', err);
-        });
+        // this.client.on('error', (err) => {
+        //     console.error('Redis Client Error:', err);
+        // });
 
-        this.client.on('connect', () => {
-            console.log('Connected to Redis');
-        });
+        // this.client.on('connect', () => {
+        //     console.log('Connected to Redis');
+        // });
     }
 
     async onModuleInit() {
