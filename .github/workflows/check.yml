@@ -81,7 +81,7 @@ jobs:
                  echo "NODE_ENV=test" >>  $GITHUB_ENV
                  echo "REDIS_HOST=localhost" >> $GITHUB_ENV
                  echo "REDIS_PORT=6379" >> $GITHUB_ENV
-                 echo "REDIS_PASSWORD=testpass" >> $GITHUB_ENV
+           
                  echo "JWT_ACCESS_SECRET=testjwtaccess" >> $GITHUB_ENV
                  echo "JWT_REFRESH_SECRET=testjwtaccess" >> $GITHUB_ENV
                  echo "SECRET_SESSION=testjwtacsesion" >> $GITHUB_ENV
