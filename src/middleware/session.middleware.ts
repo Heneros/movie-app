@@ -33,7 +33,7 @@ export class SessionMiddleware implements NestMiddleware {
             },
         });
 
-        console.log('Redis session middleware initialized');
+        //  console.log('Redis session middleware initialized');
     }
 
     use(req: Request, res: Response, next: NextFunction) {

@@ -62,6 +62,13 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
         );
     }
 
+    async deleteMovies(moviePage: string) {
+        await this.redisRepository.delete(
+            RedisPrefixEnum.MOVIE_LIST,
+            moviePage,
+        );
+    }
+
     async getMovies(moviePage: string) {
         const movie = await this.redisRepository.get(
             RedisPrefixEnum.MOVIE_LIST,

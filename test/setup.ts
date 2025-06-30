@@ -22,6 +22,7 @@ import { GoogleService } from '@/auth/services';
 import { GoogleStrategy } from '@/auth/passport/GoogleStrategy';
 import { GithubStrategy } from '@/auth/passport/GithubStrategy';
 import { DiscordStrategy } from '@/auth/passport/DiscordStrategy';
+import { RedisRepository } from '@/redis/redis.repository';
 
 export const mockMailService = {
     sendEmail: jest.fn().mockImplementation(() => Promise.resolve(true)),
@@ -30,6 +31,7 @@ export const mockMailService = {
 
 export let app: INestApplication;
 export let prisma: PrismaService;
+export let redisRepo: RedisRepository;
 
 beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -67,9 +69,12 @@ beforeAll(async () => {
 
     await app.init();
 
+    redisRepo = moduleFixture.get(RedisRepository);
+
     try {
         prisma = app.get(PrismaService);
         await clearDatabase(prisma);
+        await redisRepo.flushAll();
     } catch (e) {
         console.warn('clearDatabase in beforeAll failed:', e);
     }
@@ -80,6 +85,7 @@ afterAll(async () => {
         try {
             prisma = app.get(PrismaService);
             await clearDatabase(prisma);
+            await redisRepo.flushAll();
         } catch (e) {
             console.warn('clearDatabase in afterAll failed:', e);
         }

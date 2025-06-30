@@ -21,6 +21,10 @@ export class RedisRepository implements OnModuleDestroy {
         await this.redisClient.del(`${prefix}:${key}`);
     }
 
+    async flushAll(): Promise<void> {
+        await this.redisClient.flushdb();
+    }
+
     async setWithExpiry(
         prefix: string,
         key: string,

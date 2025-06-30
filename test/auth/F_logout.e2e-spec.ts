@@ -83,6 +83,5 @@ describe('Auth - Logout (e2e) /auth/logout', () => {
         expect(mockResponse.clearCookie).toHaveBeenCalledWith('jwtMovie');
         expect(mockResponse.clearCookie).toHaveBeenCalledWith('connect.sid');
         expect(result).toBe('Logged out successfully');
-
     });
 });

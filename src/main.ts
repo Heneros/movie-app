@@ -32,17 +32,17 @@ async function bootstrap() {
         bufferLogs: true,
     });
 
-    const configService = app.get(ConfigService);
+    // const configService = app.get(ConfigService);
 
-    const redisClient = new Redis({
-        host: configService.get('REDIS_HOST'),
-        port: configService.get('REDIS_PORT'),
-    });
+    // const redisClient = new Redis({
+    //     host: configService.get('REDIS_HOST'),
+    //     port: configService.get('REDIS_PORT'),
+    // });
 
-    const redisStore = new RedisStore({
-        client: redisClient,
-        prefix: 'sess:',
-    });
+    // const redisStore = new RedisStore({
+    //     client: redisClient,
+    //     prefix: 'sess:',
+    // });
 
     // const httpServer = createServer(app.getHttpAdapter().getInstance());
     app.enableShutdownHooks();
@@ -51,7 +51,7 @@ async function bootstrap() {
         credentials: true,
     });
     app.use(cookieParser());
-    
+
     const MemoryStore = createMemoryStore(session);
 
     app.use(

@@ -44,8 +44,8 @@ export class FindAllMovieHandler implements IQueryHandler<FindAllMovieQuery> {
             String(skip),
             allMovies,
         );
-        console.log('Saving to Redis:', allMovies.length, 'movies');
-        console.log('Cache Miss:', Date.now() - start, 'ms');
+        // console.log('Saving to Redis:', allMovies.length, 'movies');
+        // console.log('Cache Miss:', Date.now() - start, 'ms');
         return { allMovies };
     }
 }
