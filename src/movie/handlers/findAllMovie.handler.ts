@@ -24,7 +24,7 @@ export class FindAllMovieHandler implements IQueryHandler<FindAllMovieQuery> {
         if (movieCached) {
             //  const parsed = JSON.parse(cached as string) as Movie[];
             console.log(
-                'Cache Hit:',
+                'Cache Hit35:',
                 (performance.now() - start).toFixed(2),
                 'ms',
             );

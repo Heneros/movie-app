@@ -5,39 +5,46 @@ import {
     OnModuleInit,
     OnModuleDestroy,
 } from '@nestjs/common';
-import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { ConfigService } from '@nestjs/config';
 import { RedisRepository } from './redis.repository';
-import { Movie } from '@prisma/client';
+
 import { RedisPrefixEnum } from '@/data/redis-prefix-enum';
 import { CACHE_TTL } from '@/data/ttl';
+import { isTest } from '@/data/defaultData';
 
 @Injectable()
 export class RedisService implements OnModuleInit, OnModuleDestroy {
-    private client: RedisClientType;
+    // private client: RedisClientType;
 
-    //  constructor(@Inject(CACHE_MANAGER) private readonly cache: Cache) {}
     constructor(
         private readonly configService: ConfigService,
 
         @Inject(RedisRepository)
         private readonly redisRepository: RedisRepository,
+        @Inject('RedisClient') private readonly client: RedisClientType,
     ) {
+        const socket = {
+            host: this.configService.get<string>('REDIS_HOST'),
+            port: this.configService.get<number>('REDIS_PORT'),
+        };
+
         this.client = createClient({
-            socket: {
-                host: this.configService.get<string>('REDIS_HOST'),
-                port: this.configService.get<number>('REDIS_PORT'),
-            },
-            //// password:   this.configService.get<string>('REDIS_PASSWORD') || undefined,
+            // url,
+            socket,
         });
-
-        // this.client.on('error', (err) => {
-        //     console.error('Redis Client Error:', err);
-        // });
-
-        // this.client.on('connect', () => {
-        //     console.log('Connected to Redis');
-        // });
+        // if (!isTest) {
+        //     this.client = createClient({
+        //         // url,
+        //         socket,
+        //         // username: this.configService.get<string>('REDIS_USERNAME'),
+        //         // password: this.configService.get<string>('REDIS_PASSWORD'),
+        //     });
+        // } else {
+        //     this.client = createClient({
+        //         // url,
+        //         socket,
+        //     });
+        // }
     }
 
     async onModuleInit() {

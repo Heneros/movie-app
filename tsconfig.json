@@ -40,7 +40,7 @@
                 "src/*"
             ],
             "@/src/movie/*": [
-                "src/users/*"
+                "src/movie/*"
             ],
             "@/src/users/*": [
                 "src/users/*"

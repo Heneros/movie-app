@@ -23,6 +23,7 @@ import { RedisService } from '@/redis/redis.service';
         ReviewRepository,
         MovieResolver,
         RedisService,
+        
     ],
     imports: [
         PrismaModule,
@@ -32,6 +33,7 @@ import { RedisService } from '@/redis/redis.service';
         RedisModule,
         Logger,
         CacheModule.register(),
+
         // CacheModule.register({
         //     isGlobal: true,
         // }),

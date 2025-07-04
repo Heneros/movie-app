@@ -18,13 +18,15 @@ import { GqlThrottlerGuard } from './guards/gql-throttler.guard';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
-import Redis from 'ioredis';
+// import Redis from 'ioredis';
 import { WinstonModule } from 'nest-winston';
 import { winstonLoggerOptions } from './Logger';
 import { Logger } from 'winston';
 import { RedisModule } from './redis/redis.module';
-import session from 'express-session';
-import { SessionMiddleware } from './middleware/session.middleware';
+// import session from 'express-session';
+// import { SessionMiddleware } from './middleware/session.middleware';
+import Redis from 'ioredis';
+import { isProduction } from './data/defaultData';
 
 @Module({
     imports: [
@@ -36,7 +38,7 @@ import { SessionMiddleware } from './middleware/session.middleware';
         ConfigModule.forRoot({
             isGlobal: true,
             expandVariables: true,
-            envFilePath: './.env',
+            envFilePath: isProduction ? './.env.prod' : './.env',
             // load: [RedisConfig],
         }),
         RedisModule,
@@ -81,7 +83,7 @@ import { SessionMiddleware } from './middleware/session.middleware';
     providers: [
         // RedisService,
         Logger,
-        SessionMiddleware,
+        //      SessionMiddleware,
         {
             provide: APP_GUARD,
             useClass: GqlThrottlerGuard,

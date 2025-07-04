@@ -81,7 +81,6 @@ services:
 
  redis:
   image: redis:7.4
-#   container_name: 'redis-nestjs'
   restart: always
   ports:
    - '6379:6379'
@@ -96,21 +95,23 @@ services:
     app_movie:
 
 
+
+
  nestjs:
     build:
         context: .
         dockerfile: ./docker/prod/nestjs/Dockerfile
         target: production  
-    restart: unless-stopped
+    restart: always
     depends_on:
          postgres:
           condition: service_healthy
          redis:
           condition: service_healthy 
     env_file: ./.env.prod
-    environment:
-      REDIS_HOST: nest-projectfour-redis
-      REDIS_PORT: 6379
+    # environment:
+    #   REDIS_HOST: nest-projectfour-redis
+    #   REDIS_PORT: 6379
     #  - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres-master:5432/${POSTGRES_DB}?schema=public
     ports:
      - 3000:3000
