@@ -4,9 +4,7 @@ import { Inject, NotFoundException } from '@nestjs/common';
 import { performance } from 'perf_hooks';
 
 import { MovieRepository } from './../repositories/movie.repository';
-import { Movie } from '@prisma/client';
-import { CACHE_TTL } from '@/data/ttl';
-import { RedisPrefixEnum } from '@/data/redis-prefix-enum';
+
 import { RedisService } from '@/redis/redis.service';
 
 @QueryHandler(FindAllMovieQuery)
@@ -21,6 +19,7 @@ export class FindAllMovieHandler implements IQueryHandler<FindAllMovieQuery> {
 
         const start = performance.now();
         const movieCached = await this.redisService.getMovies(String(skip));
+        console.log('test555');
         if (movieCached) {
             //  const parsed = JSON.parse(cached as string) as Movie[];
             console.log(

@@ -18,12 +18,10 @@ import {
 
 import RedisStore from 'connect-redis';
 //import { PrismaClientExceptionFilter } from './prisma-client-exception/prisma-client-exception.filter';
-import { domain } from './data/defaultData';
+import { domain, domainClient } from './data/defaultData';
 import { winstonLoggerOptions } from './Logger';
 import { WinstonModule } from 'nest-winston';
 
-import Redis from 'ioredis';
-import { ConfigService } from '@nestjs/config';
 import createMemoryStore from 'memorystore';
 
 async function bootstrap() {
@@ -47,7 +45,7 @@ async function bootstrap() {
     // const httpServer = createServer(app.getHttpAdapter().getInstance());
     app.enableShutdownHooks();
     app.enableCors({
-        origin: domain,
+        origin: [domain, domainClient],
         credentials: true,
     });
     app.use(cookieParser());

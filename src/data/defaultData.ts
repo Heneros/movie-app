@@ -6,6 +6,7 @@ export const jwtConstants = {
 
 export const roundsOfHashing = 10;
 export const domain = process.env.DOMAIN_DEV;
+export const domainClient = process.env.DOMAIN_CLIENT;
 
 export const tempTokenDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 export const tempRegisterDate = new Date(Date.now() + 10 * 60 * 1000);
