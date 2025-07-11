@@ -7,6 +7,24 @@
         "paths": {
             "@/*": [
                 "src/*"
+            ],
+            "@/src/movie/*": [
+                "src/movie/*"
+            ],
+            "@/src/users/*": [
+                "src/users/*"
+            ],
+            "@/src/auth/*": [
+                "src/auth/*"
+            ],
+            "@/src/redis/*": [
+                "src/redis/*"
+            ],
+            "@types/*": [
+                "src/types/*"
+            ],
+            "test/*": [
+                "test/*"
             ]
         }
     },
