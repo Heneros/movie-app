@@ -28,8 +28,8 @@
         "strictBindCallApply": false,
         "forceConsistentCasingInFileNames": false,
         "noFallthroughCasesInSwitch": false,
-        "composite": true,
-        "noEmit": true,
+        "composite": false,
+        "noEmit": false,
         "lib": [
             "es2018",
             "esnext",
