@@ -12,11 +12,7 @@
             }
         }
     ],
-    "env": {
-        "DATABASE_URL": "@database_url",
-        "NODE_ENV": "production",
-        "SECRET_SESSION": "@secret_session"
-    },
+
     "routes": [
         {
             "src": "/(.*)",
