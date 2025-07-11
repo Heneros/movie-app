@@ -6,6 +6,10 @@
             "use": "@vercel/node"
         }
     ],
+    "env": {
+        "DATABASE_URL": "$database_url",
+         "NODE_ENV": "$node_env"
+    },    
     "routes": [
         {
             "src": "/(.*)",
@@ -23,5 +27,5 @@
             }
         }
     ],
-    "outputDirectory": "dist"
+    "outputDirectory": "dist/src/main.js"
 }
