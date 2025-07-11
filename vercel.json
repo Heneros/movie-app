@@ -12,7 +12,7 @@
             }
         }
     ],
-
+    "env": {},
     "routes": [
         {
             "src": "/(.*)",
@@ -31,5 +31,6 @@
                 "Access-Control-Allow-Headers": "Content-Type, Authorization"
             }
         }
-    ]
+    ],
+    "outputDirectory": "dist/src/main.js"
 }
