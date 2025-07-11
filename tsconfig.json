@@ -4,7 +4,6 @@
         "target": "ESNext",
         "moduleResolution": "node",
         "declaration": true,
-        "composite": true,
         "removeComments": true,
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
@@ -29,6 +28,10 @@
         "strictBindCallApply": false,
         "forceConsistentCasingInFileNames": false,
         "noFallthroughCasesInSwitch": false,
+
+        
+        "composite": false,
+        "noEmit": false,
         "lib": [
             "es2018",
             "esnext",
