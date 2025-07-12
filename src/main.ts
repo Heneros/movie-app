@@ -1,5 +1,4 @@
-// import 'tsconfig-paths/register';
-import 'tsconfig-paths/register';
+import 'module-alias/register';
 
 import { HttpAdapterHost, NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';

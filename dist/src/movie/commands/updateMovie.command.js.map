@@ -1,0 +1,1 @@
+{"version":3,"file":"updateMovie.command.js","sourceRoot":"","sources":["../../../../src/movie/commands/updateMovie.command.ts"],"names":[],"mappings":";;;AAGA,MAAa,kBAAkB;IAEP;IACA;IAFpB,YACoB,EAAU,EACV,cAA8B;QAD9B,OAAE,GAAF,EAAE,CAAQ;QACV,mBAAc,GAAd,cAAc,CAAgB;IAC/C,CAAC;CACP;AALD,gDAKC"}

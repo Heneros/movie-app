@@ -7,12 +7,12 @@
     "license": "UNLICENSED",
     "scripts": {
         "prestart:dev": "rimraf dist",
-        "build": "nest build && cp tsconfig.json dist && cp tsconfig.json dist/src",
+        "build": "nest build && cpx tsconfig.json dist && cpx tsconfig.json dist/src",
         "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
         "start": "nest start",
         "start:dev": "nest start --watch",
         "start:debug": "nest start --debug --watch",
-        "start:prod": "node -r tsconfig-paths/register dist/src/main",
+        "start:prod": "node -r module-alias/register  dist/src/main",
         "build:prod": "npm run build && node dist/src/main.js",
         "migrate": "prisma migrate deploy",
         "seed": "ts-node prisma/seed.ts",
@@ -77,6 +77,7 @@
         "graphql-subscriptions": "^3.0.0",
         "ioredis": "^5.6.0",
         "memorystore": "^1.6.7",
+        "module-alias": "^2.2.3",
         "multer": "^1.4.5-lts.2",
         "nest-winston": "^1.10.2",
         "passport": "^0.7.0",
@@ -120,6 +121,7 @@
         "@types/passport-github2": "^1.2.9",
         "@types/passport-google-oauth20": "^2.0.16",
         "@types/supertest": "^6.0.2",
+        "cpx": "^1.5.0",
         "eslint": "^9.18.0",
         "eslint-config-prettier": "^10.0.1",
         "eslint-plugin-prettier": "^5.2.2",
@@ -134,6 +136,13 @@
         "ts-node": "^10.9.2",
         "typescript": "^5.7.3",
         "typescript-eslint": "^8.20.0"
+    },
+    "_moduleAliases": {
+        "@": "dist/src",
+        "@/src": "dist/src",
+        "@/prisma": "dist/src/prisma",
+        "@/users": "dist/src/users",
+        "@/auth": "dist/src/auth"
     },
     "jest": {
         "moduleFileExtensions": [

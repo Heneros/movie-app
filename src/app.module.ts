@@ -25,7 +25,8 @@ import { Logger } from 'winston';
 import { RedisModule } from './redis/redis.module';
 // import session from 'express-session';
 // import { SessionMiddleware } from './middleware/session.middleware';
-import Redis from 'ioredis';
+// import Redis from 'ioredis';/
+import { Redis } from '@upstash/redis';
 import { isProduction } from './data/defaultData';
 
 @Module({
@@ -45,22 +46,31 @@ import { isProduction } from './data/defaultData';
         // WinstonModule.forRoot(createWinstonOptions('Movie')),
         WinstonModule.forRoot(winstonLoggerOptions),
         Logger,
-        ThrottlerModule.forRootAsync({
-            imports: [ConfigModule],
-            inject: [ConfigService],
-            useFactory: async (configService: ConfigService) => {
-                const redisClient = new Redis({
-                    host: configService.get('REDIS_HOST'),
-                    port: configService.get('REDIS_PORT'),
-                    // password: configService.get('REDIS_PASSWORD'),
-                });
-                return {
-                    throttlers: [{ ttl: 60, limit: 700 }],
-                    storage: new ThrottlerStorageRedisService(redisClient),
-                    // getTracker: (req, context) => req.headers['x-device-id'],
-                };
-            },
-        }),
+        // ThrottlerModule.forRootAsync({
+        //     imports: [ConfigModule],
+
+        //     inject: [ConfigService],
+        //     useFactory: async (configService: ConfigService) => {
+        //         const redisClient = new Redis({
+        //             url: configService.get('REDIS_URL'),
+        //             token: configService.get('REDIS_TOKEN'),
+        //             // password: configService.get('REDIS_PASSWORD'),
+        //         });
+
+        //         const redisUrl = configService.get<string>('REDIS_URL');
+
+        //         const redisToken = configService.get<string>('REDIS_TOKEN');
+        //         if (!redisUrl || !redisToken) {
+        //             throw new Error('Missing Upstash Redis config');
+        //         }
+
+        //         return {
+        //             throttlers: [{ ttl: 60, limit: 700 }],
+        //             storage: new ThrottlerStorageRedisService(redisClient),
+        //             // getTracker: (req, context) => req.headers['x-device-id'],
+        //         };
+        //     },
+        // }),
 
         GraphQLModule.forRoot<ApolloDriverConfig>({
             driver: ApolloDriver,

@@ -1,0 +1,32 @@
+import { Request, Response } from 'express';
+import { AuthEntity } from './entity-objectType/auth.entity';
+import { LogInDto } from './dto-input/Login.dto';
+import { CreateUserDto } from './dto-input/Create-user.dto';
+import { ResetPasswordDto } from './dto-input/Reset-password.dto';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { CustomRequest } from '@/types/cus-request';
+import { EmailDto } from './dto-input/Resend-email.dto';
+import { JwtService } from '@nestjs/jwt';
+import { DiscordService, GithubService, GoogleService } from './services';
+export declare class AuthController {
+    private readonly commandBus;
+    private readonly queryBus;
+    private readonly googleService;
+    private readonly githubService;
+    private readonly discordService;
+    private jwt;
+    constructor(commandBus: CommandBus, queryBus: QueryBus, googleService: GoogleService, githubService: GithubService, discordService: DiscordService, jwt: JwtService);
+    create(createUserDto: CreateUserDto): Promise<any>;
+    verifyEmail(token: string, userId: number): Promise<any>;
+    login(req: CustomRequest, res: Response, logInDto: LogInDto): Promise<AuthEntity>;
+    resendEmailValidation(userId: number, emailDto: EmailDto): Promise<AuthEntity>;
+    requestResetPassword(userId: number, emailDto: EmailDto, res: Response): Promise<any>;
+    resetPassword(userId: number, emailToken: string, resetPasswordDto: ResetPasswordDto): Promise<any>;
+    logout(req: Request, res: Response): Promise<void>;
+    googleAuth(): Promise<void>;
+    googleAuthRedirect(req: Request, res: Response): Promise<void | Response<any, Record<string, any>>>;
+    githubAuth(): void;
+    githubAuthCallback(req: any, res: Response): Promise<Response<any, Record<string, any>>>;
+    discordAuth(): void;
+    discordAuthCallback(req: any, res: Response): Promise<Response<any, Record<string, any>>>;
+}

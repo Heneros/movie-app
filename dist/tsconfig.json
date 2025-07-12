@@ -1,0 +1,72 @@
+{
+    "compilerOptions": {
+        "module": "CommonJS",
+        "target": "ESNext",
+        "moduleResolution": "node",
+        "declaration": true,
+        "removeComments": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "allowSyntheticDefaultImports": true,
+        "sourceMap": true,
+        "types": [
+            "express",
+            "jest",
+            "node"
+        ],
+        "typeRoots": [
+            "types",
+            "./node_modules/@types"
+        ],
+        "outDir": "./dist/",
+        "baseUrl": ".",
+        "incremental": true,
+        "skipLibCheck": true,
+        "strictNullChecks": false,
+        "esModuleInterop": true,
+        "noImplicitAny": false,
+        "strictBindCallApply": false,
+        "forceConsistentCasingInFileNames": false,
+        "noFallthroughCasesInSwitch": false,
+        "composite": false,
+        "noEmit": false,
+        "lib": [
+            "es2018",
+            "esnext",
+            "dom",
+            "ESNext.AsyncIterable",
+        ],
+        "paths": {
+            "@/*": [
+                "src/*"
+            ],
+            "@/src/movie/*": [
+                "src/movie/*"
+            ],
+            "@/src/users/*": [
+                "src/users/*"
+            ],
+            "@/src/auth/*": [
+                "src/auth/*"
+            ],
+            "@/src/redis/*": [
+                "src/redis/*"
+            ],
+            "@types/*": [
+                "src/types/*"
+            ],
+            "test/*": [
+                "test/*"
+            ]
+        }
+    },
+    "include": [
+        "test/**/*",
+        "src/**/*",
+        "types"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist"
+    ]
+}

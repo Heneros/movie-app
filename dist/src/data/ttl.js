@@ -1,0 +1,16 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CACHE_TTL = void 0;
+var CACHE_TTL;
+(function (CACHE_TTL) {
+    CACHE_TTL[CACHE_TTL["TEN_SECONDS"] = 10000] = "TEN_SECONDS";
+    CACHE_TTL[CACHE_TTL["ONE_MINUTE"] = 60000] = "ONE_MINUTE";
+    CACHE_TTL[CACHE_TTL["FIVE_MINUTE"] = 300000] = "FIVE_MINUTE";
+    CACHE_TTL[CACHE_TTL["HALF_HOUR"] = 1800000] = "HALF_HOUR";
+    CACHE_TTL[CACHE_TTL["ONE_HOUR"] = 3600000] = "ONE_HOUR";
+    CACHE_TTL[CACHE_TTL["TWO_HOUR"] = 7200000] = "TWO_HOUR";
+    CACHE_TTL[CACHE_TTL["THREE_HOUR"] = 10800000] = "THREE_HOUR";
+    CACHE_TTL[CACHE_TTL["ONE_DAY"] = 86400000] = "ONE_DAY";
+    CACHE_TTL[CACHE_TTL["ONE_WEEK"] = 604800000] = "ONE_WEEK";
+})(CACHE_TTL || (exports.CACHE_TTL = CACHE_TTL = {}));
+//# sourceMappingURL=ttl.js.map
