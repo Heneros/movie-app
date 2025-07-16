@@ -23,7 +23,6 @@ import { RedisService } from '@/redis/redis.service';
         ReviewRepository,
         MovieResolver,
         RedisService,
-        
     ],
     imports: [
         PrismaModule,

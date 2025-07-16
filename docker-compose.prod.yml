@@ -101,8 +101,9 @@ services:
     build:
         context: .
         dockerfile: ./docker/prod/nestjs/Dockerfile
-        target: production  
+        target: production  ##delete later
     restart: always
+  #  command:   npm run start:dev ##delete later
     depends_on:
          postgres:
           condition: service_healthy
