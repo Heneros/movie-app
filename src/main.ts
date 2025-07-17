@@ -44,10 +44,13 @@ async function bootstrap() {
     //     prefix: 'sess:',
     // });
 
+
+    
+    console.log(domain, domainClient);
     // const httpServer = createServer(app.getHttpAdapter().getInstance());
     app.enableShutdownHooks();
     app.enableCors({
-        origin: domain,
+        origin: [domain, domainClient],
         credentials: true,
     });
     app.use(cookieParser());

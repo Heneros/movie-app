@@ -46,6 +46,7 @@ import { isProduction } from './data/defaultData';
         // WinstonModule.forRoot(createWinstonOptions('Movie')),
         WinstonModule.forRoot(winstonLoggerOptions),
         Logger,
+        ThrottlerModule.forRoot(),
         // ThrottlerModule.forRootAsync({
         //     imports: [ConfigModule],
 

@@ -23,11 +23,11 @@ import { createRedisClient } from './createClient';
             provide: 'RedisClient',
             useFactory: (config: ConfigService) => {
                 const redisUrl = config.get<string>('REDIS_URL');
-
                 const redisToken = config.get<string>('REDIS_TOKEN');
                 if (!redisUrl || !redisToken) {
                     throw new Error('Missing Upstash Redis config');
                 }
+                // console.log(config.get('REDIS_URL'));
                 return createRedisClient(redisUrl, redisToken);
             },
             inject: [ConfigService],
