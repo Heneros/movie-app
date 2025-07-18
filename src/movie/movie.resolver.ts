@@ -202,9 +202,11 @@ export class MovieResolver {
         // const movies = (await this.movieFindAllService.findAll(
         //     skip,
         // )) as Movie[];
-        const movies = await this.queryBus.execute(new FindAllMovieQuery(skip));
 
-        return movies.allMovies.map((movie) => new MovieEntity(movie));
+        const movies = await this.queryBus.execute(new FindAllMovieQuery(skip));
+        let parsedMovies = JSON.parse(movies.allMovies);
+
+        return parsedMovies.map((movie: Movie) => new MovieEntity(movie));
     }
 
     @Query(() => [MovieEntity], { description: 'Search movies' })

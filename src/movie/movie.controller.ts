@@ -103,8 +103,9 @@ export class MovieController {
         const skip = (page - 1) * PAGINATION_LIMIT;
 
         const movies = await this.queryBus.execute(new FindAllMovieQuery(skip));
+        let parsedMovies = JSON.parse(movies.allMovies);
 
-        return movies.allMovies.map((movie: Movie) => new MovieEntity(movie));
+        return parsedMovies.map((movie: Movie) => new MovieEntity(movie));
     }
 
     @Get(MOVIE_ROUTES.FILTER)

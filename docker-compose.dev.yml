@@ -46,56 +46,6 @@ services:
 
 
 
- nestjs:
-    build:
-        context: .
-        dockerfile: ./docker/dev/nestjs/Dockerfile
-        target: development  ##delete later
-    restart: always
-    command:   npm run start:dev ##delete later
-    depends_on:
-         postgres-master:
-          condition: service_healthy
-         redis:
-          condition: service_healthy 
-    env_file: ./.env
-    # environment:
-    #   REDIS_HOST: nest-projectfour-redis
-    #   REDIS_PORT: 6379
-    #  - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres-master:5432/${POSTGRES_DB}?schema=public
-    ports:
-     - 3000:3000
-    # deploy:
-    #   resources:
-    #     limits:
-    #       memory: 512M
-    #       cpus: '0.5'
-    #     reservations:
-    #       memory: 256M
-    #       cpus: '0.25'
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/healthcheck"]
-      interval: 1m30s
-      timeout: 30s
-      retries: 5
-      start_period: 30s
-    volumes:
-      - /app/node_modules
-    networks:
-      app_movie:   
-#  mongodb:
-#    image: mongo:7.0.16
-#    restart: always
-#    ports:
-#      - "27017:27017"
-#    environment:
-#        - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
-#        - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
-#    volumes:
-#      - mongodb-data:/data/db
-#    networks:
-#       app_movie:
-
   
 #  mongo-express:
 #     image: mongo-express:1-18-alpine3.19

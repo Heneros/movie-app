@@ -17,16 +17,16 @@ export class FindAllMovieHandler implements IQueryHandler<FindAllMovieQuery> {
     async execute(query: FindAllMovieQuery) {
         const { skip } = query;
 
-        const start = performance.now();
+        //   const start = performance.now();
         const movieCached = await this.redisService.getMovies(String(skip));
         // console.log('test555');
         if (movieCached) {
             //  const parsed = JSON.parse(cached as string) as Movie[];
-            console.log(
-                'Cache Hit35:',
-                (performance.now() - start).toFixed(2),
-                'ms',
-            );
+            // console.log(
+            //     'Cache Hit35:',
+            //     (performance.now() - start).toFixed(2),
+            //     'ms',
+            // );
 
             return { allMovies: movieCached };
         }

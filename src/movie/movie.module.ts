@@ -33,10 +33,6 @@ import { RedisService } from '@/redis/redis.service';
         Logger,
         CacheModule.register(),
 
-        // CacheModule.register({
-        //     isGlobal: true,
-        // }),
-
         // ThrottlerModule.forRoot([
         //     {
         //         // name: 'long',

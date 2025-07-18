@@ -1,1 +1,0 @@
-{"version":3,"file":"getAllReviewsMovie.query.js","sourceRoot":"","sources":["../../../../../src/movie/queries/reviews/getAllReviewsMovie.query.ts"],"names":[],"mappings":";;;AAEA,MAAa,sBAAsB;IAEX;IACA;IAFpB,YACoB,EAAU,EACV,OAAe,CAAC;QADhB,OAAE,GAAF,EAAE,CAAQ;QACV,SAAI,GAAJ,IAAI,CAAY;IACjC,CAAC;CACP;AALD,wDAKC"}

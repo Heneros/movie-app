@@ -110,10 +110,6 @@ services:
          redis:
           condition: service_healthy 
     env_file: ./.env.prod
-    # environment:
-    #   REDIS_HOST: nest-projectfour-redis
-    #   REDIS_PORT: 6379
-    #  - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres-master:5432/${POSTGRES_DB}?schema=public
     ports:
      - 3000:3000
     # deploy:

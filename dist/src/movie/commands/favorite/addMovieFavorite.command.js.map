@@ -1,1 +1,0 @@
-{"version":3,"file":"addMovieFavorite.command.js","sourceRoot":"","sources":["../../../../../src/movie/commands/favorite/addMovieFavorite.command.ts"],"names":[],"mappings":";;;AAEA,MAAa,kBAAkB;IAEP;IACA;IAFpB,YACoB,OAAe,EACf,MAAc;QADd,YAAO,GAAP,OAAO,CAAQ;QACf,WAAM,GAAN,MAAM,CAAQ;IAC/B,CAAC;CACP;AALD,gDAKC"}

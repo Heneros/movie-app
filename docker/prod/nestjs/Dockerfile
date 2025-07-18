@@ -1,18 +1,22 @@
 FROM node:23-alpine AS base
-
 FROM base AS builder
+
 WORKDIR /app
 
 COPY package*.json ./
 RUN npm install
 
 COPY prisma ./prisma
-COPY .env ./
-RUN npx prisma generate
+COPY *.env   ./
+
+RUN npm run prisma:prod
 
 COPY . .
 
 RUN npm run build
+
+
+
 
 FROM base AS production
 WORKDIR /app
