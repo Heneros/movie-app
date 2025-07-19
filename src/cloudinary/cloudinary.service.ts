@@ -14,6 +14,7 @@ import * as path from 'path';
 const streamifier = require('streamifier');
 import { PrismaService } from '@/prisma/prisma.service';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import { url } from 'inspector';
 
 @Injectable()
 export class CloudinaryService {
@@ -156,9 +157,6 @@ export class CloudinaryService {
             );
         });
     }
-    async deleteImage(publicId: string) {
-        return cloudinary.uploader.destroy(publicId);
-    }
 
     async uploadGalleryImages(movieId: number, files: Express.Multer.File[]) {
         const mainFolder = 'nestjsMoviedb';
@@ -213,5 +211,95 @@ export class CloudinaryService {
         }
 
         return { images: savedImages };
+    }
+
+    async uploadPreview(movieId: number, file: Express.Multer.File) {
+        const mainFolder = 'nestjsMoviedb';
+
+        // const savedImages = [];
+
+        const originalName = file.originalname;
+        const fileName = path.parse(originalName).name;
+        const uniqueFileName = `${fileName}_${Date.now()}`;
+
+        const filePathOnCloudinary = `${mainFolder}/${uniqueFileName}`;
+        const uploaded = await new Promise<{
+            url: string;
+            publicId: string;
+        }>((resolve, reject) => {
+            const uploadStream = cloudinary.uploader.upload_stream(
+                {
+                    public_id: filePathOnCloudinary,
+                    resource_type: 'image',
+                    fetch_format: 'auto',
+                    quality: 'auto:eco',
+                },
+                (err, result) => {
+                    if (err) reject(err);
+                    else if (result?.secure_url)
+                        resolve({
+                            url: result.secure_url,
+                            publicId: result.public_id,
+                        });
+                    else reject(new Error('No Cloudinary URL'));
+                },
+            );
+            streamifier.createReadStream(file.buffer).pipe(uploadStream);
+        });
+
+        const previewId = await this.prisma.avatar.create({
+            data: {
+                url: uploaded.url,
+                publicId: uploaded.publicId,
+                //   previewId: uploaded.
+            },
+        });
+        //console.log({ previewId }, movieId);
+        await this.prisma.movie.update({
+            where: {
+                id: movieId,
+            },
+            data: {
+                previewId: previewId.id,
+            },
+        });
+
+        return previewId;
+    }
+
+    async getImagePreview(previewId: number) {
+        const res = await this.prisma.avatar.findUnique({
+            where: {
+                id: previewId,
+            },
+        });
+        if (!res) {
+            throw new NotFoundException('Not found image');
+        }
+        return res;
+    }
+
+    async deleteImage(publicId: string) {
+        return cloudinary.uploader.destroy(publicId);
+    }
+
+    async deleteImagePreview(previewId: number) {
+        const res = await this.prisma.avatar.findUnique({
+            where: {
+                id: previewId,
+            },
+        });
+        if (!res) {
+            throw new NotFoundException('Not found image');
+        }
+
+        await this.prisma.avatar.delete({
+            where: {
+                id: previewId,
+            },
+        });
+        await cloudinary.uploader.destroy(res.publicId);
+
+        return res.id;
     }
 }

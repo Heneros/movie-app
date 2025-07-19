@@ -59,4 +59,6 @@ export const MOVIE_ROUTES = {
 
     UPLOAD_IMAGES: 'gallery/:id',
     FILTER: 'filter',
+
+    IMAGE_PREVIEW: 'preview/:id',
 };

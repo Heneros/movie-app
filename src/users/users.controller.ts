@@ -18,7 +18,7 @@ import {
     BadRequestException,
     BadGatewayException,
 } from '@nestjs/common';
-import { Express } from 'express';
+            import { Express } from 'express';
 
 import { UpdateUserDto } from './dto-input/update-user.dto';
 import {
@@ -191,6 +191,7 @@ export class UsersController {
         return await this.commandBus.execute(new BanUserAccountCommand(id));
     }
 
+    
     @Post(USERS_ROUTES.UPLOAD_AVATAR_USER)
     @UseGuards(AuthGuard, ProfileOwnerGuard)
     @UseInterceptors(

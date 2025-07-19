@@ -22,11 +22,15 @@ import { CreateMovieDto } from './dto-input/create-movie.dto';
 import { UpdateMovieDto } from './dto-input/update-movie.dto';
 import {
     ApiBearerAuth,
+    ApiBody,
+    ApiConsumes,
     ApiCreatedResponse,
     ApiOkResponse,
     ApiOperation,
+    ApiParam,
     ApiProperty,
     ApiQuery,
+    ApiResponse,
     ApiTags,
 } from '@nestjs/swagger';
 import { MovieEntity } from './entities-objectType/movie.entity';
@@ -49,7 +53,7 @@ import { RedisService } from '../redis/redis.service';
 
 import { GqlThrottlerGuard } from '../guards/gql-throttler.guard';
 import { MOVIE_CONTROLLER, MOVIE_ROUTES } from '@/sites/site.constants';
-import { FilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from '@/cloudinary/cloudinary.service';
 import { memoryStorage } from 'multer';
 import {
@@ -429,6 +433,93 @@ export class MovieController {
             return this.cloudinaryService.uploadGalleryImages(movieId, files);
         } catch (error) {
             console.log('FILES:', error);
+        }
+    }
+
+    @Post(MOVIE_ROUTES.IMAGE_PREVIEW)
+    @UseInterceptors(
+        FileInterceptor('file', {
+            storage: memoryStorage(),
+            limits: { fileSize: 5 * 1024 * 1024 },
+        }),
+    )
+    @UseGuards(AuthGuard)
+    @Roles('Admin', 'Editor')
+    @ApiOperation({ summary: 'Upload a preview image for a movie' })
+    @ApiConsumes('multipart/form-data')
+    @ApiBody({
+        schema: {
+            type: 'object',
+            properties: {
+                file: {
+                    type: 'string',
+                    format: 'binary',
+                },
+            },
+        },
+    })
+    @ApiParam({ name: 'id', type: Number, description: 'Movie ID' })
+    @ApiResponse({
+        status: 201,
+        description: 'Preview image uploaded successfully',
+    })
+    @ApiResponse({
+        status: 400,
+        description: 'Bad Request or no file uploaded',
+    })
+    async uploadImage(
+        @Param('id', ParseIntPipe) movieId: number,
+        @UploadedFile() file: Express.Multer.File,
+    ) {
+        try {
+            if (!file) {
+                return `Error during upload file ${file}`;
+            }
+            const res = this.cloudinaryService.uploadPreview(movieId, file);
+
+            return res;
+        } catch (error) {
+            if (error instanceof BadRequestException) {
+                throw error;
+            }
+            console.log('FILE:', error);
+        }
+    }
+
+    @Get(MOVIE_ROUTES.IMAGE_PREVIEW)
+    async getPreviewImg(@Param('id', ParseIntPipe) previewId: number) {
+        try {
+            const res = this.cloudinaryService.getImagePreview(previewId);
+
+            if (!res) {
+                throw new NotFoundException('Not found image preview');
+            }
+            return res;
+        } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
+
+            console.log('FILE:', error);
+        }
+    }
+
+    @Delete(MOVIE_ROUTES.IMAGE_PREVIEW)
+    @UseGuards(AuthGuard)
+    @Roles('Admin', 'Editor')
+    async deletePreviewImg(@Param('id', ParseIntPipe) previewId: number) {
+        try {
+            const res = this.cloudinaryService.deleteImagePreview(previewId);
+
+            if (!res) {
+                throw new NotFoundException('Not found image preview');
+            }
+            return res;
+        } catch (error) {
+            console.log('FILE:', error);
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
         }
     }
 }
