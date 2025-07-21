@@ -49,7 +49,9 @@ import { plainToInstance } from 'class-transformer';
 import { MovieRepository } from './repositories/movie.repository';
 import { CreateMovieReviewDto } from './dto-input/create-review.dto';
 import { MovieReviewEntity } from './entities-objectType/movieReview.entity';
-import { RedisService } from '../redis/redis.service';
+// import { RedisService } from '../redis/redis.service';
+
+
 
 import { GqlThrottlerGuard } from '../guards/gql-throttler.guard';
 import { MOVIE_CONTROLLER, MOVIE_ROUTES } from '@/sites/site.constants';
@@ -83,15 +85,18 @@ import { FilterMovieDto } from './dto-input/filter-movie.dto';
 @Controller(MOVIE_CONTROLLER)
 @ApiTags('Movie')
 // @UseInterceptors(CacheInterceptor)
-@UseGuards(GqlThrottlerGuard)
+// @UseGuards(GqlThrottlerGuard)
 export class MovieController {
     constructor(
-        private readonly redisService: RedisService,
+        // private readonly redisService: RedisService,
         private readonly movieRepository: MovieRepository,
         private readonly commandBus: CommandBus,
         private readonly queryBus: QueryBus,
         private readonly cloudinaryService: CloudinaryService,
     ) {}
+
+
+
 
     @Get(MOVIE_ROUTES.GET_ALL)
     // @CacheTTL(60)

@@ -1,10 +1,6 @@
-import { Redis } from '@upstash/redis';
+// // import { Redis } from '@upstash/redis';
+// import { Redis } from 'ioredis';
 
-export const createRedisClient = (restUrl: string, restToken: string) => {
-    const redis = new Redis({
-        url: restUrl,
-        token: restToken,
-        //    automaticDeserialization: false,
-    });
-    return redis;
-};
+// export const createRedisClient = (restUrl, restToken) => {
+//     // return redis;
+// };

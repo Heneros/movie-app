@@ -5,33 +5,34 @@ import { performance } from 'perf_hooks';
 
 import { MovieRepository } from './../repositories/movie.repository';
 
-import { RedisService } from '@/redis/redis.service';
+// import { RedisService } from '@/redis/redis.service';
 
 @QueryHandler(FindAllMovieQuery)
 export class FindAllMovieHandler implements IQueryHandler<FindAllMovieQuery> {
     constructor(
         private readonly movieRepository: MovieRepository,
-        @Inject(RedisService) private readonly redisService: RedisService,
+      //  @Inject(RedisService) private readonly redisService: RedisService,
     ) {}
 
     async execute(query: FindAllMovieQuery) {
         const { skip } = query;
 
         //   const start = performance.now();
-        const movieCached = await this.redisService.getMovies(String(skip));
+        // const movieCached = await this.redisService.getMovies(String(skip));
         // console.log('test555');
-        if (movieCached) {
-            ///  console.log('test555');
-            //  const parsed = JSON.parse(cached as string) as Movie[];
-            // console.log(
-            //     'Cache Hit35:',
-            //     (performance.now() - start).toFixed(2),
-            //     'ms',
-            // );
+        // if (movieCached.length !== 0) {
+        //     ///  console.log('test555');
+        //     //  const parsed = JSON.parse(cached as string) as Movie[];
+        //     // console.log(
+        //     //     'Cache Hit35:',
+        //     //     (performance.now() - start).toFixed(2),
+        //     //     'ms',
+        //     // );
 
-            const parsed = JSON.parse(movieCached);
-            return parsed;
-        }
+        //     // const parsed = JSON.parse(movieCached);
+        //     // return parsed;
+        //     movieCached;
+        // }
 
         const allMovies = await this.movieRepository.findAllMovie(skip);
 
@@ -39,12 +40,12 @@ export class FindAllMovieHandler implements IQueryHandler<FindAllMovieQuery> {
             throw new NotFoundException('No movies Exist');
         }
 
-        await this.redisService.saveMovies(
-            // RedisPrefixEnum.MOVIE_LIST,
-            //    skip as number,
-            String(skip),
-            allMovies,
-        );
+        // await this.redisService.saveMovies(
+        //     // RedisPrefixEnum.MOVIE_LIST,
+        //     //    skip as number,
+        //     String(skip),
+        //     allMovies,
+        // );
         // console.log('not from redis');
         // console.log('Saving to Redis:', allMovies.length, 'movies');
         // console.log('Cache Miss:', Date.now() - start, 'ms');

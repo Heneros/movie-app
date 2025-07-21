@@ -1,41 +1,35 @@
-import { Module } from '@nestjs/common';
-import { RedisService } from './redis.service';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { RedisRepository } from './redis.repository';
-import Redis from 'ioredis';
-import { createRedisClient } from './createClient';
-import { Redis as UpstashRedis } from '@upstash/redis';
+// import { Module } from '@nestjs/common';
+// import { ConfigModule, ConfigService } from '@nestjs/config';
+// import { RedisService } from './redis.service';
+// import Redis from 'ioredis';
 
-@Module({
-    imports: [ConfigModule.forRoot({ isGlobal: true })],
-    providers: [
-        RedisService,
-        RedisRepository,
+// @Module({
+//     imports: [
+//         ConfigModule.forRoot({
+//             isGlobal: true,
+//             envFilePath: '.env',
+//         }),
+//     ],
+//     providers: [
+//         RedisService,
+//         {
+//             provide: 'RedisClient',
+//             useFactory: (cs: ConfigService) => {
+//                 const redisUrl = cs.get<string>('REDIS_URL_ORIGINAL');
+//                 if (!redisUrl) {
+//                     throw new Error(
+//                         'REDIS_URL_ORIGINAL is not defined in .env',
+//                     );
+//                 }
+       
+//                 return new Redis(redisUrl);
+  
 
-        {
-            provide: 'RedisClient',
-            useFactory: (config: ConfigService) => {
-                ///  const env = config.get<string>('NODE_ENV', 'development');
-                // const env = process.env.NODE_ENV || config.get('NODE_ENV');
-                const isProd = process.env.NODE_ENV === 'production';
-
-                console.log(isProd);
-                if (isProd) {
-                    const url = config.get<string>('REDIS_URL');
-                    const token = config.get<string>('REDIS_TOKEN');
-                    if (!url || !token) {
-                        throw new Error('Missing Upstash Redis config');
-                    }
-                    return createRedisClient(url, token);
-                }
-                const host = config.get('REDIS_HOST', 'localhost');
-                const port = config.get('REDIS_PORT', 6379);
-
-                return new Redis({ host, port });
-            },
-            inject: [ConfigService],
-        },
-    ],
-    exports: ['RedisClient', RedisService, RedisRepository],
-})
-export class RedisModule {}
+//                 // return new Redis(raw);
+//             },
+//             inject: [ConfigService],
+//         },
+//     ],
+//     exports: ['RedisClient', RedisService],
+// })
+// export class RedisModule {}

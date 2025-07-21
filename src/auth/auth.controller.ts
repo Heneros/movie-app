@@ -161,7 +161,7 @@ export class AuthController {
         return new AuthEntity(result);
     }
 
-    @Throttle({ default: { limit: 15, ttl: 60000 } })
+  //  @Throttle({ default: { limit: 15, ttl: 60000 } })
     @Post(AUTH_ROUTES.RESET_PASSWORD_REQUEST)
     @ApiOperation({
         summary:

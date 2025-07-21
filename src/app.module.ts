@@ -22,13 +22,13 @@ import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis'
 import { WinstonModule } from 'nest-winston';
 import { winstonLoggerOptions } from './Logger';
 import { Logger } from 'winston';
-import { RedisModule } from './redis/redis.module';
+// import { RedisModule } from './redis/redis.module';
 // import session from 'express-session';
 // import { SessionMiddleware } from './middleware/session.middleware';
 import Redis from 'ioredis';
 // import { Redis } from '@upstash/redis';
 import { isProduction } from './data/defaultData';
-import { createRedisClient } from './redis/createClient';
+// import { createRedisClient } from './redis/createClient';
 
 @Module({
     imports: [
@@ -43,42 +43,40 @@ import { createRedisClient } from './redis/createClient';
             envFilePath: isProduction ? './.env.prod' : './.env',
             // load: [RedisConfig],
         }),
-        RedisModule,
+        //   RedisModule,
         // WinstonModule.forRoot(createWinstonOptions('Movie')),
         WinstonModule.forRoot(winstonLoggerOptions),
         Logger,
-        ThrottlerModule.forRootAsync({
-            imports: [ConfigModule],
-            inject: [ConfigService],
-            useFactory: async (configService: ConfigService) => {
-                const env =
-                    configService.get('NODE_ENV') || process.env.NODE_ENV;
+        // ThrottlerModule.forRootAsync({
+        //     imports: [ConfigModule],
+        //     inject: [ConfigService],
+        //     useFactory: async (configService: ConfigService) => {
+        //         const isProd = process.env.NODE_ENV === 'production';
 
-                const isProd = process.env.NODE_ENV === 'production';
-                if (isProd) {
-                    const redisClient = new Redis({
-                        host: configService.get('REDIS_HOST'),
-                        port: configService.get('REDIS_PORT'),
-                    });
-                    return {
-                        throttlers: [{ ttl: 60, limit: 700 }],
-                        storage: new ThrottlerStorageRedisService(redisClient),
-                    };
-                } else {
-                    const url = configService.get<string>('REDIS_URL');
-                    const token = configService.get<string>('REDIS_TOKEN');
-                    if (!url || !token)
-                        throw new Error('Missing Upstash config');
+        //         if (isProd) {
+        //             const url = configService.get<string>('REDIS_URL');
+        //             const token = configService.get<string>('REDIS_TOKEN');
+        //             if (!url || !token)
+        //                 throw new Error('Missing Upstash config');
 
-                    return {
-                        throttlers: [{ ttl: 60, limit: 700 }],
-                        storage: new ThrottlerStorageRedisService(
-                            `${url}?token=${token}`,
-                        ),
-                    };
-                }
-            },
-        }),
+        //             return {
+        //                 throttlers: [{ ttl: 60, limit: 700 }],
+        //                 storage: new ThrottlerStorageRedisService(
+        //                     `${url}?token=${token}`,
+        //                 ),
+        //             };
+        //         } else {
+        //             const redisClient = new Redis({
+        //                 host: configService.get('REDIS_HOST'),
+        //                 port: configService.get('REDIS_PORT'),
+        //             });
+        //             return {
+        //                 throttlers: [{ ttl: 60, limit: 700 }],
+        //                 storage: new ThrottlerStorageRedisService(redisClient),
+        //             };
+        //         }
+        //     },
+        // }),
 
         GraphQLModule.forRoot<ApolloDriverConfig>({
             driver: ApolloDriver,
@@ -105,10 +103,10 @@ import { createRedisClient } from './redis/createClient';
         // RedisService,
         Logger,
         //      SessionMiddleware,
-        {
-            provide: APP_GUARD,
-            useClass: GqlThrottlerGuard,
-        },
+        // {
+        //     provide: APP_GUARD,
+        //     useClass: GqlThrottlerGuard,
+        // },
     ],
 })
 export class AppModule {
