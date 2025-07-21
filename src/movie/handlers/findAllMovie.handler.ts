@@ -21,6 +21,7 @@ export class FindAllMovieHandler implements IQueryHandler<FindAllMovieQuery> {
         const movieCached = await this.redisService.getMovies(String(skip));
         // console.log('test555');
         if (movieCached) {
+            ///  console.log('test555');
             //  const parsed = JSON.parse(cached as string) as Movie[];
             // console.log(
             //     'Cache Hit35:',
@@ -28,7 +29,8 @@ export class FindAllMovieHandler implements IQueryHandler<FindAllMovieQuery> {
             //     'ms',
             // );
 
-            return { allMovies: movieCached };
+            const parsed = JSON.parse(movieCached);
+            return parsed;
         }
 
         const allMovies = await this.movieRepository.findAllMovie(skip);
@@ -43,8 +45,9 @@ export class FindAllMovieHandler implements IQueryHandler<FindAllMovieQuery> {
             String(skip),
             allMovies,
         );
+        // console.log('not from redis');
         // console.log('Saving to Redis:', allMovies.length, 'movies');
         // console.log('Cache Miss:', Date.now() - start, 'ms');
-        return { allMovies };
+        return allMovies;
     }
 }

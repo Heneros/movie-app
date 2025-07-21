@@ -61,9 +61,9 @@ export class CreateMovieDto {
     // @ApiProperty({ required: false })
     // authorId?: number;
 
-    @Field(() => Int, { nullable: true, description: 'Year' })
+    @Field(() => Int, { nullable: false, description: 'Year' })
     @IsNumber()
-    @IsOptional()
+
     @Type(() => Number)
     @ApiProperty({ required: false })
     year: number;

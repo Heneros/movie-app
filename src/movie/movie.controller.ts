@@ -107,9 +107,12 @@ export class MovieController {
         const skip = (page - 1) * PAGINATION_LIMIT;
 
         const movies = await this.queryBus.execute(new FindAllMovieQuery(skip));
-        let parsedMovies = JSON.parse(movies.allMovies);
 
-        return parsedMovies.map((movie: Movie) => new MovieEntity(movie));
+        // console.log(movies);
+        // let parsedMovies = JSON.parse(movies);
+
+        // console.log(parsedMovies);
+        return movies.map((movie: Movie) => new MovieEntity(movie));
     }
 
     @Get(MOVIE_ROUTES.FILTER)
@@ -252,7 +255,6 @@ export class MovieController {
         return new MovieEntity(
             await this.commandBus.execute(new RemoveMovieCommand(id)),
         );
-        // return new MovieEntity(await this.movieRemoveService.remove(id));
     }
 
     @Post(MOVIE_ROUTES.ADD_FAVORITE)
@@ -463,17 +465,21 @@ export class MovieController {
         status: 201,
         description: 'Preview image uploaded successfully',
     })
+    @ApiBearerAuth('access-token')
     @ApiResponse({
         status: 400,
         description: 'Bad Request or no file uploaded',
     })
     async uploadImage(
-        @Param('id', ParseIntPipe) movieId: number,
+        @Param('id', ParseIntPipe, CheckMovieExistPipe) movieId: number,
         @UploadedFile() file: Express.Multer.File,
     ) {
         try {
             if (!file) {
-                return `Error during upload file ${file}`;
+                //   return ;
+                throw new BadRequestException(
+                    `Error during upload file ${file}`,
+                );
             }
             const res = this.cloudinaryService.uploadPreview(movieId, file);
 

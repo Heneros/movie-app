@@ -22,7 +22,7 @@ export class RedisService {
         const key = this.makeKey(RedisPrefixEnum.MOVIE_LIST, page);
         const value = JSON.stringify(data);
         await this.redis.set(key, value);
-        await this.redis.expire(key, CACHE_TTL.ONE_HOUR);
+        await this.redis.expire(key, CACHE_TTL.ONE_MINUTE);
 
         //   console.log(value);
         // const res = await this.redis.set(key, value, {

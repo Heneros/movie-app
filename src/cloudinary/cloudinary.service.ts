@@ -216,7 +216,7 @@ export class CloudinaryService {
     async uploadPreview(movieId: number, file: Express.Multer.File) {
         const mainFolder = 'nestjsMoviedb';
 
-        // const savedImages = [];
+        console.log('test');
 
         const originalName = file.originalname;
         const fileName = path.parse(originalName).name;
@@ -254,7 +254,12 @@ export class CloudinaryService {
                 //   previewId: uploaded.
             },
         });
-        //console.log({ previewId }, movieId);
+
+
+        if (!previewId) {
+            return `Not found ${movieId}`;
+        }
+        
         await this.prisma.movie.update({
             where: {
                 id: movieId,

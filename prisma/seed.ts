@@ -163,6 +163,32 @@ year: 1985,
     },
     
   });
+
+
+  await prisma.movie.upsert({
+    where: { title: 'Joker', authorId: user1.id },
+    update: {
+      // authorId: user1.id,
+      // reviews: {
+      //   connect: { id: review1.id },
+      // },
+    },
+    create: {
+      reviews: {
+        connect: { id: review1.id },
+      },
+year: 2019,
+      title: 'Joker',
+      category: 'Thriller, Drama',
+      // rating: 7,
+    //   previewId: 1,
+      description:
+        'Sad story ',
+      published: true,
+      authorId: user1.id,
+    },
+    
+  });
   const actor1 = await prisma.actors.upsert({
     where: { name: 'Johnny Depp' },
     update: {},

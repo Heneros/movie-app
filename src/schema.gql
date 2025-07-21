@@ -181,7 +181,7 @@ input CreateMovieDto {
   category: String!
 
   """Year"""
-  year: Int
+  year: Int!
 
   """List of actors"""
   actorsList: [String!]!
