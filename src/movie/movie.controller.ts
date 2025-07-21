@@ -108,7 +108,7 @@ export class MovieController {
 
         const movies = await this.queryBus.execute(new FindAllMovieQuery(skip));
 
-        // console.log(movies);
+        console.log(movies);
         // let parsedMovies = JSON.parse(movies);
 
         // console.log(parsedMovies);

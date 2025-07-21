@@ -47,41 +47,46 @@ import { createRedisClient } from './redis/createClient';
         // WinstonModule.forRoot(createWinstonOptions('Movie')),
         WinstonModule.forRoot(winstonLoggerOptions),
         Logger,
-        // ThrottlerModule.forRoot(),
         ThrottlerModule.forRootAsync({
             imports: [ConfigModule],
-
             inject: [ConfigService],
             useFactory: async (configService: ConfigService) => {
-                const redisClient = new Redis({
-                    // url: configService.get('REDIS_URL'),
-                    // token: configService.get('REDIS_TOKEN'),
-                    // password: configService.get('REDIS_PASSWORD'),
-                    host: configService.get('REDIS_HOST'),
-                    port: configService.get('REDIS_PORT'),
-                });
+                const env =
+                    configService.get('NODE_ENV') || process.env.NODE_ENV;
 
-                // const redisUrl = configService.get<string>('REDIS_URL');
+                const isProd = process.env.NODE_ENV === 'production';
+                if (isProd) {
+                    const redisClient = new Redis({
+                        host: configService.get('REDIS_HOST'),
+                        port: configService.get('REDIS_PORT'),
+                    });
+                    return {
+                        throttlers: [{ ttl: 60, limit: 700 }],
+                        storage: new ThrottlerStorageRedisService(redisClient),
+                    };
+                } else {
+                    const url = configService.get<string>('REDIS_URL');
+                    const token = configService.get<string>('REDIS_TOKEN');
+                    if (!url || !token)
+                        throw new Error('Missing Upstash config');
 
-                // const redisToken = configService.get<string>('REDIS_TOKEN');
-                // if (!redisUrl || !redisToken) {
-                //     throw new Error('Missing Upstash Redis config');
-                // }
-                // console.log('test')
-
-                // const connectString = `${redisUrl}?token=${redisToken}`;
-                return {
-                    throttlers: [{ ttl: 60, limit: 700 }],
-                    storage: new ThrottlerStorageRedisService(redisClient),
-                    // getTracker: (req, context) => req.headers['x-device-id'],
-                };
+                    return {
+                        throttlers: [{ ttl: 60, limit: 700 }],
+                        storage: new ThrottlerStorageRedisService(
+                            `${url}?token=${token}`,
+                        ),
+                    };
+                }
             },
         }),
 
         GraphQLModule.forRoot<ApolloDriverConfig>({
             driver: ApolloDriver,
-            autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
-
+            // autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+            autoSchemaFile:
+                process.env.NODE_ENV === 'production'
+                    ? true
+                    : join(process.cwd(), 'src/schema.gql'),
             installSubscriptionHandlers: process.env.NODE_ENV !== 'test',
             subscriptions:
                 process.env.NODE_ENV === 'test'
