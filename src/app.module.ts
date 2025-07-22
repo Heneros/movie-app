@@ -41,7 +41,6 @@ import { isProduction } from './data/defaultData';
             isGlobal: true,
             expandVariables: true,
             envFilePath: isProduction ? './.env.prod' : './.env',
-            // load: [RedisConfig],
         }),
         //   RedisModule,
         // WinstonModule.forRoot(createWinstonOptions('Movie')),
