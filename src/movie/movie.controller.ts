@@ -45,7 +45,7 @@ import { CheckMovieExistPipe } from './guard/checkIfMovieExist.guard';
 import { ProfileOwnerGuard } from '@/guards/ProfileOwner.guard';
 import { RateMovieDto } from './dto-input/rate-movie.dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { plainToInstance } from 'class-transformer';
+// import { plainToInstance } from 'class-transformer';
 import { MovieRepository } from './repositories/movie.repository';
 import { CreateMovieReviewDto } from './dto-input/create-review.dto';
 import { MovieReviewEntity } from './entities-objectType/movieReview.entity';
