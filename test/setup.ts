@@ -69,7 +69,7 @@ beforeAll(async () => {
     );
 
     await app.init();
-  await app.listen(3000);
+ // await app.listen(3000);
     redisRepo = moduleFixture.get(RedisRepository);
 
     try {

@@ -5,6 +5,8 @@ on:
     pull_request:
         branches: [master]
 
+
+
 jobs:
     basic:
         runs-on: ubuntu-latest
@@ -19,7 +21,7 @@ jobs:
                    --health-cmd pg_isready
                    --health-interval 10s
                    --health-timeout 5s
-                   --health-retries 10
+                   --health-retries 5
               ports:
                 - 5432:5432
             redis:
@@ -30,20 +32,17 @@ jobs:
                 --health-cmd "redis-cli ping"
                 --health-interval 10s
                 --health-timeout 5s
-                --health-retries 10
+                --health-retries 5
                 
             maildev:
               image: maildev/maildev
               ports:
                - 1080:1080 
-               - 1025:1025
-              options: >-
-                --health-cmd "wget --no-verbose --tries=1 --spider http://localhost:1080 || exit 1"
-                --health-interval 30s
-                --health-timeout 10s
-                --health-retries 5
+               - 1025:1025 
+    
 
         steps:
+
             - name: Checkout
               uses: actions/checkout@v3  
 
@@ -62,24 +61,23 @@ jobs:
                  ls -la src/auth/repositories/
                  cat tsconfig.json
 
-            # Улучшенная проверка всех сервисов
-            - name: Wait for all services to be ready
+
+            - name:  Wait for PostgreSQL to be ready
               run: |
-                echo "Waiting for PostgreSQL..."
-                for i in {1..30}; do
+                echo "Waiting for PostgreSQL to start..."
+                for i in {1..10}; do
                   if pg_isready -h localhost -p 5432 -U postgres -d moviedb; then
-                    echo "✅ PostgreSQL is ready!"
+                    echo "PostgreSQL is ready!"
                     break
                   else
-                    echo "⏳ PostgreSQL not ready yet. Retrying in 2 seconds..."
-                    sleep 2
+                    echo "PostgreSQL is not ready yet. Retrying in 5 seconds..."
+                    sleep 5
                   fi
                 done
-                
-                echo "Waiting for Redis..."
+                           echo "Waiting for Redis..."
                 for i in {1..30}; do
                   if redis-cli -h localhost -p 6379 ping | grep -q PONG; then
-                    echo "✅ Redis is ready!"
+                    echo " Redis is ready!"
                     break
                   else
                     echo "⏳ Redis not ready yet. Retrying in 2 seconds..."
@@ -90,22 +88,21 @@ jobs:
                 echo "Waiting for MailDev..."
                 for i in {1..30}; do
                   if curl -f http://localhost:1080 > /dev/null 2>&1; then
-                    echo "✅ MailDev is ready!"
+                    echo " MailDev is ready!"
                     break
                   else
                     echo "⏳ MailDev not ready yet. Retrying in 2 seconds..."
                     sleep 2
                   fi
                 done
-                
-                echo "All services are ready! 🚀"
 
             - name: Set up env variables
-              run: |
+              run:  |
                  echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> $GITHUB_ENV
-                 echo "NODE_ENV=test" >> $GITHUB_ENV
+                 echo "NODE_ENV=test" >>  $GITHUB_ENV
                  echo "REDIS_HOST=localhost" >> $GITHUB_ENV
                  echo "REDIS_PORT=6379" >> $GITHUB_ENV
+           
                  echo "JWT_ACCESS_SECRET=testjwtaccess" >> $GITHUB_ENV
                  echo "JWT_REFRESH_SECRET=testjwtaccess" >> $GITHUB_ENV
                  echo "SECRET_SESSION=testjwtacsesion" >> $GITHUB_ENV
@@ -115,15 +112,14 @@ jobs:
                  echo "CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_NAME }}" >> $GITHUB_ENV
                  echo "CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API }}" >> $GITHUB_ENV
                  echo "CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_SECRET }}" >> $GITHUB_ENV
-                 # Добавляем переменные для тестовой среды
-                 echo "DATABASE_URL=postgres://postgres:postgres@localhost:5432/moviedb" >> $GITHUB_ENV
-                 echo "TEST_TIMEOUT=180000" >> $GITHUB_ENV
+          
 
+        
             - name: Install prisma packages 
               env:
                 DATABASE_URL: "postgres://postgres:postgres@localhost:5432/moviedb"
               run: |
-                   npm install @prisma/client --legacy-peer-deps
+                   npm install @prisma/client  --legacy-peer-deps
                    npm install prisma --save-dev
                    npx prisma generate
                    npx prisma migrate deploy
@@ -133,7 +129,6 @@ jobs:
             
             - name: Lint
               run: npm run lint
-
 
             - name: Test database connection
               env: 
@@ -145,9 +140,11 @@ jobs:
 
             - name: Run Tests
               env: 
-                DATABASE_URL: "postgres://postgres:postgres@localhost:5432/moviedb"
                 NODE_OPTIONS: "--max-old-space-size=4096"
+                DATABASE_URL: "postgres://postgres:postgres@localhost:5432/moviedb"
               run: npm run test:e2e
 
-            - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+            - run:  echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
             - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+              
+            
