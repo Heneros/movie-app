@@ -100,6 +100,7 @@ export class MovieController {
 
     @Get(MOVIE_ROUTES.GET_ALL)
     // @CacheTTL(60)
+   @ApiOperation({ summary: 'Get All Movies' })
     @ApiQuery({
         name: 'page',
         required: false,
@@ -121,7 +122,7 @@ export class MovieController {
     }
 
     @Get(MOVIE_ROUTES.FILTER)
-    @ApiOperation({ summary: 'Filter movies' })
+        @ApiOperation({ summary: 'Filter movies' })
     @ApiOkResponse({ type: MovieEntity })
     async filterMovie(
         @Query(new ValidationPipe({ transform: true }))
@@ -135,7 +136,7 @@ export class MovieController {
 
     @Get(MOVIE_ROUTES.SEARCH)
     // @Throttle({ default: { limit: 3, ttl: 60000 } })
-    @ApiProperty({ description: 'Search movie by title' })
+        @ApiProperty({ description: 'Search movie by title' })
     @ApiQuery({
         name: 'title',
         required: true,
@@ -192,6 +193,10 @@ export class MovieController {
     @Roles('Admin', 'Editor')
     @ApiBearerAuth('access-token')
     @ApiOkResponse({ type: MovieEntity, isArray: true })
+        @ApiResponse({
+        status: 400,
+        description: 'Not found drafms',
+    })
     async findDrafts(@Query('page') pageString?: string) {
         const page = pageString ? parseInt(pageString, 10) : 1;
         const skip = (page - 1) * PAGINATION_LIMIT;
@@ -204,6 +209,10 @@ export class MovieController {
 
     @Get(MOVIE_ROUTES.GET_ID_MOVIE)
     // @Throttle({ default: { limit: 3, ttl: 60000 } })
+    @ApiResponse({
+        status: 200,
+        description: `Movie get successfully!`,
+    })
     @ApiOkResponse({ type: MovieEntity })
     async findOne(@Param('id', ParseIntPipe, CheckMovieExistPipe) id: number) {
         const movie = await this.queryBus.execute(new FindOneMovieQuery(+id));
@@ -213,6 +222,10 @@ export class MovieController {
 
     @Post(MOVIE_ROUTES.CREATE_MOVIE)
     @UseGuards(AuthGuard)
+        @ApiResponse({
+        status: 201,
+        description: `Movie created successfully!`,
+    })
     @Roles('Admin', 'Editor')
     @ApiCreatedResponse({ type: MovieEntity })
     @ApiBearerAuth('access-token')
@@ -229,6 +242,10 @@ export class MovieController {
     }
 
     @Patch(MOVIE_ROUTES.UPDATE_MOVIE)
+    @ApiResponse({
+        status: 201,
+        description: `Movie updated successfully!`,
+    })
     @UseGuards(AuthGuard)
     @Roles('Admin', 'Editor')
     @ApiBearerAuth('access-token')
@@ -243,6 +260,10 @@ export class MovieController {
     }
 
     @Delete(MOVIE_ROUTES.DELETE_MOVIE)
+    @ApiResponse({
+        status: 200,
+        description: 'The movie has been successfully deleted',
+    })
     @Roles('Admin', 'Editor')
     @UseGuards(AuthGuard)
     @ApiBearerAuth('access-token')
@@ -263,6 +284,7 @@ export class MovieController {
     }
 
     @Post(MOVIE_ROUTES.ADD_FAVORITE)
+    
     @UseGuards(AuthGuard)
     @ApiBearerAuth('access-token')
     @ApiOperation({ summary: 'Add to favorite list user.' })
@@ -421,6 +443,22 @@ export class MovieController {
     }
 
     @Post(MOVIE_ROUTES.UPLOAD_IMAGES)
+    @ApiOperation({ summary: 'Gallery upload multiple images' })
+    @ApiConsumes('multipart/form-data')
+    @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        files: {
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+        },
+      },
+    },
+  })  
     @UseInterceptors(
         FilesInterceptor('files', 5, {
             storage: memoryStorage(),
@@ -497,6 +535,7 @@ export class MovieController {
         }
     }
 
+        @ApiOperation({ summary: 'Get preview image movie' })
     @Get(MOVIE_ROUTES.IMAGE_PREVIEW)
     async getPreviewImg(@Param('id', ParseIntPipe) previewId: number) {
         try {
@@ -515,6 +554,7 @@ export class MovieController {
         }
     }
 
+    @ApiOperation({ summary: 'Delete preview image movie' })
     @Delete(MOVIE_ROUTES.IMAGE_PREVIEW)
     @UseGuards(AuthGuard)
     @Roles('Admin', 'Editor')
