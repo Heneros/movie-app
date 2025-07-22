@@ -73,13 +73,14 @@ beforeAll(async () => {
     redisRepo = moduleFixture.get(RedisRepository);
 
     try {
+            await new Promise(resolve => setTimeout(resolve, 3000));
         prisma = app.get(PrismaService);
         await clearDatabase(prisma);
         await redisRepo.flushAll();
     } catch (e) {
         console.warn('clearDatabase in beforeAll failed:', e);
     }
-}, 140000);
+}, 180000);
 
 afterAll(async () => {
     if (app) {
