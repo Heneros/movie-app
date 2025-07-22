@@ -10,10 +10,10 @@ import { CloudinaryModule } from '@/cloudinary/cloudinary.module';
 import * as Handlers from './handlers';
 import { MovieRepository } from './repositories/movie.repository';
 import { ReviewRepository } from './repositories/review.repository';
-// import { RedisModule } from '@/redis/redis.module';
+import { RedisModule } from '@/redis/redis.module';
 import { Logger } from 'winston';
 import { CacheModule } from '@nestjs/cache-manager';
-// import { RedisService } from '@/redis/redis.service';
+import { RedisService } from '@/redis/redis.service';
 
 @Module({
     controllers: [MovieController],
@@ -22,14 +22,14 @@ import { CacheModule } from '@nestjs/cache-manager';
         MovieRepository,
         ReviewRepository,
         MovieResolver,
-        // RedisService,
+       RedisService,
     ],
     imports: [
         PrismaModule,
 
         CqrsModule,
         CloudinaryModule,
-        // RedisModule,
+        RedisModule,
         Logger,
         CacheModule.register(),
 

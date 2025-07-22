@@ -22,7 +22,7 @@ import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis'
 import { WinstonModule } from 'nest-winston';
 import { winstonLoggerOptions } from './Logger';
 import { Logger } from 'winston';
-// import { RedisModule } from './redis/redis.module';
+import { RedisModule } from './redis/redis.module';
 // import session from 'express-session';
 // import { SessionMiddleware } from './middleware/session.middleware';
 import Redis from 'ioredis';
@@ -42,7 +42,7 @@ import { isProduction } from './data/defaultData';
             expandVariables: true,
             envFilePath: isProduction ? './.env.prod' : './.env',
         }),
-        //   RedisModule,
+       RedisModule,
         // WinstonModule.forRoot(createWinstonOptions('Movie')),
         WinstonModule.forRoot(winstonLoggerOptions),
         Logger,

@@ -97,6 +97,7 @@ export class MovieController {
 
 
 
+    
 
     @Get(MOVIE_ROUTES.GET_ALL)
     // @CacheTTL(60)
@@ -114,7 +115,7 @@ export class MovieController {
 
         const movies = await this.queryBus.execute(new FindAllMovieQuery(skip));
 
-        console.log(movies);
+       // console.log(movies);
         // let parsedMovies = JSON.parse(movies);
 
         // console.log(parsedMovies);
@@ -212,6 +213,7 @@ export class MovieController {
 
     @Get(MOVIE_ROUTES.GET_ID_MOVIE)
     // @Throttle({ default: { limit: 3, ttl: 60000 } })
+      @ApiOperation({ summary: 'Get movie movie by id' })
     @ApiResponse({
         status: 200,
         description: `Movie get successfully!`,
@@ -246,6 +248,7 @@ export class MovieController {
     }
 
     @Patch(MOVIE_ROUTES.UPDATE_MOVIE)
+     @ApiOperation({ summary: 'Update Movie. Only admin or editor' })
     @ApiResponse({
         status: 201,
         description: `Movie updated successfully!`,

@@ -70,6 +70,8 @@ describe('Movies - Get all favorite movies by user(e2e) METHOD GET movie/:userID
                     actorsList: [faker.person.fullName()],
                     description: 'Horror movie about missing in forest',
                 })
+    
+
                 .expect(201);
 
             createdMovies.push(res.body);

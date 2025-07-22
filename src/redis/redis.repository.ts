@@ -1,40 +1,40 @@
-// import { RedisPrefixEnum } from '@/data/redis-prefix-enum';
-// import { Inject, Injectable, OnModuleDestroy } from '@nestjs/common';
+import { RedisPrefixEnum } from '@/data/redis-prefix-enum';
+import { Inject, Injectable, OnModuleDestroy } from '@nestjs/common';
 
-// import Redis from 'ioredis';
+import Redis from 'ioredis';
 
-// @Injectable()
-// export class RedisRepository {
-//     constructor(@Inject('RedisClient') private readonly redis: Redis) {}
+@Injectable()
+export class RedisRepository {
+    constructor(@Inject('REDIS_CLIENT') private readonly redis: Redis) {}
 
-//     private generateKey(prefix: RedisPrefixEnum, key: string): string {
-//         return `${prefix}:${key}`;
-//     }
+    private generateKey(prefix: RedisPrefixEnum, key: string): string {
+        return `${prefix}:${key}`;
+    }
 
-//     async get(prefix: RedisPrefixEnum, key: string): Promise<string | null> {
-//         const fullKey = this.generateKey(prefix, key);
-//         return await this.redis.get(fullKey);
-//     }
+    async get(prefix: RedisPrefixEnum, key: string): Promise<string | null> {
+        const fullKey = this.generateKey(prefix, key);
+        return await this.redis.get(fullKey);
+    }
 
-//     async set(prefix: string, key: string, value: string): Promise<void> {
-//         await this.redis.set(`${prefix}:${key}`, value);
-//     }
+    async set(prefix: string, key: string, value: string): Promise<void> {
+        await this.redis.set(`${prefix}:${key}`, value);
+    }
 
-//     async delete(prefix: string, key: string): Promise<void> {
-//         await this.redis.del(`${prefix}:${key}`);
-//     }
+    async delete(prefix: string, key: string): Promise<void> {
+        await this.redis.del(`${prefix}:${key}`);
+    }
 
-//     async flushAll(): Promise<void> {
-//         await this.redis.flushdb();
-//     }
+    async flushAll(): Promise<void> {
+        await this.redis.flushall();
+    }
 
-//     // async setWithExpiry(
-//     //     prefix: RedisPrefixEnum,
-//     //     key: string,
-//     //     value: string,
-//     //     ttl: number,
-//     // ) {
-//     //     const fullKey = this.generateKey(prefix, key);
-//     //     await this.redis.set(fullKey, value, ttl);
-//     // }
-// }
+    // async setWithExpiry(
+    //     prefix: RedisPrefixEnum,
+    //     key: string,
+    //     value: string,
+    //     ttl: number,
+    // ) {
+    //     const fullKey = this.generateKey(prefix, key);
+    //     await this.redis.set(fullKey, value, ttl);
+    // }
+}

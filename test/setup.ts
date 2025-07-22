@@ -23,6 +23,7 @@ import { GoogleStrategy } from '@/auth/passport/GoogleStrategy';
 import { GithubStrategy } from '@/auth/passport/GithubStrategy';
 import { DiscordStrategy } from '@/auth/passport/DiscordStrategy';
 import { RedisRepository } from '@/redis/redis.repository';
+import { RedisModule } from '@/redis/redis.module';
 
 export const mockMailService = {
     sendEmail: jest.fn().mockImplementation(() => Promise.resolve(true)),
@@ -35,7 +36,7 @@ export let redisRepo: RedisRepository;
 
 beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-        imports: [AppModule, PrismaModule, AuthModule, MailModule],
+        imports: [AppModule, PrismaModule, AuthModule,     RedisModule,  MailModule],
         providers: [
             {
                 provide: APP_INTERCEPTOR,
