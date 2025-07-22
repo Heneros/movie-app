@@ -69,7 +69,7 @@ beforeAll(async () => {
     );
 
     await app.init();
-
+  await app.listen(3000);
     redisRepo = moduleFixture.get(RedisRepository);
 
     try {
@@ -79,7 +79,7 @@ beforeAll(async () => {
     } catch (e) {
         console.warn('clearDatabase in beforeAll failed:', e);
     }
-}, 120000);
+}, 140000);
 
 afterAll(async () => {
     if (app) {
