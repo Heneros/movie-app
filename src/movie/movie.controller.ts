@@ -122,6 +122,7 @@ export class MovieController {
     }
 
     @Get(MOVIE_ROUTES.FILTER)
+    
         @ApiOperation({ summary: 'Filter movies' })
     @ApiOkResponse({ type: MovieEntity })
     async filterMovie(
@@ -136,7 +137,8 @@ export class MovieController {
 
     @Get(MOVIE_ROUTES.SEARCH)
     // @Throttle({ default: { limit: 3, ttl: 60000 } })
-        @ApiProperty({ description: 'Search movie by title' })
+        @ApiOperation({ summary: 'Search movie by title' })
+        @ApiProperty({ description: 'Enter title' })
     @ApiQuery({
         name: 'title',
         required: true,
@@ -191,6 +193,7 @@ export class MovieController {
     @Get(MOVIE_ROUTES.DRAFTS)
     @UseGuards(AuthGuard)
     @Roles('Admin', 'Editor')
+        @ApiOperation({ summary: 'Get drafts movies from site' })
     @ApiBearerAuth('access-token')
     @ApiOkResponse({ type: MovieEntity, isArray: true })
         @ApiResponse({
@@ -221,6 +224,7 @@ export class MovieController {
     }
 
     @Post(MOVIE_ROUTES.CREATE_MOVIE)
+          @ApiOperation({ summary: 'Create movie. available only for admin or editor role' })
     @UseGuards(AuthGuard)
         @ApiResponse({
         status: 201,
