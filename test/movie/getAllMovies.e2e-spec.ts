@@ -56,6 +56,8 @@ describe('Movies - Get All movies(e2e)', () => {
                     }),
             );
         }
+            await new Promise(resolve => setTimeout(resolve, 500));
+
         await Promise.all(moviePromises);
         const responseGet = await request(app.getHttpServer()).get(`/movie`);
 
@@ -78,6 +80,8 @@ describe('Movies - Get All movies(e2e)', () => {
                     }),
             );
         }
+            await new Promise(resolve => setTimeout(resolve, 500));
+
         await Promise.all(moviePromises);
         const responseGet = await request(app.getHttpServer()).get(
             `/movie?page=2`,

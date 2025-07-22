@@ -54,6 +54,8 @@ describe('Movies - Get All movies(e2e)', () => {
                     .expect(201),
             );
         }
+            await new Promise(resolve => setTimeout(resolve, 500));
+
         await Promise.all(moviePromises);
         const responseGet = await request(app.getHttpServer())
             .get(`/movie/drafts`)
@@ -79,6 +81,8 @@ describe('Movies - Get All movies(e2e)', () => {
                     }),
             );
         }
+            await new Promise(resolve => setTimeout(resolve, 500));
+
         // console.log(moviePromises);
         await Promise.all(moviePromises);
         let user = await registerTestNotAdminUser();

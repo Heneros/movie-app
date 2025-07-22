@@ -76,6 +76,8 @@ describe('Movies - Get all favorite movies by user(e2e) METHOD GET movie/:userID
 
             createdMovies.push(res.body);
         }
+            await new Promise(resolve => setTimeout(resolve, 500));
+
         for (const singleMovie of createdMovies) {
             await request(app.getHttpServer())
                 .post(`/movie/${singleMovie.id}/addFav`)
