@@ -1,32 +1,29 @@
-import { createParamDecorator } from '@nestjs/common';
-import { ExecutionContextHost } from '@nestjs/core/helpers/execution-context-host';
-import { GqlExecutionContext } from '@nestjs/graphql';
-import { Request } from 'express';
-import * as jwt from 'jsonwebtoken';
-import { JwtPayload } from 'jsonwebtoken';
+// app/movie/[id]/page.tsx
+import { getMovie } from '@/lib/getMovie'
+import type { Metadata } from 'next'
 
-export interface User {
-    id: number;
+type Props = {
+  params: {
+    id: string
+  }
 }
 
-export const User = createParamDecorator(
-    (data: unknown, context: ExecutionContextHost) => {
-        // const request = context.switchToHttp().getRequest<Request>();
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const movie = await getMovie(params.id)
+  return {
+    title: movie.title,
+    description: movie.overview
+  }
+}
 
-        let request: any;
+export default async function MoviePage({ params }: Props) {
+  const movie = await getMovie(params.id)
 
-        if (context.getType().toString() === 'http') {
-            request = context.switchToHttp().getRequest();
-        } else {
-            const gqlContext = GqlExecutionContext.create(context);
-            request = gqlContext.getContext().req;
-        }
-        // console.log(request.headers.authorization);
-        const authHeader = request.headers.authorization;
-        const token = authHeader?.split('Bearer ')[1];
-        const payload = jwt.verify(token, process.env.JWT_SECRET) as JwtPayload;
-
-        // console.log(payload);
-        return (request.user as User) || payload;
-    },
-);
+  return (
+    <div className="p-8">
+      <h1 className="text-3xl font-bold mb-4">{movie.title}</h1>
+      <p className="text-gray-300">{movie.overview}</p>
+      <p className="mt-4">Rating: {movie.vote_average}</p>
+    </div>
+  )
+}
