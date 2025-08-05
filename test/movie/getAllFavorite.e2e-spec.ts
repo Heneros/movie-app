@@ -70,13 +70,12 @@ describe('Movies - Get all favorite movies by user(e2e) METHOD GET movie/:userID
                     actorsList: [faker.person.fullName()],
                     description: 'Horror movie about missing in forest',
                 })
-    
 
                 .expect(201);
 
             createdMovies.push(res.body);
         }
-            await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
         for (const singleMovie of createdMovies) {
             await request(app.getHttpServer())

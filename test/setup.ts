@@ -36,7 +36,7 @@ export let redisRepo: RedisRepository;
 
 beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-        imports: [AppModule, PrismaModule, AuthModule,     RedisModule,  MailModule],
+        imports: [AppModule, PrismaModule, AuthModule, RedisModule, MailModule],
         providers: [
             {
                 provide: APP_INTERCEPTOR,
@@ -69,11 +69,11 @@ beforeAll(async () => {
     );
 
     await app.init();
- // await app.listen(3000);
+    // await app.listen(3000);
     redisRepo = moduleFixture.get(RedisRepository);
 
     try {
-            await new Promise(resolve => setTimeout(resolve, 3000));
+        await new Promise((resolve) => setTimeout(resolve, 3000));
         prisma = app.get(PrismaService);
         await clearDatabase(prisma);
         await redisRepo.flushAll();
