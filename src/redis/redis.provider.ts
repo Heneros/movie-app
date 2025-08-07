@@ -7,7 +7,7 @@ export const RedisProvider: Provider = {
     useFactory: (configService: ConfigService) => {
         const env = configService.get('NODE_ENV');
 
-        console.log(env);
+        // console.log(env);
         if (env === 'production') {
             const redisUrl = configService.get<string>('REDIS_URL_ORIGINAL');
 
@@ -17,9 +17,15 @@ export const RedisProvider: Provider = {
 
             return new Redis(redisUrl);
         }
-        const host = configService.get<string>('REDIS_HOST', 'redis');
+        const host = configService.get<string>('REDIS_HOST', 'localhost');
         const port = configService.get<number>('REDIS_PORT', 6379);
-        return new Redis({ host, port });
+        return new Redis({
+            host,
+            port,
+
+            maxRetriesPerRequest: 3,
+            lazyConnect: true, 
+        });
     },
     inject: [ConfigService],
 };
