@@ -1,25 +1,34 @@
-interface User {
-    id: number;
-    name: string;
-    role: 'admin' | 'user';
-    isActive: boolean;
+function validator(
+    target: any,
+    propertyKey: string,
+    descriptor: PropertyDescriptor,
+) {
+    const oldSet = descriptor.set;
+
+    descriptor.set = function (value: string) {
+        if (value === 'admin') {
+            throw new Error('Invalid value');
+        }
+
+        if (oldSet !== undefined) oldSet.call(this, value);
+    };
 }
 
-const users: User[] = [
-    { id: 1, name: 'Alice', role: 'admin', isActive: true },
-    { id: 2, name: 'Bob', role: 'user', isActive: false },
-    { id: 3, name: 'Charlie', role: 'user', isActive: true },
-];
+class User {
+    private _name: string;
+    constructor(name: string) {
+        this.name = name;
+    }
 
-function filterObjects<T>(items: T[], conditions: Partial<T>): T[] {
-    return items.filter((item) =>
-        Object.entries(conditions).every(([key, value]) => {
-            return item[key as keyof T] === value;
-        }),
-    );
+    public get name(): string {
+        return this._name;
+    }
+    @validator
+    public set name(n: string) {
+        this._name = n;
+    }
 }
-
-// Хочется получить только активных пользователей
-const activeUsers = filterObjects(users, { isActive: true });
-
-console.log(activeUsers);
+let tom = new User('Tom');
+console.log(tom.name);
+tom.name = 'admin';
+console.log(tom.name);
