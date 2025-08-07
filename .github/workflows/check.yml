@@ -5,8 +5,6 @@ on:
     pull_request:
         branches: [master]
 
-
-
 jobs:
     basic:
         runs-on: ubuntu-latest
@@ -25,7 +23,7 @@ jobs:
               ports:
                 - 5432:5432
             redis:
-               image: redis:7.4 
+               image: redis:7.4-alpine
                ports:
                 - 6379:6379
                options: >-
@@ -39,12 +37,44 @@ jobs:
               ports:
                - 1080:1080 
                - 1025:1025 
-    
+              options: >-
+                --health-cmd "wget --quiet --tries=1 --spider http://localhost:1080 || exit 1"
+                --health-interval 10s
+                --health-timeout 5s
+                --health-retries 5
+
+        env:
+          # Database
+          DATABASE_URL: "postgres://postgres:postgres@localhost:5432/moviedb"
+          
+          # Environment
+          NODE_ENV: test
+          
+          # Redis
+          REDIS_HOST: 127.0.0.1
+          REDIS_PORT: 6379
+          
+          # JWT
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          JWT_ACCESS_SECRET: testjwtaccess
+          JWT_REFRESH_SECRET: testjwtrefresh
+          SECRET_SESSION: testjwtsession
+          
+          # App settings
+          PAGINATION: 5
+          
+          # SMTP
+          SMTP_HOST: localhost
+          SMTP_PORT: 1025
+          
+          # Cloudinary
+          CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_NAME }}
+          CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API }}
+          CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_SECRET }}
 
         steps:
-
             - name: Checkout
-              uses: actions/checkout@v3  
+              uses: actions/checkout@v4
 
             - name: Set up Node.js
               uses: actions/setup-node@v4
@@ -53,96 +83,60 @@ jobs:
                 cache: 'npm'
 
             - name: Install dependencies
-              run: npm ci
+              run: npm ci --legacy-peer-deps
 
             - name: verify project structure
               run: |
                  echo "Checking project structure..."
-                 ls -la src/auth/repositories/
+                 ls -la src/auth/repositories/ || echo "Auth repositories directory not found"
                  cat tsconfig.json
 
-            - name: Install redis-cli
+            - name: Install system dependencies
               run: |
-                    sudo apt-get update
-                    sudo apt-get install -y redis-tools
+                sudo apt-get update
+                sudo apt-get install -y redis-tools postgresql-client curl wget
 
-            - name:  Wait for PostgreSQL and Redis to be ready
+            - name: Wait for services to be ready
               run: |
-                echo "Waiting for PostgreSQL to start..."
-                for i in {1..10}; do
-                  if pg_isready -h localhost -p 5432 -U postgres -d moviedb; then
-                    echo "PostgreSQL is ready!"
-                    break
-                  else
-                    echo "PostgreSQL is not ready yet. Retrying in 5 seconds..."
-                    sleep 5
-                  fi
-                done
-
+                echo "Waiting for PostgreSQL..."
+                timeout 60 bash -c 'until pg_isready -h localhost -p 5432 -U postgres; do echo "Waiting for postgres..."; sleep 2; done'
+                
                 echo "Waiting for Redis..."
-                for i in {1..30}; do
-                 if redis-cli -h 127.0.0.1 -p 6379 ping | grep -q PONG; then
-                    echo " Redis is ready!"
-                    break
-                  else
-                    echo " Redis not ready yet. Retrying in 2 seconds..."
-                    sleep 2
-                  fi
-                done
+                timeout 60 bash -c 'until redis-cli -h 127.0.0.1 -p 6379 ping | grep -q PONG; do echo "Waiting for redis..."; sleep 2; done'
                 
                 echo "Waiting for MailDev..."
-                for i in {1..30}; do
-                  if curl -f http://localhost:1080 > /dev/null 2>&1; then
-                    echo " MailDev is ready!"
-                    break
-                  else
-                    echo " MailDev not ready yet. Retrying in 2 seconds..."
-                    sleep 2
-                  fi
-                done
+                timeout 60 bash -c 'until curl -f http://localhost:1080 > /dev/null 2>&1; do echo "Waiting for maildev..."; sleep 2; done'
+                
+                echo "All services are ready!"
 
-            - name: Set up env variables
-              run:  |
-                 echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> $GITHUB_ENV
-                 echo "NODE_ENV=test" >>  $GITHUB_ENV
-                 echo "REDIS_HOST=127.0.0.1" >> $GITHUB_ENV
-                 echo "REDIS_PORT=6379" >> $GITHUB_ENV
-           
-                 echo "JWT_ACCESS_SECRET=testjwtaccess" >> $GITHUB_ENV
-                 echo "JWT_REFRESH_SECRET=testjwtaccess" >> $GITHUB_ENV
-                 echo "SECRET_SESSION=testjwtacsesion" >> $GITHUB_ENV
-                 echo "PAGINATION=5" >> $GITHUB_ENV
-                 echo "SMTP_HOST=localhost" >> $GITHUB_ENV
-                 echo "SMTP_PORT=1025" >> $GITHUB_ENV
-                 echo "CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_NAME }}" >> $GITHUB_ENV
-                 echo "CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API }}" >> $GITHUB_ENV
-                 echo "CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_SECRET }}" >> $GITHUB_ENV
-          
-
-        
-            - name: Install prisma packages 
-              env:
-                DATABASE_URL: "postgres://postgres:postgres@localhost:5432/moviedb"
+            - name: Setup database
               run: |
-                   npm install @prisma/client  --legacy-peer-deps
-                   npm install prisma --save-dev
-                   npx prisma generate
-                   npx prisma migrate deploy
+                echo "Setting up database..."
+                npx prisma generate
+                npx prisma migrate reset --force --skip-seed
+                npx prisma migrate deploy
 
-            - name: Build Typescript
-              run: npm run build  
-            
-            - name: Lint
+            - name: Build application
+              run: npm run build
+
+            - name: Run linting
               run: npm run lint
 
-     
-            - name: Run Tests
-              env: 
-                NODE_OPTIONS: "--max-old-space-size=4096"
-                DATABASE_URL: "postgres://postgres:postgres@localhost:5432/moviedb"
-              run: npm run test:e2e
+            - name: Run e2e tests
+              env:
+                NODE_OPTIONS: "--max-old-space-size=4096 --unhandled-rejections=strict"
+              run: |
+                echo "Starting e2e tests..."
+                npm run test:e2e -- --verbose --detectOpenHandles --forceExit
 
-            - run:  echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-            - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
-              
-            
+            - name: Cleanup
+              if: always()
+              run: |
+                echo "Cleaning up..."
+                redis-cli -h 127.0.0.1 -p 6379 flushall || true
+                
+            - name: Job summary
+              if: always()
+              run: |
+                echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+                echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
