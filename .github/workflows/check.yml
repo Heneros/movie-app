@@ -44,30 +44,29 @@ jobs:
                 --health-retries 5
 
         env:
-          # Database
+    
           DATABASE_URL: "postgres://postgres:postgres@localhost:5432/moviedb"
           
-          # Environment
+        
           NODE_ENV: test
-          
-          # Redis
+   
           REDIS_HOST: 127.0.0.1
           REDIS_PORT: 6379
           
-          # JWT
+     
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           JWT_ACCESS_SECRET: testjwtaccess
           JWT_REFRESH_SECRET: testjwtrefresh
           SECRET_SESSION: testjwtsession
           
-          # App settings
+        
           PAGINATION: 5
           
-          # SMTP
+  
           SMTP_HOST: localhost
           SMTP_PORT: 1025
           
-          # Cloudinary
+      
           CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_NAME }}
           CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API }}
           CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_SECRET }}
