@@ -42,7 +42,7 @@ import { isProduction } from './data/defaultData';
             expandVariables: true,
             envFilePath: isProduction ? './.env.prod' : './.env',
         }),
-       RedisModule,
+        RedisModule,
         // WinstonModule.forRoot(createWinstonOptions('Movie')),
         WinstonModule.forRoot(winstonLoggerOptions),
         Logger,
@@ -109,7 +109,7 @@ import { isProduction } from './data/defaultData';
     ],
 })
 export class AppModule {
-   //
+    //
     // configure(consumer: MiddlewareConsumer) {
     //     consumer.apply(SessionMiddleware).forRoutes('*');
     // }

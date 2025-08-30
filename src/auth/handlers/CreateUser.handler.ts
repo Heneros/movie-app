@@ -52,6 +52,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
         const createdUser = await this.authRepository.createUser(userData);
 
         const userId = createdUser.id;
+        
         const emailVerificationToken = await this.authRepository.createToken({
             userId,
             token,

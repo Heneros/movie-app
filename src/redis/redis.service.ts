@@ -25,12 +25,6 @@ export class RedisService {
         const value = JSON.stringify(data);
         await this.redis.set(key, value);
         await this.redis.expire(key, CACHE_TTL.ONE_MINUTE);
-
-        //   console.log(value);
-        // const res = await this.redis.set(key, value, {
-        //     ex: CACHE_TTL.ONE_HOUR,
-        // });
-        // console.log(res);
     }
 
     async deleteMovies(page: string): Promise<void> {

@@ -28,10 +28,10 @@ import createMemoryStore from 'memorystore';
 import express from 'express';
 import { ExpressAdapter } from '@nestjs/platform-express';
 
-console.log('Environment variables:');
-console.log('REDIS_URL:', process.env.REDIS_URL ? 'Set' : 'Not set');
-console.log('REDIS_TOKEN:', process.env.REDIS_TOKEN ? 'Set' : 'Not set');
-console.log('NODE_ENV:', process.env.NODE_ENV);
+// console.log('Environment variables:');
+// console.log('REDIS_URL:', process.env.REDIS_URL ? 'Set' : 'Not set');
+// console.log('REDIS_TOKEN:', process.env.REDIS_TOKEN ? 'Set' : 'Not set');
+// console.log('NODE_ENV:', process.env.NODE_ENV);
 async function bootstrap() {
 
     const app = await NestFactory.create(AppModule, {
