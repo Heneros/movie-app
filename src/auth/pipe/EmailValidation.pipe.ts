@@ -5,7 +5,7 @@ import { PrismaService } from '@/prisma/prisma.service';
 export class EmailValidationPipe implements PipeTransform {
     constructor(private prisma: PrismaService) {}
 
-    async transform(value: { userId?: number; email?: string }) {
+    async transform(value: { userId?: unmber; email?: string }) {
         if (!value.userId && !value.email) {
             throw new BadRequestException(
                 'Either userId or email must be provided',

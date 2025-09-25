@@ -109,6 +109,7 @@ export class AuthRepository {
             data: { password: newPassword },
         });
     }
+    
 
     async findTokenByUserId(userId: number) {
         return this.prisma.verifyResetToken.findUnique({

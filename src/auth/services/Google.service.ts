@@ -1,7 +1,6 @@
 import { PrismaService } from '@/prisma/prisma.service';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { AuthRepository } from '../repositories/Auth.repository';
-import bcrypt from 'bcrypt';
 
 import { CloudinaryService } from '@/cloudinary/cloudinary.service';
 import { HandleIOauth } from './HandleIOauth.service';

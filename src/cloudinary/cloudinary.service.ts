@@ -138,10 +138,7 @@ export class CloudinaryService {
                     resource_type: 'image',
                 },
                 (error, result) => {
-                    // console.log(publicId, imageUrl);
                     if (error) {
-                        // console.error('Cloudinary upload error:', error);
-
                         return reject(error);
                     }
                     if (!result?.secure_url) {
@@ -216,7 +213,7 @@ export class CloudinaryService {
     async uploadPreview(movieId: number, file: Express.Multer.File) {
         const mainFolder = 'nestjsMoviedb';
 
-        console.log('test');
+        // console.log('test');
 
         const originalName = file.originalname;
         const fileName = path.parse(originalName).name;
@@ -255,11 +252,10 @@ export class CloudinaryService {
             },
         });
 
-
         if (!previewId) {
             return `Not found ${movieId}`;
         }
-        
+
         await this.prisma.movie.update({
             where: {
                 id: movieId,

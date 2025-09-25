@@ -9,7 +9,6 @@ import { isDevelopment, isTest } from '@/data/defaultData';
 @Module({
     imports: [
         MailerModule.forRoot({
-        
             transport: {
                 host: isDevelopment ? '127.0.0.1' : process.env.SMTP_HOST,
                 secure: false,
@@ -33,7 +32,7 @@ import { isDevelopment, isTest } from '@/data/defaultData';
                                     process.cwd(),
                                     '/dist/src/mail/templates',
                                 )
-                                : path.join(__dirname, '/templates'),
+                              : path.join(__dirname, '/templates'),
                           adapter:
                               new (require('@nestjs-modules/mailer/dist/adapters/handlebars.adapter').HandlebarsAdapter)(),
                           options: {

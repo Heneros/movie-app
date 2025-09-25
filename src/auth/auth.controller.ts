@@ -93,11 +93,11 @@ export class AuthController {
     async verifyEmail(
         @Param('emailToken') token: string,
         @Param('userId') userId: number,
-        // @Res({ passthrough: true }) res: Response,
+  
     ) {
         return await this.queryBus.execute(new VerifyEmailQuery(token, userId));
 
-        // return res.status(200).json({ message: 'Your email is verified!' });
+       
     }
 
     @Post(AUTH_ROUTES.LOGIN)
@@ -232,6 +232,7 @@ export class AuthController {
     @UseGuards(AuthGuard('google'))
     async googleAuth() {}
 
+    
     @Get(AUTH_ROUTES.GOOGLE_CALLBACK)
     @ApiOperation({ summary: 'Callback from Google OAuth' })
     @ApiResponse({
