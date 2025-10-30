@@ -10,6 +10,7 @@ import { Reflector } from '@nestjs/core';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { JwtService } from '@nestjs/jwt';
 import { ExecException } from 'child_process';
+
 @Injectable()
 export class ProfileOwnerGuard implements CanActivate {
     constructor(private readonly jwtService: JwtService) {}
