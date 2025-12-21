@@ -22,7 +22,7 @@ export class FilterMoviesHandler
 
     async execute(command: FilterMoviesCommand) {
         const { filters } = command;
-        this.logger.debug('debug', 'Received filters:', filters);
+        // this.logger.debug('debug', 'Received filters:', filters);
 
         const nameCache = `${RedisPrefixEnum.MOVIE}:filters:${filters}`;
 
